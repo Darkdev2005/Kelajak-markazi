@@ -115,7 +115,17 @@
     </article>
 
     <article class="card">
-        <h2>Tadbirlar</h2>
+        <h2>Mening yaqin jadvalim</h2>
+        @forelse($lessonSchedules as $slot)
+            <div class="list-item">
+                <strong>{{ $slot->program?->title ?? 'Erkin mashg\'ulot' }}</strong>
+                <p>{{ $slot->day_label }} | {{ $slot->start_time->format('H:i') }} - {{ $slot->end_time->format('H:i') }} | {{ $slot->room ?? 'Online' }}</p>
+            </div>
+        @empty
+            <p>Dars jadvali topilmadi.</p>
+        @endforelse
+
+        <h2 class="subsection-title">Tadbirlar</h2>
         @forelse($events as $event)
             <div class="list-item">
                 <strong>{{ $event->title }}</strong>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 640" role="img" aria-label="Biologiya">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#ecfeff"/>
+      <stop offset="1" stop-color="#dcfce7"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="640" rx="42" fill="url(#bg)"/>
+  <path d="M230 500c280-72 344-250 432-372" fill="none" stroke="#16a34a" stroke-width="32" stroke-linecap="round"/>
+  <path d="M300 452c96-30 170-92 224-182" fill="none" stroke="#2563eb" stroke-width="18" stroke-linecap="round"/>
+  <path d="M376 420c-34-76-32-160 6-252" fill="none" stroke="#0ea5e9" stroke-width="16" stroke-linecap="round"/>
+  <path d="M468 348c-42-76-38-154 14-236" fill="none" stroke="#3a1b78" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="595" cy="210" r="86" fill="#84cc16" opacity=".78"/>
+  <circle cx="330" cy="390" r="70" fill="#38bdf8" opacity=".82"/>
+  <circle cx="505" cy="500" r="48" fill="#f97316" opacity=".85"/>
+</svg>

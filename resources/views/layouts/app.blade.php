@@ -6,32 +6,41 @@
     <title>Kelajak Markazi</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('platform.css') }}">
 </head>
 <body>
-<div class="bg-orb orb-a"></div>
-<div class="bg-orb orb-b"></div>
 <header class="topbar">
-    <div class="container row space">
-        <a href="{{ route('home') }}" class="brand">Kelajak Markazi</a>
-        <nav class="row gap">
-            <a href="/#/home">Bosh sahifa</a>
-            <a href="/#/about-us">Biz Haqimizda</a>
-            <a href="/#/courses">Yo'nalishlar</a>
-            <a href="/#/events">Tadbirlar</a>
+    <div class="container nav-shell">
+        <a href="{{ route('home') }}#/home" class="brand" aria-label="Kelajak Markazi">
+            <img src="{{ asset('images/kelajak-logo.png') }}" alt="Kelajak Markazi">
+        </a>
+
+        <button class="nav-toggle" type="button" aria-label="Menyuni ochish" data-nav-toggle>
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <nav class="site-nav" data-site-nav>
+            <a href="/#/home" data-route-link="home">Asosiy sahifa</a>
+            <a href="/#/clubs" data-route-link="clubs">To'garaklar</a>
+            <a href="/#/special" data-route-link="special">Maxsus katalog</a>
+            <a href="/#/lessonSchedule" data-route-link="lessonSchedule">Dars jadvali</a>
+            <a href="/#/about-us" data-route-link="about-us">Markaz haqida</a>
+            <a href="/#/our-contact" data-route-link="our-contact">Kontaktlar</a>
             @auth
-                <a href="/#/dashboard">Dashboard</a>
+                <a href="/#/dashboard" data-route-link="dashboard">Dashboard</a>
                 @if(auth()->user()->isAdmin())
-                    <a href="/#/admin">Admin</a>
+                    <a href="/#/admin" data-route-link="admin">Admin</a>
                 @endif
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logout') }}" class="nav-form">
                     @csrf
-                    <button type="submit" class="btn ghost">Chiqish</button>
+                    <button type="submit" class="icon-btn" title="Chiqish">-&gt;</button>
                 </form>
             @else
-                <a href="/#/auth/login">Kirish</a>
-                <a href="/#/auth/register" class="btn">Ro'yxatdan o'tish</a>
+                <a href="/#/auth/login" data-route-link="auth/login">Kirish</a>
+                <a href="/#/auth/register" class="btn small" data-route-link="auth/register">Ro'yxatdan o'tish</a>
             @endauth
         </nav>
     </div>
@@ -50,6 +59,34 @@
 
     @yield('content')
 </main>
+
+<footer class="footer">
+    <div class="container footer-grid">
+        <div class="footer-brand">
+            <img src="{{ asset('images/kelajak-logo.png') }}" alt="Kelajak Markazi">
+            <p>Qo'shimcha ta'lim, to'garaklar, tadbirlar va shaxsiy rivojlanish uchun raqamli markaz.</p>
+        </div>
+        <div>
+            <h3>Bo'limlar</h3>
+            <a href="/#/home">Asosiy sahifa</a>
+            <a href="/#/clubs">To'garaklar</a>
+            <a href="/#/special">Maxsus katalog</a>
+            <a href="/#/lessonSchedule">Dars jadvali</a>
+            <a href="/#/about-us">Markaz haqida</a>
+        </div>
+        <div>
+            <h3>Aloqa</h3>
+            <p>+998 (71) 217-18-71</p>
+            <p>kelajakmarkazlari@gmail.com</p>
+            <p>Toshkent, Navoiy ko'chasi, 2A-uy</p>
+        </div>
+    </div>
+    <div class="container footer-bottom">
+        <span>© {{ date('Y') }} Kelajak Markazi</span>
+        <span>Barcha huquqlar himoyalangan</span>
+    </div>
+</footer>
+
 <script src="{{ asset('platform.js') }}" defer></script>
 </body>
 </html>

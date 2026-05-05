@@ -17,10 +17,19 @@
       admin: '/admin'
     };
 
+    const aliases = {
+      courses: 'clubs',
+      'special-courses': 'special',
+      'special-students': 'special',
+      contact: 'our-contact',
+      contacts: 'our-contact'
+    };
+
     const normalizeRoute = () => {
       const hash = window.location.hash || '';
       const cleaned = hash.replace(/^#\/?/, '').replace(/^\/+/, '');
-      return cleaned || 'home';
+      const route = cleaned || 'home';
+      return aliases[route] || route;
     };
 
     const renderRoute = () => {
@@ -40,6 +49,13 @@
       routeLinks.forEach((link) => {
         link.classList.toggle('active', link.getAttribute('data-route-link') === currentRoute);
       });
+
+      const nav = document.querySelector('[data-site-nav]');
+      if (nav) {
+        nav.classList.remove('open');
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     if (!window.location.hash) {
@@ -49,6 +65,19 @@
     }
 
     window.addEventListener('hashchange', renderRoute);
+  }
+
+  function initNav() {
+    const toggle = document.querySelector('[data-nav-toggle]');
+    const nav = document.querySelector('[data-site-nav]');
+
+    if (!toggle || !nav) {
+      return;
+    }
+
+    toggle.addEventListener('click', () => {
+      nav.classList.toggle('open');
+    });
   }
 
   function initCountdown() {
@@ -100,22 +129,25 @@
       return;
     }
 
+    if (!('IntersectionObserver' in window)) {
+      reveals.forEach((el) => el.classList.add('shown'));
+      return;
+    }
+
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          entry.target.style.animationPlayState = 'running';
+          entry.target.classList.add('shown');
           observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.15 });
+    }, { threshold: 0.12 });
 
-    reveals.forEach((el) => {
-      el.style.animationPlayState = 'paused';
-      observer.observe(el);
-    });
+    reveals.forEach((el) => observer.observe(el));
   }
 
   initHashRoutes();
+  initNav();
   initCountdown();
   initReveal();
 })();

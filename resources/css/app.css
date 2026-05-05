@@ -4,8 +4,105 @@
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
+@source '../**/*.jsx';
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+@keyframes kelajak-gradient {
+    0%, 100% {
+        transform: translate3d(0, 0, 0) scale(1);
+        opacity: 0.88;
+    }
+
+    50% {
+        transform: translate3d(3%, -2%, 0) scale(1.08);
+        opacity: 1;
+    }
+}
+
+@keyframes kelajak-float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-14px);
+    }
+}
+
+@keyframes kelajak-scan {
+    0% {
+        transform: translateX(-120%);
+    }
+
+    100% {
+        transform: translateX(120%);
+    }
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        margin: 0;
+        min-width: 320px;
+    }
+}
+
+@layer components {
+    .premium-bg {
+        background:
+            radial-gradient(circle at 14% 18%, rgba(99, 102, 241, 0.28), transparent 32%),
+            radial-gradient(circle at 82% 12%, rgba(20, 184, 166, 0.22), transparent 28%),
+            radial-gradient(circle at 72% 82%, rgba(249, 115, 22, 0.16), transparent 30%),
+            linear-gradient(135deg, #f8fafc 0%, #eef2ff 45%, #f8fafc 100%);
+    }
+
+    .dark .premium-bg {
+        background:
+            radial-gradient(circle at 16% 16%, rgba(124, 58, 237, 0.38), transparent 31%),
+            radial-gradient(circle at 84% 8%, rgba(6, 182, 212, 0.22), transparent 28%),
+            radial-gradient(circle at 76% 78%, rgba(245, 158, 11, 0.16), transparent 32%),
+            linear-gradient(135deg, #050816 0%, #10102a 50%, #050816 100%);
+    }
+
+    .neon-orb {
+        animation: kelajak-gradient 9s ease-in-out infinite;
+        filter: blur(2px);
+    }
+
+    .float-slow {
+        animation: kelajak-float 5.5s ease-in-out infinite;
+    }
+
+    .scan-line::after {
+        animation: kelajak-scan 3.8s ease-in-out infinite;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.52), transparent);
+        content: "";
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 42%;
+    }
+
+    .glass-panel {
+        backdrop-filter: blur(22px);
+        background: rgba(255, 255, 255, 0.68);
+        border: 1px solid rgba(255, 255, 255, 0.62);
+        box-shadow: 0 24px 90px rgba(15, 23, 42, 0.12);
+    }
+
+    .dark .glass-panel {
+        background: rgba(15, 23, 42, 0.54);
+        border-color: rgba(255, 255, 255, 0.12);
+        box-shadow: 0 24px 100px rgba(0, 0, 0, 0.38);
+    }
 }

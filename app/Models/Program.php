@@ -18,4 +18,9 @@ class Program extends Model
     {
         return $this->hasMany(ApplicationRequest::class);
     }
+
+    public function lessonSchedules(): HasMany
+    {
+        return $this->hasMany(LessonSchedule::class);
+    }
 }

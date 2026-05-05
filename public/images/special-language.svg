@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 640" role="img" aria-label="Til darsi">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#f8fafc"/>
+      <stop offset="1" stop-color="#dbeafe"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="640" rx="42" fill="url(#bg)"/>
+  <rect x="110" y="120" width="680" height="390" rx="28" fill="#fff" stroke="#dbe1ea" stroke-width="8"/>
+  <rect x="155" y="165" width="270" height="72" rx="18" fill="#3a1b78"/>
+  <rect x="470" y="165" width="270" height="72" rx="18" fill="#f97316"/>
+  <rect x="155" y="285" width="585" height="36" rx="12" fill="#c7d2fe"/>
+  <rect x="155" y="350" width="485" height="36" rx="12" fill="#fed7aa"/>
+  <rect x="155" y="415" width="540" height="36" rx="12" fill="#bbf7d0"/>
+  <circle cx="182" cy="548" r="46" fill="#2563eb"/>
+  <circle cx="270" cy="548" r="46" fill="#22c55e"/>
+  <circle cx="358" cy="548" r="46" fill="#f97316"/>
+</svg>

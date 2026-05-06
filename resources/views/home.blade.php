@@ -9,6 +9,19 @@
         'registerUrl' => route('register'),
         'dashboardUrl' => route('dashboard'),
         'isAuthenticated' => auth()->check(),
+        'csrfToken' => csrf_token(),
+        'flashMessage' => session('ok'),
+        'contact' => [
+            'storeUrl' => route('contacts.store'),
+            'phone' => '+998 (71) 217-18-71',
+            'phoneRaw' => '+998712171871',
+            'email' => 'kelajakmarkazlari@gmail.com',
+            'address' => '100011, O\'zbekiston, Toshkent, Shayxontohur tumani, Navoiy ko\'chasi, 2A-uy',
+            'hours' => 'Dushanba - Shanba · 09:00 - 18:00',
+            'responseTime' => 'Odatda 30 daqiqa ichida javob',
+            'mapUrl' => 'https://maps.google.com/?q=' . urlencode('100011, O\'zbekiston, Toshkent, Shayxontohur tumani, Navoiy ko\'chasi, 2A-uy'),
+            'mapEmbedUrl' => 'https://www.google.com/maps?q=' . urlencode('100011, O\'zbekiston, Toshkent, Shayxontohur tumani, Navoiy ko\'chasi, 2A-uy') . '&z=15&output=embed',
+        ],
         'stats' => $statistics,
         'features' => [
             [

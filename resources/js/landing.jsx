@@ -18,6 +18,18 @@ const defaultDirections = [
   { title: 'Ijod va media', text: 'Dizayn, video, sahna va raqamli portfolio.', meta: '3 oy' },
 ];
 
+const defaultContact = {
+  storeUrl: '/contact-messages',
+  phone: '+998 (71) 217-18-71',
+  phoneRaw: '+998712171871',
+  email: 'kelajakmarkazlari@gmail.com',
+  address: "100011, O'zbekiston, Toshkent, Shayxontohur tumani, Navoiy ko'chasi, 2A-uy",
+  hours: 'Dushanba - Shanba · 09:00 - 18:00',
+  responseTime: 'Odatda 30 daqiqa ichida javob',
+  mapUrl: 'https://maps.google.com/?q=Toshkent%20Navoiy%202A',
+  mapEmbedUrl: 'https://www.google.com/maps?q=Toshkent%20Navoiy%202A&z=15&output=embed',
+};
+
 const toneClasses = {
   violet: 'from-violet-500 to-fuchsia-500 text-violet-600 dark:text-violet-200',
   blue: 'from-blue-500 to-cyan-400 text-blue-600 dark:text-blue-200',
@@ -55,7 +67,11 @@ function getRouteFromHash() {
     return 'schedule';
   }
 
-  return ['clubs', 'schedule'].includes(route) ? route : 'home';
+  if (route === 'our-contact') {
+    return 'contact';
+  }
+
+  return ['clubs', 'schedule', 'contact'].includes(route) ? route : 'home';
 }
 
 function useHashRoute() {
@@ -120,7 +136,7 @@ function Header({ route }) {
     ["To'garaklar", '#clubs'],
     ['Dars jadvali', '#lessonSchedule'],
     ['Markaz haqida', '#cta'],
-    ['Kontaktlar', '#cta'],
+    ['Kontaktlar', '#our-contact'],
   ];
 
   return (
@@ -177,6 +193,7 @@ function Header({ route }) {
             const isActive =
               (route === 'clubs' && href === '#clubs')
               || (route === 'schedule' && href === '#lessonSchedule')
+              || (route === 'contact' && href === '#our-contact')
               || (route === 'home' && index === 0);
 
             return (
@@ -236,6 +253,7 @@ function Header({ route }) {
             const isActive =
               (route === 'clubs' && href === '#clubs')
               || (route === 'schedule' && href === '#lessonSchedule')
+              || (route === 'contact' && href === '#our-contact')
               || (route === 'home' && index === 0);
 
             return (
@@ -1421,6 +1439,238 @@ function SchedulePage({ schedules, clubs }) {
   );
 }
 
+function ContactHeroPreview({ contact }) {
+  return (
+    <section id="our-contact" className="relative overflow-hidden bg-[linear-gradient(135deg,#2d1459_0%,#43207f_52%,#244a9a_100%)]">
+      <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:34px_34px]" />
+      <div className="absolute -left-16 top-8 h-56 w-56 rounded-full bg-cyan-400/14 blur-3xl" />
+      <div className="absolute bottom-0 right-0 h-72 w-72 rounded-full bg-fuchsia-500/12 blur-3xl" />
+
+      <div className="relative mx-auto grid min-h-[290px] max-w-[1536px] gap-8 px-5 py-10 lg:grid-cols-[1fr_0.96fr] lg:px-16 lg:py-12">
+        <div className="flex flex-col justify-center">
+          <div className="flex items-center gap-3 text-lg font-black text-white/90">
+            <span className="grid h-8 w-8 place-items-center rounded-xl border border-white/10 bg-cyan-400/95 text-[13px] font-black text-[#23114f] shadow-lg shadow-cyan-400/20">◔</span>
+            <span>›</span>
+            <span>Kontaktlar</span>
+          </div>
+
+          <h1 className="mt-5 max-w-xl text-4xl font-black leading-tight text-white sm:text-5xl">
+            Biz bilan bog'laning
+          </h1>
+          <p className="mt-4 max-w-2xl text-base font-semibold leading-7 text-white/78">
+            Savol, taklif yoki hamkorlik bo'lsa, murojaatni shu yerdan yuboring. Platforma, to'garaklar va dars jarayonlari bo'yicha jamoamiz tezkor javob beradi.
+          </p>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <span className="rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-sm font-black text-white backdrop-blur">
+              {contact.responseTime}
+            </span>
+            <span className="rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-sm font-black text-white/90 backdrop-blur">
+              {contact.hours}
+            </span>
+          </div>
+        </div>
+
+        <div className="relative flex items-center justify-end">
+          <div className="grid w-full max-w-[560px] gap-4 rounded-[2rem] border border-white/12 bg-white/8 p-4 shadow-2xl shadow-slate-950/25 backdrop-blur-xl lg:grid-cols-[1fr_210px]">
+            <div className="rounded-[1.5rem] border border-white/10 bg-slate-950/18 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-cyan-100">Aloqa markazi</p>
+              <h3 className="mt-2 text-2xl font-black text-white">Bir nechta kanal, bitta javob markazi</h3>
+
+              <div className="mt-5 grid gap-3">
+                <a href={`tel:${contact.phoneRaw}`} className="rounded-2xl border border-white/10 bg-white/8 px-4 py-3 text-white transition hover:bg-white/12">
+                  <span className="block text-[11px] font-black uppercase tracking-[0.16em] text-white/55">Telefon</span>
+                  <span className="mt-2 block text-lg font-black">{contact.phone}</span>
+                </a>
+                <a href={`mailto:${contact.email}`} className="rounded-2xl border border-white/10 bg-white/8 px-4 py-3 text-white transition hover:bg-white/12">
+                  <span className="block text-[11px] font-black uppercase tracking-[0.16em] text-white/55">Elektron manzil</span>
+                  <span className="mt-2 block break-words text-lg font-black">{contact.email}</span>
+                </a>
+                <div className="rounded-2xl border border-white/10 bg-white/8 px-4 py-3 text-white">
+                  <span className="block text-[11px] font-black uppercase tracking-[0.16em] text-white/55">Ish vaqti</span>
+                  <span className="mt-2 block text-lg font-black">{contact.hours}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative overflow-hidden rounded-[1.5rem] border border-white/12 bg-slate-950/20">
+              <img src={payload.heroImageUrl} alt="Kelajak Markazi aloqa preview" className="h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-slate-950/12 to-transparent" />
+              <div className="absolute bottom-3 left-3 right-3 rounded-2xl border border-white/12 bg-slate-950/40 px-3 py-3 backdrop-blur">
+                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-cyan-100">Qabul punkti</p>
+                <p className="mt-2 text-sm font-bold leading-6 text-white/88">Murojaatlar bir nuqtada yig'iladi, keyin tegishli jamoaga yo'naltiriladi.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ContactPage() {
+  const contact = payload.contact || defaultContact;
+  const flashMessage = payload.flashMessage;
+
+  const infoCards = [
+    {
+      label: 'Telefon',
+      value: contact.phone,
+      href: `tel:${contact.phoneRaw}`,
+      icon: (
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M5 5h3l2 5-2 1.5a16.2 16.2 0 004.5 4.5L14 14l5 2v3a2 2 0 01-2.2 2A17 17 0 015 7.2 2 2 0 015 5z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Elektron manzil',
+      value: contact.email,
+      href: `mailto:${contact.email}`,
+      icon: (
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 7l8 6 8-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          <rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" strokeWidth="1.8" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Manzil',
+      value: contact.address,
+      href: contact.mapUrl,
+      icon: (
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 21s6-5.6 6-11a6 6 0 10-12 0c0 5.4 6 11 6 11z" stroke="currentColor" strokeWidth="1.8" />
+          <circle cx="12" cy="10" r="2.2" stroke="currentColor" strokeWidth="1.8" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Ish vaqti',
+      value: contact.hours,
+      href: null,
+      icon: (
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M12 8v5l3 2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      ),
+    },
+  ];
+
+  const fieldClass = 'min-h-14 w-full rounded-2xl border border-slate-200 bg-white px-4 text-base font-semibold text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-violet-300 focus:ring-4 focus:ring-violet-200/40';
+
+  return (
+    <div className="bg-[#f4f5fb] text-slate-950">
+      <ContactHeroPreview contact={contact} />
+
+      <section className="mx-auto grid max-w-[1536px] gap-6 px-5 py-12 lg:grid-cols-[0.92fr_1.08fr] lg:px-16">
+        <div className="grid gap-4">
+          {infoCards.map((item) => {
+            const content = (
+              <div className="grid gap-3 rounded-[1.35rem] border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-lg hover:shadow-slate-900/5">
+                <span className="inline-grid h-11 w-11 place-items-center rounded-2xl bg-violet-50 text-violet-700">
+                  {item.icon}
+                </span>
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-400">{item.label}</p>
+                  <p className="mt-2 text-2xl font-black leading-tight text-slate-950">{item.value}</p>
+                </div>
+              </div>
+            );
+
+            return item.href ? (
+              <a key={item.label} href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noreferrer' : undefined}>
+                {content}
+              </a>
+            ) : (
+              <div key={item.label}>{content}</div>
+            );
+          })}
+
+          <div className="overflow-hidden rounded-[1.6rem] border border-slate-200 bg-white shadow-sm">
+            <div className="border-b border-slate-100 px-5 py-4">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-violet-600">Xarita</p>
+              <h3 className="mt-2 text-2xl font-black text-slate-950">Qabul punktiga yo'l</h3>
+            </div>
+            <iframe
+              title="Kelajak Markazi xarita"
+              src={contact.mapEmbedUrl}
+              className="h-[320px] w-full"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
+        </div>
+
+        <div className="rounded-[1.7rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="max-w-2xl">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-violet-600">Murojaat qoldirish</p>
+              <h2 className="mt-2 text-3xl font-black text-slate-950 sm:text-[2.4rem]">Savolingizni yozing, biz javob beramiz</h2>
+              <p className="mt-3 text-base font-semibold leading-7 text-slate-600">
+                To'garak, dars jadvali, hamkorlik yoki texnik masala bo'lsa, shu formadan yuboring. Xabar admin panelga tushadi.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-black text-emerald-700">
+              {contact.responseTime}
+            </div>
+          </div>
+
+          {flashMessage ? (
+            <div className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-sm font-bold text-emerald-700">
+              {flashMessage}
+            </div>
+          ) : null}
+
+          <form method="POST" action={contact.storeUrl} className="mt-6 grid gap-4">
+            <input type="hidden" name="_token" value={payload.csrfToken} />
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="grid gap-2">
+                <span className="text-sm font-black text-slate-700">Ism familiya</span>
+                <input className={fieldClass} type="text" name="name" placeholder="Ismingizni kiriting" required />
+              </label>
+              <label className="grid gap-2">
+                <span className="text-sm font-black text-slate-700">Telefon raqam</span>
+                <input className={fieldClass} type="text" name="phone" placeholder="+998 90 000 00 00" required />
+              </label>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-[1fr_0.9fr]">
+              <label className="grid gap-2">
+                <span className="text-sm font-black text-slate-700">Elektron pochta</span>
+                <input className={fieldClass} type="email" name="email" placeholder="example@mail.uz" />
+              </label>
+              <label className="grid gap-2">
+                <span className="text-sm font-black text-slate-700">Mavzu</span>
+                <input className={fieldClass} type="text" name="subject" placeholder="Qaysi masala bo'yicha?" required />
+              </label>
+            </div>
+
+            <label className="grid gap-2">
+              <span className="text-sm font-black text-slate-700">Xabar</span>
+              <textarea className={`${fieldClass} min-h-[180px] py-4`} name="message" placeholder="Murojaatingizni batafsil yozing" required />
+            </label>
+
+            <div className="flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
+              <p className="max-w-xl text-sm font-semibold leading-6 text-slate-500">
+                Yuborilgan murojaatlar admin paneldagi “Murojaatlar” bo'limida ko'rinadi va status bilan boshqariladi.
+              </p>
+              <button
+                type="submit"
+                className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-violet-600 via-blue-600 to-cyan-500 px-7 text-base font-black text-white shadow-2xl shadow-cyan-500/20 transition hover:-translate-y-0.5 hover:shadow-violet-500/25"
+              >
+                Murojaat yuborish
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function Hero({ stats, schedules }) {
   return (
     <section id="top" className="mx-auto w-full max-w-[1208px] min-w-0 px-3.5 pb-16 pt-10 lg:pb-24 lg:pt-16">
@@ -1467,10 +1717,12 @@ function Hero({ stats, schedules }) {
 
 function Footer() {
   const year = new Date().getFullYear();
+  const contact = payload.contact || defaultContact;
   const footerLinks = [
     ['Asosiy sahifa', '#top'],
     ["To'garaklar", '#clubs'],
     ['Dars jadvali', '#lessonSchedule'],
+    ['Kontaktlar', '#our-contact'],
     ['Maxsus katalog', '#special'],
     ['Markaz haqida', '#cta'],
   ];
@@ -1510,9 +1762,9 @@ function Footer() {
         <div>
           <h3 className="text-sm font-black uppercase tracking-[0.18em] text-slate-950 dark:text-white">Aloqa</h3>
           <div className="mt-5 grid gap-3 text-sm font-bold text-slate-600 dark:text-slate-300">
-            <a href="tel:+998712171871" className="transition hover:text-violet-700 dark:hover:text-cyan-200">+998 (71) 217-18-71</a>
-            <a href="mailto:kelajakmarkazlari@gmail.com" className="break-words transition hover:text-violet-700 dark:hover:text-cyan-200">kelajakmarkazlari@gmail.com</a>
-            <span>Samarqand viloyati, Kelajak markazlari</span>
+            <a href={`tel:${contact.phoneRaw}`} className="transition hover:text-violet-700 dark:hover:text-cyan-200">{contact.phone}</a>
+            <a href={`mailto:${contact.email}`} className="break-words transition hover:text-violet-700 dark:hover:text-cyan-200">{contact.email}</a>
+            <span>{contact.address}</span>
           </div>
         </div>
 
@@ -1571,6 +1823,11 @@ function App() {
         ) : route === 'schedule' ? (
           <>
             <SchedulePage schedules={schedules} clubs={clubs} />
+            <Footer />
+          </>
+        ) : route === 'contact' ? (
+          <>
+            <ContactPage />
             <Footer />
           </>
         ) : (

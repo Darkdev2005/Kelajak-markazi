@@ -30,9 +30,9 @@
             <a href="/#/about-us" data-route-link="about-us">Markaz haqida</a>
             <a href="/#/our-contact" data-route-link="our-contact">Kontaktlar</a>
             @auth
-                <a href="/#/dashboard" data-route-link="dashboard">Dashboard</a>
+                <a href="{{ route('dashboard') }}" data-route-link="dashboard">Dashboard</a>
                 @if(auth()->user()->isAdmin())
-                    <a href="/#/admin" data-route-link="admin">Admin</a>
+                    <a href="{{ route('admin.index') }}" data-route-link="admin">Admin</a>
                 @endif
                 <form method="POST" action="{{ route('logout') }}" class="nav-form">
                     @csrf

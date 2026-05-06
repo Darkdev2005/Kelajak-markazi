@@ -114,6 +114,7 @@ function ThemeToggle({ theme, onToggle }) {
 }
 
 function Header({ route }) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navItems = [
     ['Asosiy sahifa', '#top'],
     ["To'garaklar", '#clubs'],
@@ -148,17 +149,28 @@ function Header({ route }) {
           </span>
         </a>
 
-        <a
-          href={payload.isAuthenticated ? payload.dashboardUrl : payload.loginUrl}
+        <button
+          type="button"
+          onClick={() => setMobileMenuOpen((current) => !current)}
           className="fixed right-3.5 top-7 z-[70] inline-grid h-12 w-12 place-items-center rounded-2xl bg-white text-violet-700 shadow-xl shadow-violet-500/20 ring-1 ring-white/70 transition hover:-translate-y-0.5 hover:bg-cyan-50 sm:hidden"
-          aria-label={payload.isAuthenticated ? 'Dashboard' : 'Kirish'}
+          aria-label="Menyuni ochish"
+          aria-expanded={mobileMenuOpen}
         >
           <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M10 17l5-5-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M15 12H3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            <path d="M13 4h5a3 3 0 013 3v10a3 3 0 01-3 3h-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            {mobileMenuOpen ? (
+              <>
+                <path d="M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <path d="M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </>
+            ) : (
+              <>
+                <path d="M4 7h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <path d="M4 12h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <path d="M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </>
+            )}
           </svg>
-        </a>
+        </button>
 
         <nav className="hidden justify-self-center rounded-2xl border border-slate-200/80 bg-white/62 p-1 shadow-inner shadow-slate-950/5 backdrop-blur-xl dark:border-white/10 dark:bg-white/8 xl:flex">
           {navItems.map(([label, href], index) => {
@@ -212,6 +224,69 @@ function Header({ route }) {
             <span className="hidden text-2xl leading-none sm:inline">›</span>
           </a>
         </div>
+      </div>
+
+      <div
+        className={`overflow-hidden border-t border-slate-200/70 bg-white/96 px-4 transition-[max-height,opacity] duration-300 dark:border-white/10 dark:bg-slate-950/96 sm:hidden ${
+          mobileMenuOpen ? 'max-h-[420px] opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <nav className="grid gap-2 py-4">
+          {navItems.map(([label, href], index) => {
+            const isActive =
+              (route === 'clubs' && href === '#clubs')
+              || (route === 'schedule' && href === '#lessonSchedule')
+              || (route === 'home' && index === 0);
+
+            return (
+              <a
+                key={href}
+                href={href}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`rounded-2xl px-4 py-3 text-base font-bold transition ${
+                  isActive
+                    ? 'bg-slate-950 text-white'
+                    : 'bg-slate-50 text-slate-700 hover:bg-violet-50 hover:text-[#3a1b78] dark:bg-white/6 dark:text-slate-200'
+                }`}
+              >
+                {label}
+              </a>
+            );
+          })}
+
+          <div className="mt-2 grid gap-2 border-t border-slate-200 pt-4 dark:border-white/10">
+            <button
+              type="button"
+              className="inline-flex min-h-12 items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 text-base font-bold text-slate-800 dark:border-white/10 dark:bg-white/8 dark:text-white"
+              aria-label="Til tanlash"
+            >
+              <span className="inline-flex items-center gap-2">
+                <span className="relative block h-5 w-7 overflow-hidden rounded-[4px] shadow-sm ring-1 ring-black/5">
+                  <span className="absolute inset-x-0 top-0 h-1/3 bg-[#0099b5]" />
+                  <span className="absolute inset-x-0 top-1/3 h-1/3 bg-white" />
+                  <span className="absolute inset-x-0 bottom-0 h-1/3 bg-[#1eb53a]" />
+                  <span className="absolute left-0 right-0 top-[31%] h-[1px] bg-[#ce1126]" />
+                  <span className="absolute left-0 right-0 top-[64%] h-[1px] bg-[#ce1126]" />
+                </span>
+                O'z
+              </span>
+              <span className="text-lg leading-none text-slate-500">⌄</span>
+            </button>
+
+            <a
+              href={payload.isAuthenticated ? payload.dashboardUrl : payload.loginUrl}
+              onClick={() => setMobileMenuOpen(false)}
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-slate-950 px-4 text-base font-bold text-white shadow-lg shadow-violet-500/15 dark:bg-white dark:text-slate-950"
+            >
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M10 17l5-5-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M15 12H3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <path d="M13 4h5a3 3 0 013 3v10a3 3 0 01-3 3h-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+              {payload.isAuthenticated ? 'Dashboard' : 'Kirish'}
+            </a>
+          </div>
+        </nav>
       </div>
     </motion.header>
   );

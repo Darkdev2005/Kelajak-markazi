@@ -10,8 +10,23 @@ class Program extends Model
     protected $fillable = [
         'title',
         'description',
+        'category',
+        'club_type',
         'duration',
+        'price',
+        'phone',
+        'address',
+        'location_name',
+        'map_url',
+        'image_url',
         'is_active',
+        'sort_order',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'price' => 'integer',
+        'sort_order' => 'integer',
     ];
 
     public function applications(): HasMany

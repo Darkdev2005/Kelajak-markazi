@@ -36,11 +36,74 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        $mathProgram = Program::query()->updateOrCreate(
+            ['title' => 'MATEMATIKA'],
+            [
+                'description' => 'Matematika bo\'yicha mantiqiy fikrlash, masala yechish va fan olimpiadasiga tayyorgarlik.',
+                'category' => 'Umumta\'lim fanlari',
+                'club_type' => 'Fan to\'garagi',
+                'duration' => 'Doimiy',
+                'price' => 330000,
+                'phone' => '999999999999',
+                'address' => 'Farg\'ona viloyati, Farg\'ona shahri, Vatan ko\'chasi, 2-uy',
+                'location_name' => 'Farg\'ona shahar maktabgacha va maktab ta\'limi bo\'limi',
+                'map_url' => 'https://maps.google.com/?q=Fargona',
+                'image_url' => 'images/special-physics.svg',
+                'sort_order' => 1,
+                'is_active' => true,
+            ]
+        );
+
+        $childrenProgram = Program::query()->updateOrCreate(
+            ['title' => 'Bolalar to\'garagi'],
+            [
+                'description' => 'Boshlang\'ich yoshdagi bolalar uchun ijodiy mashg\'ulot, o\'qish savodxonligi va qiziqarli amaliy topshiriqlar.',
+                'category' => 'Qo\'shimcha ta\'lim (uzaytirilgan kun guruhlari)',
+                'club_type' => 'Uzaytirilgan kun',
+                'duration' => 'Doimiy',
+                'price' => 412000,
+                'phone' => '998972455878',
+                'address' => 'Sirdaryo viloyati, Mirzaobod tumani, Dexqonobod MFY Tinchlik ko\'chasi 30-uy',
+                'location_name' => 'Mirzaobod tumani 18-sonli umumiy o\'rta ta\'lim maktabi',
+                'map_url' => 'https://maps.google.com/?q=Mirzaobod',
+                'image_url' => 'images/special-school.svg',
+                'sort_order' => 2,
+                'is_active' => true,
+            ]
+        );
+
+        $primaryProgram = Program::query()->updateOrCreate(
+            ['title' => 'Boshlang\'ich sinflar uchun'],
+            [
+                'description' => 'Boshlang\'ich sinflar uchun matematika, o\'qish, yozuv va mantiqiy fikrlashni mustahkamlash.',
+                'category' => 'Qo\'shimcha ta\'lim (uzaytirilgan kun guruhlari)',
+                'club_type' => 'Boshlang\'ich ta\'lim',
+                'duration' => 'Doimiy',
+                'price' => 400000,
+                'phone' => '998912628062',
+                'address' => 'Qashqadaryo viloyati, Muborak tumani, Geolog, Temir yo\'l vokzali yaqinida',
+                'location_name' => 'Muborak maktabgacha va maktab ta\'limi bo\'limi',
+                'map_url' => 'https://maps.google.com/?q=Muborak',
+                'image_url' => 'images/special-extended.svg',
+                'sort_order' => 3,
+                'is_active' => true,
+            ]
+        );
+
         $itProgram = Program::query()->updateOrCreate(
             ['title' => 'IT va Sun\'iy Intellekt'],
             [
                 'description' => 'Frontend, backend, data, AI va robototexnika bo\'yicha loyiha asosidagi mashg\'ulotlar.',
+                'category' => 'Axborot texnologiyalari',
+                'club_type' => 'Kasb-hunar yo\'nalishlari',
                 'duration' => '6 oy',
+                'price' => 450000,
+                'phone' => '+998901112233',
+                'address' => 'Samarqand viloyati, Kelajak markazi IT laboratoriyasi',
+                'location_name' => 'Kelajak IT laboratoriyasi',
+                'map_url' => 'https://maps.google.com/?q=Samarqand',
+                'image_url' => 'images/special-physics.svg',
+                'sort_order' => 4,
                 'is_active' => true,
             ]
         );
@@ -49,7 +112,16 @@ class DatabaseSeeder extends Seeder
             ['title' => 'Xorijiy Tillar'],
             [
                 'description' => 'Ingliz tili, speaking club va xalqaro sertifikatlarga tayyorlov dasturi.',
+                'category' => 'Xorijiy tillar',
+                'club_type' => 'Til to\'garagi',
                 'duration' => '4 oy',
+                'price' => 380000,
+                'phone' => '+998901112244',
+                'address' => 'Samarqand viloyati, Kelajak markazi til xonasi',
+                'location_name' => 'Kelajak til markazi',
+                'map_url' => 'https://maps.google.com/?q=Samarqand',
+                'image_url' => 'images/special-language.svg',
+                'sort_order' => 5,
                 'is_active' => true,
             ]
         );
@@ -58,7 +130,16 @@ class DatabaseSeeder extends Seeder
             ['title' => 'Media Dizayn va Kontent'],
             [
                 'description' => 'Grafik dizayn, video montaj, SMM va kreativ portfolio tayyorlash.',
+                'category' => 'Media va ijod',
+                'club_type' => 'Kasb-hunar yo\'nalishlari',
                 'duration' => '3 oy',
+                'price' => 420000,
+                'phone' => '+998901112255',
+                'address' => 'Samarqand viloyati, Kelajak markazi media studiyasi',
+                'location_name' => 'Kelajak media studiyasi',
+                'map_url' => 'https://maps.google.com/?q=Samarqand',
+                'image_url' => 'images/special-biology.svg',
+                'sort_order' => 6,
                 'is_active' => true,
             ]
         );
@@ -67,7 +148,16 @@ class DatabaseSeeder extends Seeder
             ['title' => 'Liderlik va Debat'],
             [
                 'description' => 'O\'quvchilar kengashi, ommaviy nutq, debat va loyiha boshqaruvi.',
+                'category' => 'Liderlik va olimpiada',
+                'club_type' => 'Rivojlanish to\'garagi',
                 'duration' => 'Doimiy',
+                'price' => 250000,
+                'phone' => '+998901112266',
+                'address' => 'Samarqand viloyati, Kelajak markazi konferensiya zali',
+                'location_name' => 'Kelajak konferensiya zali',
+                'map_url' => 'https://maps.google.com/?q=Samarqand',
+                'image_url' => 'images/special-school.svg',
+                'sort_order' => 7,
                 'is_active' => true,
             ]
         );

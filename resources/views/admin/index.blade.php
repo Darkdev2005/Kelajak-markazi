@@ -30,16 +30,53 @@
 
 <section class="grid three section-block reveal">
     <article class="card">
-        <h2>Dastur qo'shish</h2>
-        <form method="POST" action="{{ route('admin.programs.store') }}" class="form">
+        <h2>To'garak qo'shish</h2>
+        <form method="POST" action="{{ route('admin.programs.store') }}" class="form" enctype="multipart/form-data">
             @csrf
             <label>Nomi</label>
-            <input type="text" name="title" required>
+            <input type="text" name="title" required placeholder="Matematika">
+            <div class="grid two compact">
+                <div>
+                    <label>Yo'nalish</label>
+                    <input type="text" name="category" placeholder="Umumta'lim fanlari">
+                </div>
+                <div>
+                    <label>To'garak turi</label>
+                    <input type="text" name="club_type" placeholder="Qo'shimcha ta'lim">
+                </div>
+            </div>
             <label>Tavsif</label>
-            <textarea name="description" rows="3" required></textarea>
-            <label>Muddati</label>
-            <input type="text" name="duration" placeholder="6 oy">
-            <button class="btn" type="submit">Saqlash</button>
+            <textarea name="description" rows="3" required placeholder="Dars mazmuni va afzalliklari"></textarea>
+            <div class="grid two compact">
+                <div>
+                    <label>Narx</label>
+                    <input type="number" name="price" min="0" value="330000">
+                </div>
+                <div>
+                    <label>Muddati</label>
+                    <input type="text" name="duration" placeholder="6 oy">
+                </div>
+                <div>
+                    <label>Telefon</label>
+                    <input type="text" name="phone" placeholder="+998 90 123 45 67">
+                </div>
+                <div>
+                    <label>Tartib</label>
+                    <input type="number" name="sort_order" min="0" value="0">
+                </div>
+            </div>
+            <label>Manzil</label>
+            <textarea name="address" rows="2" placeholder="Viloyat, tuman, ko'cha va bino"></textarea>
+            <label>Joylashuv nomi</label>
+            <input type="text" name="location_name" placeholder="Maktab yoki markaz nomi">
+            <label>Xarita havolasi</label>
+            <input type="url" name="map_url" placeholder="https://maps.google.com/...">
+            <label>Rasm yuklash</label>
+            <input type="file" name="image" accept="image/*">
+            <label>Yoki rasm yo'li/URL</label>
+            <input type="text" name="image_url" placeholder="images/programs/math.jpg">
+            <label class="row gap"><input type="checkbox" value="1" name="is_active" checked> Saytda ko'rinsin</label>
+            <button class="btn" type="submit">To'garakni saqlash</button>
         </form>
     </article>
 
@@ -280,8 +317,9 @@
 
 <section class="section-block reveal" id="admin-programs">
     <div class="section-head">
-        <span class="eyebrow">Dasturlar</span>
-        <h2>Dasturlarni tahrirlash</h2>
+        <span class="eyebrow">To'garaklar</span>
+        <h2>To'garak katalogini tahrirlash</h2>
+        <p>Dasturlarni tahrirlash endi to'garak katalogini ham boshqaradi: rasm, narx, telefon, manzil va xarita shu yerdan kiritiladi.</p>
     </div>
     <div class="grid two">
         @forelse($programs as $program)
@@ -289,19 +327,58 @@
                 <summary>
                     <span>
                         <strong>{{ $program->title }}</strong>
-                        <small>{{ $program->duration ?? 'Muddat yo\'q' }}</small>
+                        <small>{{ number_format($program->price ?? 0, 0, '.', ' ') }} so'm · {{ $program->category ?? 'Yo\'nalish kiritilmagan' }}</small>
                     </span>
                     <em>{{ $program->is_active ? 'Faol' : 'Yopiq' }}</em>
                 </summary>
-                <form method="POST" action="{{ route('admin.programs.update', $program) }}" class="form edit-form">
+                @if($program->image_url)
+                    <img class="admin-preview" src="{{ \Illuminate\Support\Str::startsWith($program->image_url, ['http://', 'https://']) ? $program->image_url : asset($program->image_url) }}" alt="{{ $program->title }}">
+                @endif
+                <form method="POST" action="{{ route('admin.programs.update', $program) }}" class="form edit-form" enctype="multipart/form-data">
                     @csrf
                     @method('PATCH')
                     <label>Nomi</label>
                     <input type="text" name="title" value="{{ $program->title }}" required>
+                    <div class="grid two compact">
+                        <div>
+                            <label>Yo'nalish</label>
+                            <input type="text" name="category" value="{{ $program->category }}">
+                        </div>
+                        <div>
+                            <label>To'garak turi</label>
+                            <input type="text" name="club_type" value="{{ $program->club_type }}">
+                        </div>
+                    </div>
                     <label>Tavsif</label>
                     <textarea name="description" rows="4" required>{{ $program->description }}</textarea>
-                    <label>Muddati</label>
-                    <input type="text" name="duration" value="{{ $program->duration }}">
+                    <div class="grid two compact">
+                        <div>
+                            <label>Narx</label>
+                            <input type="number" name="price" min="0" value="{{ $program->price ?? 0 }}">
+                        </div>
+                        <div>
+                            <label>Muddati</label>
+                            <input type="text" name="duration" value="{{ $program->duration }}">
+                        </div>
+                        <div>
+                            <label>Telefon</label>
+                            <input type="text" name="phone" value="{{ $program->phone }}">
+                        </div>
+                        <div>
+                            <label>Tartib</label>
+                            <input type="number" name="sort_order" min="0" value="{{ $program->sort_order ?? 0 }}">
+                        </div>
+                    </div>
+                    <label>Manzil</label>
+                    <textarea name="address" rows="3">{{ $program->address }}</textarea>
+                    <label>Joylashuv nomi</label>
+                    <input type="text" name="location_name" value="{{ $program->location_name }}">
+                    <label>Xarita havolasi</label>
+                    <input type="url" name="map_url" value="{{ $program->map_url }}">
+                    <label>Yangi rasm yuklash</label>
+                    <input type="file" name="image" accept="image/*">
+                    <label>Rasm yo'li yoki URL</label>
+                    <input type="text" name="image_url" value="{{ $program->image_url }}">
                     <label class="row gap"><input type="checkbox" value="1" name="is_active" @checked($program->is_active)> Saytda ko'rinsin</label>
                     <button class="btn" type="submit">Yangilash</button>
                 </form>

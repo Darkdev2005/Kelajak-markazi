@@ -12,6 +12,7 @@ use App\Models\SpecialCourse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class AdminController extends Controller
@@ -21,6 +22,72 @@ class AdminController extends Controller
         if (!Auth::user() || !Auth::user()->isAdmin()) {
             abort(403);
         }
+    }
+
+    private function programValidationRules(): array
+    {
+        return [
+            'title' => ['required', 'string', 'max:180'],
+            'description' => ['required', 'string', 'max:2000'],
+            'category' => ['nullable', 'string', 'max:140'],
+            'club_type' => ['nullable', 'string', 'max:140'],
+            'duration' => ['nullable', 'string', 'max:120'],
+            'price' => ['nullable', 'integer', 'min:0', 'max:100000000'],
+            'phone' => ['nullable', 'string', 'max:40'],
+            'address' => ['nullable', 'string', 'max:2000'],
+            'location_name' => ['nullable', 'string', 'max:180'],
+            'map_url' => ['nullable', 'url', 'max:500'],
+            'image_url' => ['nullable', 'string', 'max:255'],
+            'image' => ['nullable', 'image', 'max:4096'],
+            'sort_order' => ['nullable', 'integer', 'min:0', 'max:999'],
+            'is_active' => ['nullable', 'boolean'],
+        ];
+    }
+
+    private function resolveProgramImage(Request $request, ?Program $program = null): ?string
+    {
+        if (! $request->hasFile('image')) {
+            return $request->filled('image_url') ? $request->string('image_url')->toString() : null;
+        }
+
+        $directory = public_path('images/programs');
+
+        if (! is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
+
+        $file = $request->file('image');
+        $name = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) ?: 'togarak';
+        $filename = $name . '-' . Str::uuid() . '.' . $file->extension();
+
+        $file->move($directory, $filename);
+
+        $oldImage = $program?->image_url;
+
+        if ($oldImage && Str::startsWith($oldImage, 'images/programs/') && is_file(public_path($oldImage))) {
+            @unlink(public_path($oldImage));
+        }
+
+        return 'images/programs/' . $filename;
+    }
+
+    private function programPayload(array $validated, ?string $imageUrl, bool $defaultActive): array
+    {
+        return [
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'category' => $validated['category'] ?? null,
+            'club_type' => $validated['club_type'] ?? null,
+            'duration' => $validated['duration'] ?? null,
+            'price' => $validated['price'] ?? 0,
+            'phone' => $validated['phone'] ?? null,
+            'address' => $validated['address'] ?? null,
+            'location_name' => $validated['location_name'] ?? null,
+            'map_url' => $validated['map_url'] ?? null,
+            'image_url' => $imageUrl,
+            'sort_order' => $validated['sort_order'] ?? 0,
+            'is_active' => (bool) ($validated['is_active'] ?? $defaultActive),
+        ];
     }
 
     public function index(): View
@@ -44,7 +111,7 @@ class AdminController extends Controller
             ->limit(10)
             ->get();
 
-        $programs = Program::query()->latest()->get();
+        $programs = Program::query()->orderBy('sort_order')->latest()->get();
         $events = Event::query()->latest('event_date')->get();
         $announcements = Announcement::query()->latest('published_at')->latest()->get();
         $lessonSchedules = LessonSchedule::query()
@@ -75,17 +142,12 @@ class AdminController extends Controller
         $this->ensureAdmin();
 
         $validated = $request->validate([
-            'title' => ['required', 'string', 'max:180'],
-            'description' => ['required', 'string', 'max:2000'],
-            'duration' => ['nullable', 'string', 'max:120'],
+            ...$this->programValidationRules(),
         ]);
 
-        Program::create([
-            ...$validated,
-            'is_active' => true,
-        ]);
+        Program::create($this->programPayload($validated, $this->resolveProgramImage($request), true));
 
-        return back()->with('ok', 'Dastur qo\'shildi.');
+        return back()->with('ok', 'To\'garak qo\'shildi.');
     }
 
     public function updateProgram(Request $request, Program $program): RedirectResponse
@@ -93,20 +155,12 @@ class AdminController extends Controller
         $this->ensureAdmin();
 
         $validated = $request->validate([
-            'title' => ['required', 'string', 'max:180'],
-            'description' => ['required', 'string', 'max:2000'],
-            'duration' => ['nullable', 'string', 'max:120'],
-            'is_active' => ['nullable', 'boolean'],
+            ...$this->programValidationRules(),
         ]);
 
-        $program->update([
-            'title' => $validated['title'],
-            'description' => $validated['description'],
-            'duration' => $validated['duration'] ?? null,
-            'is_active' => (bool) ($validated['is_active'] ?? false),
-        ]);
+        $program->update($this->programPayload($validated, $this->resolveProgramImage($request, $program), false));
 
-        return back()->with('ok', 'Dastur yangilandi.');
+        return back()->with('ok', 'To\'garak yangilandi.');
     }
 
     public function destroyProgram(Program $program): RedirectResponse

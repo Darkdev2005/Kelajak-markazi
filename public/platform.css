@@ -940,6 +940,16 @@ img {
   padding: 15px;
 }
 
+.admin-preview {
+  width: calc(100% - 30px);
+  max-height: 220px;
+  margin: 15px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  object-fit: cover;
+  background: #eef3fb;
+}
+
 .admin-actions,
 .delete-form {
   display: flex;

@@ -37,6 +37,26 @@
             'description' => $program->description,
             'duration' => $program->duration ?? 'Moslashuvchan',
         ])->values(),
+        'clubs' => $programs->map(function ($program) {
+            $imageUrl = $program->image_url
+                ? (\Illuminate\Support\Str::startsWith($program->image_url, ['http://', 'https://']) ? $program->image_url : asset($program->image_url))
+                : asset('images/special-physics.svg');
+
+            return [
+                'id' => $program->id,
+                'title' => $program->title,
+                'description' => $program->description,
+                'category' => $program->category ?: 'Umumta\'lim fanlari',
+                'clubType' => $program->club_type ?: 'Qo\'shimcha ta\'lim',
+                'price' => (int) ($program->price ?? 0),
+                'priceText' => number_format((int) ($program->price ?? 0), 0, '.', ' ') . ' so\'m',
+                'phone' => $program->phone ?: '+998 (71) 217-18-71',
+                'address' => $program->address ?: 'Samarqand viloyati, Kelajak markazi',
+                'locationName' => $program->location_name ?: $program->address ?: 'Kelajak Markazi',
+                'mapUrl' => $program->map_url ?: 'https://maps.google.com/?q=' . urlencode($program->address ?: 'Samarqand Kelajak Markazi'),
+                'imageUrl' => $imageUrl,
+            ];
+        })->values(),
         'specialCourses' => $specialCourses->take(5)->map(function ($course) {
             $imageUrl = $course->image_url
                 ? (\Illuminate\Support\Str::startsWith($course->image_url, ['http://', 'https://']) ? $course->image_url : asset($course->image_url))
@@ -51,10 +71,17 @@
                 'description' => $course->description,
             ];
         })->values(),
-        'lessonSchedules' => $lessonSchedules->take(4)->map(fn ($slot) => [
+        'lessonSchedules' => $lessonSchedules->map(fn ($slot) => [
+            'programId' => $slot->program_id,
             'title' => $slot->program?->title ?? 'Erkin mashg\'ulot',
             'time' => $slot->day_label . ' · ' . $slot->start_time->format('H:i'),
+            'dayLabel' => $slot->day_label,
+            'startTime' => $slot->start_time->format('H:i'),
+            'endTime' => $slot->end_time->format('H:i'),
             'mentor' => $slot->mentor ?? 'Mentor belgilanadi',
+            'room' => $slot->room,
+            'capacity' => $slot->capacity,
+            'isOnline' => (bool) $slot->is_online,
         ])->values(),
     ];
 @endphp

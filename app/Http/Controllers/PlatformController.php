@@ -20,7 +20,11 @@ class PlatformController extends Controller
 {
     public function home(): View
     {
-        $programs = Program::query()->where('is_active', true)->latest()->get();
+        $programs = Program::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->latest()
+            ->get();
         $events = Event::query()->orderBy('event_date')->limit(8)->get();
         $announcements = Announcement::query()
             ->whereNotNull('published_at')
@@ -91,7 +95,7 @@ class PlatformController extends Controller
             ->latest()
             ->get();
 
-        $programs = Program::query()->where('is_active', true)->orderBy('title')->get();
+        $programs = Program::query()->where('is_active', true)->orderBy('sort_order')->orderBy('title')->get();
         $events = Event::query()->orderBy('event_date')->limit(5)->get();
         $nextEvent = Event::query()->whereDate('event_date', '>=', now()->toDateString())->orderBy('event_date')->first();
         $lessonSchedules = LessonSchedule::query()

@@ -48,6 +48,30 @@ function useTheme() {
   return [theme, () => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))];
 }
 
+function getRouteFromHash() {
+  const route = window.location.hash.replace(/^#\/?/, '');
+
+  if (route === 'lessonSchedule') {
+    return 'schedule';
+  }
+
+  return ['clubs', 'schedule'].includes(route) ? route : 'home';
+}
+
+function useHashRoute() {
+  const [route, setRoute] = useState(getRouteFromHash);
+
+  useEffect(() => {
+    const syncRoute = () => setRoute(getRouteFromHash());
+
+    window.addEventListener('hashchange', syncRoute);
+
+    return () => window.removeEventListener('hashchange', syncRoute);
+  }, []);
+
+  return route;
+}
+
 function Button({ children, href, variant = 'primary', className = '' }) {
   const display = className.includes('hidden') ? '' : 'inline-flex';
   const base = `${display} min-h-12 items-center justify-center rounded-full px-6 text-sm font-black tracking-normal transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-violet-400/30`;
@@ -89,11 +113,11 @@ function ThemeToggle({ theme, onToggle }) {
   );
 }
 
-function Header() {
+function Header({ route }) {
   const navItems = [
     ['Asosiy sahifa', '#top'],
-    ["To'garaklar", '#directions'],
-    ['Dars jadvali', '#features'],
+    ["To'garaklar", '#clubs'],
+    ['Dars jadvali', '#lessonSchedule'],
     ['Markaz haqida', '#cta'],
     ['Kontaktlar', '#cta'],
   ];
@@ -137,19 +161,26 @@ function Header() {
         </a>
 
         <nav className="hidden justify-self-center rounded-2xl border border-slate-200/80 bg-white/62 p-1 shadow-inner shadow-slate-950/5 backdrop-blur-xl dark:border-white/10 dark:bg-white/8 xl:flex">
-          {navItems.map(([label, href], index) => (
+          {navItems.map(([label, href], index) => {
+            const isActive =
+              (route === 'clubs' && href === '#clubs')
+              || (route === 'schedule' && href === '#lessonSchedule')
+              || (route === 'home' && index === 0);
+
+            return (
             <a
               key={href}
               href={href}
               className={`whitespace-nowrap rounded-xl px-4 py-3 text-base font-bold tracking-normal transition-all duration-300 ${
-                index === 0
+                isActive
                   ? 'bg-slate-950 text-white shadow-lg shadow-violet-500/15 dark:bg-white dark:text-slate-950'
                   : 'text-slate-700 hover:bg-violet-50 hover:text-[#3a1b78] dark:text-slate-200 dark:hover:bg-white/10 dark:hover:text-cyan-100'
               }`}
             >
               {label}
             </a>
-          ))}
+            );
+          })}
         </nav>
 
         <div className="hidden shrink-0 items-center justify-self-end gap-2 sm:flex sm:gap-3">
@@ -356,6 +387,965 @@ function SpecialStrip({ items }) {
   );
 }
 
+function getAddressPart(address, index) {
+  return address?.split(',').map((part) => part.trim()).filter(Boolean)[index] || '';
+}
+
+function extractRegion(club) {
+  return getAddressPart(club.address, 0) || 'Boshqa hudud';
+}
+
+function extractDistrict(club) {
+  return getAddressPart(club.address, 1) || 'Boshqa tuman';
+}
+
+function getOrganizationLabel(club) {
+  return club.locationName || getAddressPart(club.address, 2) || "Tashkilot ko'rsatilmagan";
+}
+
+function FilterSelect({ value, onChange, options, placeholder, compact = false }) {
+  return (
+    <label className="relative block">
+      <select
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className={`w-full appearance-none border border-slate-200 bg-white px-4 pr-11 text-sm font-bold text-slate-700 shadow-sm outline-none transition focus:border-violet-300 focus:ring-4 focus:ring-violet-100 ${
+          compact ? 'h-11 rounded-xl' : 'h-12 rounded-2xl'
+        }`}
+      >
+        <option value="all">{placeholder}</option>
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">⌄</span>
+    </label>
+  );
+}
+
+function ClubDetailsModal({ club, onClose }) {
+  if (!club) {
+    return null;
+  }
+
+  const imageUrl = club.imageUrl || payload.heroImageUrl;
+
+  return (
+    <div className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="relative max-h-[90vh] w-full max-w-4xl overflow-hidden rounded-[2rem] bg-white shadow-2xl shadow-slate-950/30"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-4 top-4 z-10 inline-grid h-11 w-11 place-items-center rounded-full bg-white/90 text-lg font-black text-slate-700 shadow-lg transition hover:bg-white"
+          aria-label="Yopish"
+        >
+          ✕
+        </button>
+
+        <div className="grid max-h-[90vh] overflow-y-auto lg:grid-cols-[1.05fr_1fr]">
+          <div className="relative min-h-[280px] bg-[#3a1b78]">
+            <img src={imageUrl} alt={club.title} className="h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 via-transparent to-slate-950/10" />
+            <div className="absolute bottom-5 left-5 right-5">
+              <span className="inline-flex rounded-full bg-white/18 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-white backdrop-blur">
+                {club.category}
+              </span>
+              <h3 className="mt-4 text-3xl font-black text-white">{club.title}</h3>
+            </div>
+          </div>
+
+          <div className="p-6 sm:p-8">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="rounded-full bg-violet-100 px-4 py-2 text-sm font-black text-violet-700">{club.clubType || "To'garak"}</span>
+              {club.priceText ? <span className="rounded-full bg-orange-100 px-4 py-2 text-sm font-black text-orange-600">{club.priceText}</span> : null}
+            </div>
+
+            <p className="mt-6 text-base font-semibold leading-7 text-slate-600">
+              {club.description || "Mazkur yo'nalish bo'yicha o'quvchilar uchun sifatli mashg'ulotlar tashkil etiladi."}
+            </p>
+
+            <dl className="mt-8 grid gap-4 text-sm font-semibold text-slate-600">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <dt className="text-xs font-black uppercase tracking-[0.16em] text-slate-400">Manzil</dt>
+                <dd className="mt-2 text-base font-bold text-slate-900">{club.address}</dd>
+              </div>
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <dt className="text-xs font-black uppercase tracking-[0.16em] text-slate-400">Tashkilot</dt>
+                <dd className="mt-2 text-base font-bold text-slate-900">{club.locationName}</dd>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                  <dt className="text-xs font-black uppercase tracking-[0.16em] text-slate-400">Telefon</dt>
+                  <dd className="mt-2 text-base font-bold text-slate-900">{club.phone}</dd>
+                </div>
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                  <dt className="text-xs font-black uppercase tracking-[0.16em] text-slate-400">Yo'nalish</dt>
+                  <dd className="mt-2 text-base font-bold text-slate-900">{club.category}</dd>
+                </div>
+              </div>
+            </dl>
+
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <a
+                href={club.mapUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-slate-950 px-6 text-base font-black text-white transition hover:-translate-y-0.5 hover:bg-[#3a1b78]"
+              >
+                Xaritadan ko'rish
+              </a>
+              <a
+                href={payload.isAuthenticated ? payload.dashboardUrl : payload.loginUrl}
+                className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-violet-600 to-cyan-500 px-6 text-base font-black text-white transition hover:-translate-y-0.5"
+              >
+                Ariza qoldirish
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ClubCard({ club, onSelect }) {
+  const applicationUrl = payload.isAuthenticated ? payload.dashboardUrl : payload.loginUrl;
+
+  return (
+    <motion.article
+      initial={{ y: 18, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.35, ease: 'easeOut' }}
+      whileHover={{ y: -3 }}
+      className="grid gap-4 rounded-[1.1rem] border border-slate-200 bg-white p-3 shadow-sm transition hover:border-violet-200 hover:shadow-lg hover:shadow-slate-900/8 md:grid-cols-[216px_1fr]"
+    >
+      <div className="overflow-hidden rounded-[0.95rem] bg-slate-100">
+        <img src={club.imageUrl} alt={club.title} className="h-52 w-full object-cover md:h-full" />
+      </div>
+
+      <div className="grid min-w-0 gap-4">
+        <div className="grid gap-3 xl:grid-cols-[1fr_360px]">
+          <div className="min-w-0">
+            <h3 className="break-words text-[2rem] font-black leading-tight text-slate-950">{club.title}</h3>
+            <p className="mt-3 text-base font-medium leading-7 text-slate-800">{club.address}</p>
+            <a href={club.mapUrl} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-2 text-base font-bold text-[#4a3298] underline-offset-4 hover:underline">
+              <span className="text-slate-300">•</span>
+              Xaritadan ko'rish
+            </a>
+            <div className="mt-4 flex flex-wrap items-center gap-2 text-base">
+              <span className="font-medium text-slate-500">Yo'nalish:</span>
+              <span className="h-1.5 w-1.5 rounded-full bg-slate-300" />
+              <strong className="font-black text-slate-900">{club.category}</strong>
+            </div>
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-base">
+              <span className="font-medium text-slate-500">Telefon raqam</span>
+              <span className="h-1.5 w-1.5 rounded-full bg-slate-300" />
+              <strong className="font-black text-slate-900">{club.phone}</strong>
+            </div>
+          </div>
+
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold text-slate-800">
+              <span className="grid h-6 w-6 place-items-center rounded-full bg-[#43207f] text-white">⌖</span>
+              <span className="truncate">{club.locationName}</span>
+            </div>
+            {club.description ? (
+              <p className="mt-3 line-clamp-3 text-sm font-medium leading-6 text-slate-600">{club.description}</p>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="mt-auto flex flex-col gap-3 border-t border-slate-100 pt-3 sm:flex-row sm:items-center sm:justify-between">
+          <strong className="inline-flex w-fit rounded-xl border border-violet-100 bg-white px-4 py-2 text-2xl font-black text-violet-400">
+            {club.priceText}
+          </strong>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <a href={applicationUrl} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-orange-200 bg-orange-50 px-5 text-base font-bold text-orange-600 transition hover:-translate-y-0.5 hover:bg-orange-100">
+              Ariza qoldirish
+            </a>
+            <button
+              type="button"
+              onClick={() => onSelect(club)}
+              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#c8b8ff] px-5 text-base font-bold text-[#43207f] transition hover:-translate-y-0.5 hover:bg-[#bbabfb]"
+            >
+              Batafsil ma'lumot ›
+            </button>
+          </div>
+        </div>
+      </div>
+    </motion.article>
+  );
+}
+
+function ClubsHeroPreview({ clubs, categories, regions }) {
+  const previewItems = clubs.slice(0, 3);
+  const avgPrice = clubs.length
+    ? Math.round(clubs.reduce((sum, club) => sum + (club.price || 0), 0) / clubs.length)
+    : 0;
+
+  return (
+    <section className="relative overflow-hidden bg-[linear-gradient(135deg,#2a1453_0%,#43207f_44%,#5a2ea8_100%)]">
+      <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:34px_34px]" />
+      <div className="absolute -left-24 top-10 h-64 w-64 rounded-full bg-cyan-400/15 blur-3xl" />
+      <div className="absolute bottom-0 right-10 h-72 w-72 rounded-full bg-fuchsia-400/10 blur-3xl" />
+
+      <div className="relative mx-auto grid min-h-[280px] max-w-[1536px] gap-8 px-5 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:px-16 lg:py-12">
+        <div className="flex flex-col justify-center">
+          <div className="flex items-center gap-3 text-lg font-black text-white/90">
+            <span className="grid h-8 w-8 place-items-center rounded-xl border border-white/10 bg-cyan-400/95 text-[13px] font-black text-[#23114f] shadow-lg shadow-cyan-400/20">⌂</span>
+            <span>›</span>
+            <span>To'garaklar</span>
+          </div>
+
+          <h1 className="mt-5 max-w-xl text-4xl font-black leading-tight text-white sm:text-5xl">
+            To'garaklar
+          </h1>
+          <p className="mt-4 max-w-2xl text-base font-semibold leading-7 text-white/75">
+            Yo'nalishlar, hududlar va narxlarni bitta tizimda ko'rib chiqing. O'quvchi uchun mos
+            to'garakni tez topish, solishtirish va ariza yuborish shu yerda jamlangan.
+          </p>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <span className="rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-sm font-black text-white backdrop-blur">
+              {clubs.length} ta to'garak
+            </span>
+            <span className="rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-sm font-black text-white/90 backdrop-blur">
+              {regions.length} ta hudud
+            </span>
+            <span className="rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-sm font-black text-white/90 backdrop-blur">
+              O'rtacha {avgPrice.toLocaleString('en-US').replace(/,/g, ' ')} so'm
+            </span>
+          </div>
+        </div>
+
+        <div className="relative flex items-center justify-end">
+          <div className="grid w-full max-w-[560px] gap-4 rounded-[2rem] border border-white/12 bg-white/8 p-4 shadow-2xl shadow-slate-950/25 backdrop-blur-xl lg:grid-cols-[1fr_190px]">
+            <div className="rounded-[1.5rem] border border-white/10 bg-slate-950/18 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-cyan-100">Katalog preview</p>
+                  <h3 className="mt-2 text-xl font-black text-white">Mashhur yo'nalishlar</h3>
+                </div>
+                <span className="rounded-full bg-amber-300/18 px-3 py-1 text-xs font-black text-amber-100">Top tanlov</span>
+              </div>
+
+              <div className="mt-4 grid gap-3">
+                {previewItems.map((club) => (
+                  <div key={club.id || club.title} className="grid grid-cols-[1fr_auto] items-center gap-3 rounded-2xl border border-white/10 bg-white/8 px-3 py-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-black text-white">{club.title}</p>
+                      <p className="mt-1 truncate text-xs font-bold text-white/65">{club.category} · {extractRegion(club)}</p>
+                    </div>
+                    <span className="rounded-xl bg-white/10 px-3 py-2 text-xs font-black text-white">
+                      {club.priceText}
+                    </span>
+                  </div>
+                ))}
+
+                {!previewItems.length ? (
+                  <div className="rounded-2xl border border-dashed border-white/18 px-4 py-6 text-center text-sm font-bold text-white/60">
+                    To'garaklar admin paneldan qo'shiladi
+                  </div>
+                ) : null}
+              </div>
+            </div>
+
+            <div className="relative overflow-hidden rounded-[1.5rem] border border-white/12 bg-slate-950/20">
+              <img src={payload.heroImageUrl} alt="To'garaklar preview" className="h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 via-slate-950/10 to-transparent" />
+              <div className="absolute bottom-3 left-3 right-3 rounded-2xl border border-white/12 bg-slate-950/38 px-3 py-3 backdrop-blur">
+                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-cyan-100">Asosiy yo'nalishlar</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {categories.slice(0, 3).map((category) => (
+                    <span key={category} className="rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-black text-white">
+                      {category}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ClubsPage({ clubs }) {
+  const [query, setQuery] = useState('');
+  const [viewMode, setViewMode] = useState('list');
+  const [category, setCategory] = useState('all');
+  const [clubType, setClubType] = useState('all');
+  const [region, setRegion] = useState('all');
+  const [district, setDistrict] = useState('all');
+  const [organization, setOrganization] = useState('all');
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(12);
+  const [selectedClub, setSelectedClub] = useState(null);
+
+  const categories = useMemo(() => [...new Set(clubs.map((club) => club.category).filter(Boolean))], [clubs]);
+  const clubTypes = useMemo(() => [...new Set(clubs.map((club) => club.clubType).filter(Boolean))], [clubs]);
+  const regions = useMemo(() => [...new Set(clubs.map(extractRegion).filter(Boolean))], [clubs]);
+  const districts = useMemo(() => [...new Set(clubs.map(extractDistrict).filter(Boolean))], [clubs]);
+  const organizations = useMemo(() => [...new Set(clubs.map(getOrganizationLabel).filter(Boolean))], [clubs]);
+
+  const filtered = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+
+    return clubs.filter((club) => {
+      const matchesCategory = category === 'all' || club.category === category;
+      const matchesClubType = clubType === 'all' || club.clubType === clubType;
+      const matchesRegion = region === 'all' || extractRegion(club) === region;
+      const matchesDistrict = district === 'all' || extractDistrict(club) === district;
+      const matchesOrganization = organization === 'all' || getOrganizationLabel(club) === organization;
+      const haystack = `${club.title} ${club.address} ${club.category} ${club.phone} ${club.locationName} ${club.clubType}`.toLowerCase();
+
+      return matchesCategory && matchesClubType && matchesRegion && matchesDistrict && matchesOrganization && (!needle || haystack.includes(needle));
+    });
+  }, [category, clubType, clubs, district, organization, query, region]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+  const safePage = Math.min(page, totalPages);
+  const paginatedClubs = useMemo(() => {
+    const start = (safePage - 1) * perPage;
+    return filtered.slice(start, start + perPage);
+  }, [filtered, perPage, safePage]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [query, category, clubType, region, district, organization, perPage]);
+
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [page, totalPages]);
+
+  const pageNumbers = useMemo(() => {
+    const start = Math.max(1, safePage - 2);
+    const end = Math.min(totalPages, start + 4);
+    const adjustedStart = Math.max(1, end - 4);
+
+    return Array.from({ length: end - adjustedStart + 1 }, (_, index) => adjustedStart + index);
+  }, [safePage, totalPages]);
+
+  return (
+    <div className="bg-[#f4f5fb] text-slate-950">
+      <ClubsHeroPreview clubs={clubs} categories={categories} regions={regions} />
+
+      <section className="mx-auto grid max-w-[1536px] gap-4 px-5 py-12 lg:grid-cols-[minmax(0,1fr)_300px] lg:px-16">
+        <div className="min-w-0">
+          <div className="grid gap-3 xl:grid-cols-[1.2fr_0.9fr_0.9fr_auto]">
+            <label className="flex min-h-12 items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 shadow-sm">
+              <span className="text-2xl text-[#3a1b78]">⌕</span>
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                className="w-full bg-transparent text-base font-semibold outline-none placeholder:text-slate-400"
+                placeholder="Izlash"
+              />
+            </label>
+            <FilterSelect value={category} onChange={setCategory} options={categories} placeholder="To'garak yo'nalishlari" compact />
+            <FilterSelect value={clubType} onChange={setClubType} options={clubTypes} placeholder="To'garak turi" compact />
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                className={`inline-grid h-11 w-11 place-items-center rounded-xl border text-lg transition ${
+                  viewMode === 'list'
+                    ? 'border-violet-200 bg-violet-50 text-[#43207f]'
+                    : 'border-slate-200 bg-white text-slate-400 hover:border-violet-100 hover:text-[#43207f]'
+                }`}
+                aria-label="Ro'yxat ko'rinishi"
+              >
+                ☷
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                className={`inline-grid h-11 w-11 place-items-center rounded-xl border text-lg transition ${
+                  viewMode === 'grid'
+                    ? 'border-violet-200 bg-violet-50 text-[#43207f]'
+                    : 'border-slate-200 bg-white text-slate-400 hover:border-violet-100 hover:text-[#43207f]'
+                }`}
+                aria-label="Katak ko'rinishi"
+              >
+                ▦
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-8">
+            <div className="flex flex-wrap items-end gap-3">
+              <h2 className="text-3xl font-black text-slate-950 sm:text-[2.2rem]">Mavjud to'garaklar</h2>
+              <span className="pb-1 text-3xl font-black text-orange-500">{filtered.length}</span>
+            </div>
+
+            <div className="mt-5 inline-flex rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-600">
+              ⓘ To'garakni tanlang, so'ng ariza yoki batafsil ma'lumot bo'limiga o'ting
+            </div>
+
+            <div className={`mt-5 grid gap-4 ${viewMode === 'grid' ? 'xl:grid-cols-2' : ''}`}>
+              {paginatedClubs.map((club) => (
+                <ClubCard key={club.id || club.title} club={club} onSelect={setSelectedClub} />
+              ))}
+
+              {!paginatedClubs.length && (
+                <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center font-bold text-slate-500">
+                  Bu filtr bo'yicha to'garak topilmadi.
+                </div>
+              )}
+            </div>
+
+            <div className="mt-8 flex flex-col items-center justify-between gap-4 xl:flex-row">
+              <p className="text-sm font-bold text-slate-500">
+                Topilgan to'garaklar soni: <strong className="text-slate-950">{filtered.length}</strong>
+              </p>
+
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPage(1)}
+                  disabled={safePage === 1}
+                  className="inline-grid h-11 w-11 place-items-center rounded-xl border border-slate-200 bg-white text-slate-400 disabled:opacity-50"
+                >
+                  «
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPage((current) => Math.max(1, current - 1))}
+                  disabled={safePage === 1}
+                  className="inline-grid h-11 w-11 place-items-center rounded-xl border border-slate-200 bg-white text-slate-400 disabled:opacity-50"
+                >
+                  ‹
+                </button>
+
+                {pageNumbers.map((pageNumber) => (
+                  <button
+                    key={pageNumber}
+                    type="button"
+                    onClick={() => setPage(pageNumber)}
+                    className={`inline-grid h-11 w-11 place-items-center rounded-xl border text-sm font-black transition ${
+                      pageNumber === safePage
+                        ? 'border-orange-200 bg-white text-orange-500'
+                        : 'border-slate-200 bg-white text-slate-500 hover:border-violet-200 hover:text-violet-700'
+                    }`}
+                  >
+                    {pageNumber}
+                  </button>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+                  disabled={safePage === totalPages}
+                  className="inline-grid h-11 w-11 place-items-center rounded-xl border border-slate-200 bg-white text-slate-400 disabled:opacity-50"
+                >
+                  ›
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPage(totalPages)}
+                  disabled={safePage === totalPages}
+                  className="inline-grid h-11 w-11 place-items-center rounded-xl border border-slate-200 bg-white text-slate-400 disabled:opacity-50"
+                >
+                  »
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside className="grid h-fit gap-4 lg:sticky lg:top-36">
+          <div className="relative h-44 overflow-hidden rounded-[1.1rem] border border-slate-200 bg-white shadow-sm">
+            <div className="absolute inset-0 bg-[linear-gradient(45deg,#e9eef8_25%,transparent_25%),linear-gradient(-45deg,#e9eef8_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#e9eef8_75%),linear-gradient(-45deg,transparent_75%,#e9eef8_75%)] bg-[length:28px_28px] opacity-80" />
+            <div className="absolute inset-4 rounded-xl border border-violet-200 bg-white/60" />
+            <span className="absolute left-1/2 top-1/2 grid h-12 w-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[#3a1b78] text-2xl text-white shadow-xl">⌖</span>
+            <a href={filtered[0]?.mapUrl || 'https://maps.google.com'} target="_blank" rel="noreferrer" className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-xl bg-[#43207f] px-5 py-3 text-base font-bold text-white">
+              Xaritadan ko'rish
+            </a>
+          </div>
+
+          <div className="rounded-[1.1rem] border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 className="text-2xl font-black">Filtr</h2>
+            <div className="mt-4 border-t border-slate-100 pt-4">
+              <h3 className="mb-4 text-base font-black text-slate-900">To'garak yo'nalishlari</h3>
+              <div className="grid gap-3">
+                {['all', ...categories].map((item) => (
+                  <label key={item} className="flex cursor-pointer items-start gap-3 text-base font-medium text-slate-700">
+                    <input
+                      type="radio"
+                      name="club-category-sidebar"
+                      checked={category === item}
+                      onChange={() => setCategory(item)}
+                      className="mt-1 accent-[#43207f]"
+                    />
+                    <span>{item === 'all' ? 'Hammasi' : item}</span>
+                  </label>
+                ))}
+              </div>
+
+              <div className="mt-6 grid gap-3 border-t border-slate-100 pt-5">
+                <FilterSelect value={clubType} onChange={setClubType} options={clubTypes} placeholder="To'garak turi" compact />
+                <FilterSelect value={region} onChange={setRegion} options={regions} placeholder="Hududni tanlang" compact />
+                <FilterSelect value={district} onChange={setDistrict} options={districts} placeholder="Tumanni tanlang" compact />
+                <FilterSelect value={organization} onChange={setOrganization} options={organizations} placeholder="Tashkilotni tanlang" compact />
+              </div>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <ClubDetailsModal club={selectedClub} onClose={() => setSelectedClub(null)} />
+    </div>
+  );
+}
+
+function normalizeText(value) {
+  return (value || '').toLowerCase().replace(/[^a-z0-9\u0400-\u04FF\u0100-\u017f]+/g, ' ').trim();
+}
+
+function ScheduleProgramModal({ club, slots, onClose }) {
+  if (!club) {
+    return null;
+  }
+
+  return (
+    <div className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="relative max-h-[90vh] w-full max-w-4xl overflow-hidden rounded-[2rem] bg-white shadow-2xl shadow-slate-950/30"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-4 top-4 z-10 inline-grid h-11 w-11 place-items-center rounded-full bg-white/90 text-lg font-black text-slate-700 shadow-lg transition hover:bg-white"
+          aria-label="Yopish"
+        >
+          ✕
+        </button>
+
+        <div className="border-b border-slate-200 bg-[#3a1b78] px-6 py-6 text-white sm:px-8">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="rounded-full bg-white/14 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-cyan-100">
+              Dars jadvali
+            </span>
+            <span className="rounded-full bg-white/14 px-4 py-2 text-xs font-black text-white/90">
+              {club.category}
+            </span>
+          </div>
+          <h3 className="mt-4 text-3xl font-black">{club.title}</h3>
+          <p className="mt-2 text-sm font-semibold text-white/75">{club.locationName}</p>
+        </div>
+
+        <div className="max-h-[70vh] overflow-y-auto p-6 sm:p-8">
+          <div className="grid gap-4 md:grid-cols-2">
+            {slots.map((slot) => (
+              <article key={`${slot.programId || club.id}-${slot.time}-${slot.mentor}`} className="rounded-[1.1rem] border border-slate-200 bg-slate-50 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-400">{slot.dayLabel}</p>
+                    <h4 className="mt-2 text-xl font-black text-slate-950">{slot.startTime} - {slot.endTime}</h4>
+                  </div>
+                  <span className="rounded-full bg-violet-100 px-3 py-1.5 text-xs font-black text-violet-700">
+                    {slot.isOnline ? 'Online' : 'Offline'}
+                  </span>
+                </div>
+
+                <dl className="mt-4 grid gap-3 text-sm font-semibold text-slate-600">
+                  <div className="flex items-center justify-between gap-4 rounded-xl bg-white px-3 py-2">
+                    <dt>Mentor</dt>
+                    <dd className="font-black text-slate-900">{slot.mentor}</dd>
+                  </div>
+                  <div className="flex items-center justify-between gap-4 rounded-xl bg-white px-3 py-2">
+                    <dt>Xona</dt>
+                    <dd className="font-black text-slate-900">{slot.room || 'Belgilanmagan'}</dd>
+                  </div>
+                  <div className="flex items-center justify-between gap-4 rounded-xl bg-white px-3 py-2">
+                    <dt>Sig'im</dt>
+                    <dd className="font-black text-slate-900">{slot.capacity || '—'} ta</dd>
+                  </div>
+                </dl>
+              </article>
+            ))}
+          </div>
+
+          {!slots.length ? (
+            <div className="rounded-[1.1rem] border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm font-bold text-slate-500">
+              Bu to'garak uchun dars slotlari hali kiritilmagan.
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ScheduleProgramCard({ item, onOpen }) {
+  const applicationUrl = payload.isAuthenticated ? payload.dashboardUrl : payload.loginUrl;
+
+  return (
+    <motion.article
+      initial={{ y: 18, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.35, ease: 'easeOut' }}
+      whileHover={{ y: -4 }}
+      className="flex h-full flex-col rounded-[1.1rem] border border-slate-200 bg-white p-4 shadow-sm transition hover:border-violet-200 hover:shadow-lg hover:shadow-slate-900/8"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <h3 className="line-clamp-2 text-[1.15rem] font-black leading-tight text-slate-950 sm:text-[1.2rem]">{item.title}</h3>
+        <span className="max-w-[52%] truncate rounded-xl border border-violet-100 bg-violet-50 px-3 py-1.5 text-xs font-bold text-[#43207f]">
+          {item.locationName}
+        </span>
+      </div>
+
+      <p className="mt-4 line-clamp-2 text-[15px] font-medium leading-7 text-slate-800">{item.address}</p>
+
+      <a
+        href={item.mapUrl}
+        target="_blank"
+        rel="noreferrer"
+        className="mt-1 inline-flex items-center gap-2 text-[15px] font-bold text-[#4a3298] underline-offset-4 hover:underline"
+      >
+        <span className="text-slate-300">•</span>
+        Xaritadan ko'rish
+      </a>
+
+      <div className="mt-3 space-y-2 text-[15px]">
+        <div className="flex flex-wrap items-center gap-2 text-slate-500">
+          <span className="font-medium">Yo'nalish:</span>
+          <span className="h-1.5 w-1.5 rounded-full bg-slate-300" />
+          <strong className="font-black text-slate-900">{item.category}</strong>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 text-slate-500">
+          <span className="font-medium">Telefon raqam</span>
+          <span className="h-1.5 w-1.5 rounded-full bg-slate-300" />
+          <strong className="font-black text-slate-900">{item.phone}</strong>
+        </div>
+      </div>
+
+      <div className="mt-auto pt-5">
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <button
+            type="button"
+            onClick={() => onOpen(item)}
+            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#c8b8ff] px-5 text-base font-bold text-[#43207f] transition hover:-translate-y-0.5 hover:bg-[#bbabfb]"
+          >
+            Batafsil ma'lumot ›
+          </button>
+          <a href={applicationUrl} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-orange-200 bg-orange-50 px-5 text-base font-bold text-orange-600 transition hover:-translate-y-0.5 hover:bg-orange-100">
+            ✎ Ariza qoldirish
+          </a>
+        </div>
+      </div>
+    </motion.article>
+  );
+}
+
+function ScheduleHeroPreview({ schedules }) {
+  const previewSlots = schedules.slice(0, 3);
+  const onlineCount = schedules.filter((slot) => slot.isOnline).length;
+  const uniqueDays = new Set(schedules.map((slot) => slot.dayLabel || slot.time?.split('·')[0]?.trim()).filter(Boolean)).size;
+
+  return (
+    <section className="relative overflow-hidden bg-[linear-gradient(135deg,#241047_0%,#3a1b78_42%,#1f4f7a_100%)]">
+      <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:34px_34px]" />
+      <div className="absolute -left-20 top-10 h-56 w-56 rounded-full bg-cyan-400/18 blur-3xl" />
+      <div className="absolute bottom-0 right-20 h-64 w-64 rounded-full bg-fuchsia-400/12 blur-3xl" />
+
+      <div className="relative mx-auto grid min-h-[280px] max-w-[1536px] gap-8 px-5 py-10 lg:grid-cols-[1.1fr_0.95fr] lg:px-16 lg:py-12">
+        <div className="flex flex-col justify-center">
+          <div className="flex items-center gap-3 text-lg font-black text-white/90">
+            <span className="grid h-8 w-8 place-items-center rounded-xl border border-white/10 bg-cyan-400/95 text-[13px] font-black text-[#23114f] shadow-lg shadow-cyan-400/20">◔</span>
+            <span>›</span>
+            <span>Dars jadvali</span>
+          </div>
+
+          <h1 className="mt-5 max-w-xl text-4xl font-black leading-tight text-white sm:text-5xl">
+            Dars jadvali
+          </h1>
+          <p className="mt-4 max-w-2xl text-base font-semibold leading-7 text-white/75">
+            Har bir to'garak bo'yicha dars kunlari, mentorlar va mavjud slotlar bir joyda jamlangan.
+            Avval yo'nalishni tanlang, keyin jadvalni batafsil ko'ring.
+          </p>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <span className="rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-sm font-black text-white backdrop-blur">
+              {schedules.length} ta faol slot
+            </span>
+            <span className="rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-sm font-black text-white/90 backdrop-blur">
+              {uniqueDays} kunlik jadval
+            </span>
+            <span className="rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-sm font-black text-white/90 backdrop-blur">
+              {onlineCount} ta online dars
+            </span>
+          </div>
+        </div>
+
+        <div className="relative flex items-center justify-end">
+          <div className="grid w-full max-w-[560px] gap-4 rounded-[2rem] border border-white/12 bg-white/8 p-4 shadow-2xl shadow-slate-950/25 backdrop-blur-xl lg:grid-cols-[1fr_190px]">
+            <div className="rounded-[1.5rem] border border-white/10 bg-slate-950/18 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-cyan-100">Hafta preview</p>
+                  <h3 className="mt-2 text-xl font-black text-white">Yaqin darslar</h3>
+                </div>
+                <span className="rounded-full bg-emerald-400/18 px-3 py-1 text-xs font-black text-emerald-100">Real vaqt</span>
+              </div>
+
+              <div className="mt-4 grid gap-3">
+                {previewSlots.map((slot, index) => (
+                  <div key={`${slot.programId || slot.title}-${slot.time}-${index}`} className="grid grid-cols-[88px_1fr] items-center gap-3 rounded-2xl border border-white/10 bg-white/8 px-3 py-3">
+                    <div className="rounded-xl bg-white/10 px-3 py-2 text-center text-sm font-black text-white">
+                      {slot.startTime || slot.time?.split('·')[1]?.trim() || '09:00'}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-black text-white">{slot.title}</p>
+                      <p className="mt-1 truncate text-xs font-bold text-white/65">{slot.dayLabel || slot.time?.split('·')[0]?.trim()} · {slot.mentor}</p>
+                    </div>
+                  </div>
+                ))}
+
+                {!previewSlots.length ? (
+                  <div className="rounded-2xl border border-dashed border-white/18 px-4 py-6 text-center text-sm font-bold text-white/60">
+                    Dars slotlari admin paneldan qo'shiladi
+                  </div>
+                ) : null}
+              </div>
+            </div>
+
+            <div className="relative overflow-hidden rounded-[1.5rem] border border-white/12 bg-slate-950/20">
+              <img src={payload.heroImageUrl} alt="Dars jadvali preview" className="h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 via-slate-950/10 to-transparent" />
+              <div className="absolute bottom-3 left-3 right-3 rounded-2xl border border-white/12 bg-slate-950/38 px-3 py-3 backdrop-blur">
+                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-cyan-100">Kelasi slot</p>
+                <p className="mt-2 text-sm font-black text-white">
+                  {previewSlots[0]?.dayLabel || 'Dushanba'} · {previewSlots[0]?.startTime || '09:00'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SchedulePage({ schedules, clubs }) {
+  const [query, setQuery] = useState('');
+  const [category, setCategory] = useState('all');
+  const [clubType, setClubType] = useState('all');
+  const [region, setRegion] = useState('all');
+  const [district, setDistrict] = useState('all');
+  const [organization, setOrganization] = useState('all');
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(12);
+  const [selectedProgram, setSelectedProgram] = useState(null);
+
+  const schedulePrograms = useMemo(() => {
+    const grouped = new Map();
+
+    schedules.forEach((schedule, index) => {
+      const matchedClub = clubs.find((club) => {
+        if (schedule.programId && club.id === schedule.programId) {
+          return true;
+        }
+
+        return normalizeText(schedule.title).includes(normalizeText(club.title)) || normalizeText(club.title).includes(normalizeText(schedule.title));
+      });
+
+      if (!matchedClub) {
+        return;
+      }
+
+      const key = matchedClub.id || `${matchedClub.title}-${index}`;
+      const existing = grouped.get(key) || {
+        ...matchedClub,
+        slots: [],
+      };
+
+      existing.slots.push(schedule);
+      grouped.set(key, existing);
+    });
+
+    return Array.from(grouped.values());
+  }, [clubs, schedules]);
+
+  const categories = useMemo(() => [...new Set(schedulePrograms.map((item) => item.category).filter(Boolean))], [schedulePrograms]);
+  const clubTypes = useMemo(() => [...new Set(schedulePrograms.map((item) => item.clubType).filter(Boolean))], [schedulePrograms]);
+  const regions = useMemo(() => [...new Set(schedulePrograms.map(extractRegion).filter(Boolean))], [schedulePrograms]);
+  const districts = useMemo(() => [...new Set(schedulePrograms.map(extractDistrict).filter(Boolean))], [schedulePrograms]);
+  const organizations = useMemo(() => [...new Set(schedulePrograms.map(getOrganizationLabel).filter(Boolean))], [schedulePrograms]);
+
+  const filtered = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+
+    return schedulePrograms.filter((item) => {
+      const matchesCategory = category === 'all' || item.category === category;
+      const matchesClubType = clubType === 'all' || item.clubType === clubType;
+      const matchesRegion = region === 'all' || extractRegion(item) === region;
+      const matchesDistrict = district === 'all' || extractDistrict(item) === district;
+      const matchesOrganization = organization === 'all' || getOrganizationLabel(item) === organization;
+      const haystack = `${item.title} ${item.address} ${item.category} ${item.phone} ${item.locationName} ${item.clubType}`.toLowerCase();
+
+      return matchesCategory && matchesClubType && matchesRegion && matchesDistrict && matchesOrganization && (!needle || haystack.includes(needle));
+    });
+  }, [category, clubType, district, organization, query, region, schedulePrograms]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+  const safePage = Math.min(page, totalPages);
+  const paginated = useMemo(() => {
+    const start = (safePage - 1) * perPage;
+    return filtered.slice(start, start + perPage);
+  }, [filtered, perPage, safePage]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [query, category, clubType, region, district, organization, perPage]);
+
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [page, totalPages]);
+
+  const pageNumbers = useMemo(() => {
+    const start = Math.max(1, safePage - 2);
+    const end = Math.min(totalPages, start + 4);
+    const adjustedStart = Math.max(1, end - 4);
+
+    return Array.from({ length: end - adjustedStart + 1 }, (_, index) => adjustedStart + index);
+  }, [safePage, totalPages]);
+
+  return (
+    <div className="bg-[#f4f5fb] text-slate-950">
+      <ScheduleHeroPreview schedules={schedules} />
+
+      <section className="mx-auto max-w-[1536px] px-5 py-12 lg:px-16">
+        <div className="grid gap-3 xl:grid-cols-[1.2fr_repeat(5,minmax(0,1fr))]">
+          <label className="flex min-h-12 items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 shadow-sm">
+            <span className="text-2xl text-[#3a1b78]">⌕</span>
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              className="w-full bg-transparent text-base font-semibold outline-none placeholder:text-slate-400"
+              placeholder="Izlash"
+            />
+          </label>
+
+          <FilterSelect value={category} onChange={setCategory} options={categories} placeholder="To'garak yo'nalishlari" compact />
+          <FilterSelect value={clubType} onChange={setClubType} options={clubTypes} placeholder="To'garak turi" compact />
+          <FilterSelect value={region} onChange={setRegion} options={regions} placeholder="Hududni tanlang" compact />
+          <FilterSelect value={district} onChange={setDistrict} options={districts} placeholder="Tumanni tanlang" compact />
+          <FilterSelect value={organization} onChange={setOrganization} options={organizations} placeholder="Tashkilotni tanlang" compact />
+        </div>
+
+        <div className="mt-8">
+          <div className="flex flex-wrap items-end gap-3">
+            <h2 className="text-3xl font-black text-slate-950 sm:text-[2.2rem]">Mavjud to'garaklar</h2>
+            <span className="pb-1 text-3xl font-black text-orange-500">{filtered.length}</span>
+          </div>
+
+          <div className="mt-5 inline-flex rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-600">
+            ⓘ Dars jadvalini ko'rish uchun to'garakni tanlang
+          </div>
+
+          <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {paginated.map((item) => (
+              <ScheduleProgramCard key={item.id || item.title} item={item} onOpen={setSelectedProgram} />
+            ))}
+
+            {!paginated.length && (
+              <div className="col-span-full rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center font-bold text-slate-500">
+                Bu filtr bo'yicha jadvali bor to'garak topilmadi.
+              </div>
+            )}
+          </div>
+
+          <div className="mt-8 flex flex-col items-center justify-between gap-4 xl:flex-row">
+            <p className="text-sm font-bold text-slate-500">
+              Topilgan to'garaklar soni: <strong className="text-slate-950">{filtered.length}</strong>
+            </p>
+
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => setPage(1)}
+                disabled={safePage === 1}
+                className="inline-grid h-11 w-11 place-items-center rounded-xl border border-slate-200 bg-white text-slate-400 disabled:opacity-50"
+              >
+                «
+              </button>
+              <button
+                type="button"
+                onClick={() => setPage((current) => Math.max(1, current - 1))}
+                disabled={safePage === 1}
+                className="inline-grid h-11 w-11 place-items-center rounded-xl border border-slate-200 bg-white text-slate-400 disabled:opacity-50"
+              >
+                ‹
+              </button>
+
+              {pageNumbers.map((pageNumber) => (
+                <button
+                  key={pageNumber}
+                  type="button"
+                  onClick={() => setPage(pageNumber)}
+                  className={`inline-grid h-11 w-11 place-items-center rounded-xl border text-sm font-black transition ${
+                    pageNumber === safePage
+                      ? 'border-orange-200 bg-white text-orange-500'
+                      : 'border-slate-200 bg-white text-slate-500 hover:border-violet-200 hover:text-violet-700'
+                  }`}
+                >
+                  {pageNumber}
+                </button>
+              ))}
+
+              <button
+                type="button"
+                onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+                disabled={safePage === totalPages}
+                className="inline-grid h-11 w-11 place-items-center rounded-xl border border-slate-200 bg-white text-slate-400 disabled:opacity-50"
+              >
+                ›
+              </button>
+              <button
+                type="button"
+                onClick={() => setPage(totalPages)}
+                disabled={safePage === totalPages}
+                className="inline-grid h-11 w-11 place-items-center rounded-xl border border-slate-200 bg-white text-slate-400 disabled:opacity-50"
+              >
+                »
+              </button>
+
+              <label className="relative ml-1 block">
+                <select
+                  value={perPage}
+                  onChange={(event) => setPerPage(Number(event.target.value))}
+                  className="h-11 appearance-none rounded-xl border border-slate-200 bg-white px-4 pr-10 text-sm font-bold text-slate-600 shadow-sm outline-none"
+                >
+                  {[6, 9, 12].map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
+                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">⌄</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <ScheduleProgramModal club={selectedProgram} slots={selectedProgram?.slots || []} onClose={() => setSelectedProgram(null)} />
+    </div>
+  );
+}
+
 function Hero({ stats, schedules }) {
   return (
     <section id="top" className="mx-auto w-full max-w-[1208px] min-w-0 px-3.5 pb-16 pt-10 lg:pb-24 lg:pt-16">
@@ -404,8 +1394,8 @@ function Footer() {
   const year = new Date().getFullYear();
   const footerLinks = [
     ['Asosiy sahifa', '#top'],
-    ["To'garaklar", '#directions'],
-    ['Dars jadvali', '#features'],
+    ["To'garaklar", '#clubs'],
+    ['Dars jadvali', '#lessonSchedule'],
     ['Maxsus katalog', '#special'],
     ['Markaz haqida', '#cta'],
   ];
@@ -477,9 +1467,12 @@ function Footer() {
 
 function App() {
   const [theme, toggleTheme] = useTheme();
+  const route = useHashRoute();
   const stats = useMemo(() => payload.stats?.length ? payload.stats : defaultStats, []);
   const directions = useMemo(() => payload.directions?.length ? payload.directions : defaultDirections, []);
   const features = payload.features || [];
+  const clubs = payload.clubs?.length ? payload.clubs : [];
+  const schedules = payload.lessonSchedules?.length ? payload.lessonSchedules : [];
 
   return (
     <main className="premium-bg relative min-h-screen overflow-hidden text-slate-950 transition-colors duration-500 dark:text-white">
@@ -491,70 +1484,84 @@ function App() {
       </div>
 
       <div className="relative z-10">
-        <Header />
+        <Header route={route} />
         <div className="fixed bottom-5 right-5 z-50">
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
         </div>
-        <Hero stats={stats} schedules={payload.lessonSchedules} />
+        {route === 'clubs' ? (
+          <>
+            <ClubsPage clubs={clubs} />
+            <Footer />
+          </>
+        ) : route === 'schedule' ? (
+          <>
+            <SchedulePage schedules={schedules} clubs={clubs} />
+            <Footer />
+          </>
+        ) : (
+          <>
+            <Hero stats={stats} schedules={payload.lessonSchedules} />
 
-        <section className="mx-auto w-[calc(100%_-_28px)] max-w-[1180px] py-12">
-          <div className="mb-8 max-w-3xl">
-            <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-600 dark:text-cyan-200">Nega bu platforma kuchli</p>
-            <h2 className="mt-3 text-3xl font-black text-slate-950 dark:text-white sm:text-5xl">Oddiy landing emas, markaz ishini yuritadigan raqamli boshqaruv</h2>
-          </div>
-          <div className="grid gap-5 md:grid-cols-3">
-            {features.map((feature, index) => (
-              <FeatureCard key={feature.title} feature={feature} index={index} />
-            ))}
-          </div>
-        </section>
+            <section className="mx-auto w-[calc(100%_-_28px)] max-w-[1180px] py-12">
+              <div className="mb-8 max-w-3xl">
+                <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-600 dark:text-cyan-200">Nega bu platforma kuchli</p>
+                <h2 className="mt-3 text-3xl font-black text-slate-950 dark:text-white sm:text-5xl">Oddiy landing emas, markaz ishini yuritadigan raqamli boshqaruv</h2>
+              </div>
+              <div className="grid gap-5 md:grid-cols-3">
+                {features.map((feature, index) => (
+                  <FeatureCard key={feature.title} feature={feature} index={index} />
+                ))}
+              </div>
+            </section>
 
-        <section id="directions" className="mx-auto w-[calc(100%_-_28px)] max-w-[1180px] py-12">
-          <div className="mb-8 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-            <div className="max-w-3xl">
-              <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-600 dark:text-cyan-200">Yo'nalishlar</p>
-              <h2 className="mt-3 text-3xl font-black text-slate-950 dark:text-white sm:text-5xl">Qiziqishdan kasbgacha olib boradigan yo'nalishlar</h2>
-            </div>
-            <p className="max-w-sm text-base font-semibold leading-7 text-slate-600 dark:text-slate-300">
-              Har bir guruh mentor, jadval va progress bilan boshqariladi. O'quvchi qayerdan boshlaganini ham, qayerga ketayotganini ham ko'radi.
-            </p>
-          </div>
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {directions.map((item, index) => (
-              <DirectionCard key={item.title} item={item} index={index} />
-            ))}
-          </div>
-        </section>
-
-        <SpecialStrip items={payload.specialCourses} />
-
-        <section id="cta" className="mx-auto w-[calc(100%_-_28px)] max-w-[1180px] py-16">
-          <motion.div
-            initial={{ y: 24, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.55 }}
-            className="relative overflow-hidden rounded-[2rem] bg-slate-950 p-7 text-white shadow-2xl shadow-violet-500/20 dark:bg-white dark:text-slate-950 sm:p-10 lg:p-14"
-          >
-            <div className="absolute right-[-6rem] top-[-6rem] h-72 w-72 rounded-full bg-cyan-400/30 blur-3xl" />
-            <div className="absolute bottom-[-8rem] left-[-8rem] h-80 w-80 rounded-full bg-violet-500/25 blur-3xl" />
-            <div className="relative grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
-              <div>
-                <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-200 dark:text-violet-700">Kelajak shu yerdan boshlanadi</p>
-                <h2 className="mt-4 max-w-3xl text-4xl font-black leading-tight sm:text-5xl">O'quvchi imkoniyatini sezdiradigan, ota-onaga ishonch beradigan platforma.</h2>
-                <p className="mt-5 max-w-2xl text-base font-semibold leading-8 text-white/70 dark:text-slate-600">
-                  Endi markaz faqat kurslar ro'yxati emas. Bu natija, nazorat, ilhom va real rivojlanish uchun milliy darajadagi raqamli tajriba.
+            <section id="directions" className="mx-auto w-[calc(100%_-_28px)] max-w-[1180px] py-12">
+              <div className="mb-8 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+                <div className="max-w-3xl">
+                  <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-600 dark:text-cyan-200">Yo'nalishlar</p>
+                  <h2 className="mt-3 text-3xl font-black text-slate-950 dark:text-white sm:text-5xl">Qiziqishdan kasbgacha olib boradigan yo'nalishlar</h2>
+                </div>
+                <p className="max-w-sm text-base font-semibold leading-7 text-slate-600 dark:text-slate-300">
+                  Har bir guruh mentor, jadval va progress bilan boshqariladi. O'quvchi qayerdan boshlaganini ham, qayerga ketayotganini ham ko'radi.
                 </p>
               </div>
-              <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
-                <Button href={payload.isAuthenticated ? payload.dashboardUrl : payload.registerUrl} variant="glow">Boshlash</Button>
-                <Button href={payload.isAuthenticated ? payload.dashboardUrl : payload.loginUrl} variant="ghost">Kirish</Button>
+              <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+                {directions.map((item, index) => (
+                  <DirectionCard key={item.title} item={item} index={index} />
+                ))}
               </div>
-            </div>
-          </motion.div>
-        </section>
+            </section>
 
-        <Footer />
+            <SpecialStrip items={payload.specialCourses} />
+
+            <section id="cta" className="mx-auto w-[calc(100%_-_28px)] max-w-[1180px] py-16">
+              <motion.div
+                initial={{ y: 24, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true, margin: '-100px' }}
+                transition={{ duration: 0.55 }}
+                className="relative overflow-hidden rounded-[2rem] bg-slate-950 p-7 text-white shadow-2xl shadow-violet-500/20 dark:bg-white dark:text-slate-950 sm:p-10 lg:p-14"
+              >
+                <div className="absolute right-[-6rem] top-[-6rem] h-72 w-72 rounded-full bg-cyan-400/30 blur-3xl" />
+                <div className="absolute bottom-[-8rem] left-[-8rem] h-80 w-80 rounded-full bg-violet-500/25 blur-3xl" />
+                <div className="relative grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+                  <div>
+                    <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-200 dark:text-violet-700">Kelajak shu yerdan boshlanadi</p>
+                    <h2 className="mt-4 max-w-3xl text-4xl font-black leading-tight sm:text-5xl">O'quvchi imkoniyatini sezdiradigan, ota-onaga ishonch beradigan platforma.</h2>
+                    <p className="mt-5 max-w-2xl text-base font-semibold leading-8 text-white/70 dark:text-slate-600">
+                      Endi markaz faqat kurslar ro'yxati emas. Bu natija, nazorat, ilhom va real rivojlanish uchun milliy darajadagi raqamli tajriba.
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
+                    <Button href={payload.isAuthenticated ? payload.dashboardUrl : payload.registerUrl} variant="glow">Boshlash</Button>
+                    <Button href={payload.isAuthenticated ? payload.dashboardUrl : payload.loginUrl} variant="ghost">Kirish</Button>
+                  </div>
+                </div>
+              </motion.div>
+            </section>
+
+            <Footer />
+          </>
+        )}
       </div>
     </main>
   );

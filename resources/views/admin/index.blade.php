@@ -6,7 +6,7 @@
     <div>
         <span class="eyebrow">Admin markaz</span>
         <h1>Boshqaruv paneli</h1>
-        <p>Dastur, maxsus katalog, dars jadvali, tadbir, e'lon, ariza va murojaatlar to'liq shu yerdan boshqariladi.</p>
+        <p>Dastur, maxsus katalog, dars jadvali, tadbir, yangilik, ariza va murojaatlar to'liq shu yerdan boshqariladi.</p>
     </div>
     <div class="grid three compact">
         <article class="mini-card"><strong>{{ $stats['users'] }}</strong><span>Foydalanuvchi</span></article>
@@ -15,7 +15,7 @@
         <article class="mini-card"><strong>{{ $stats['special_courses'] }}</strong><span>Maxsus katalog</span></article>
         <article class="mini-card"><strong>{{ $stats['leadership_members'] }}</strong><span>Rahbariyat</span></article>
         <article class="mini-card"><strong>{{ $stats['events'] }}</strong><span>Tadbir</span></article>
-        <article class="mini-card"><strong>{{ $stats['announcements'] }}</strong><span>E'lon</span></article>
+        <article class="mini-card"><strong>{{ $stats['announcements'] }}</strong><span>Yangilik</span></article>
         <article class="mini-card"><strong>{{ $stats['contacts'] }}</strong><span>Yangi murojaat</span></article>
     </div>
 </section>
@@ -25,7 +25,7 @@
     <a href="{{ route('admin.index', ['section' => 'special']) }}" class="{{ $section === 'special' ? 'active' : '' }}">Maxsus katalog</a>
     <a href="{{ route('admin.index', ['section' => 'lessons']) }}" class="{{ $section === 'lessons' ? 'active' : '' }}">Dars jadvali</a>
     <a href="{{ route('admin.index', ['section' => 'events']) }}" class="{{ $section === 'events' ? 'active' : '' }}">Tadbirlar</a>
-    <a href="{{ route('admin.index', ['section' => 'announcements']) }}" class="{{ $section === 'announcements' ? 'active' : '' }}">E'lonlar</a>
+    <a href="{{ route('admin.index', ['section' => 'announcements']) }}" class="{{ $section === 'announcements' ? 'active' : '' }}">Yangiliklar</a>
     <a href="{{ route('admin.index', ['section' => 'leadership']) }}" class="{{ $section === 'leadership' ? 'active' : '' }}">Rahbariyat</a>
     <a href="{{ route('admin.index', ['section' => 'requests']) }}" class="{{ $section === 'requests' ? 'active' : '' }}">Arizalar</a>
     <a href="{{ route('admin.index', ['section' => 'contacts']) }}" class="{{ $section === 'contacts' ? 'active' : '' }}">Murojaatlar</a>
@@ -137,14 +137,14 @@
 
     @if($section === 'announcements')
     <article class="card">
-        <h2>E'lon joylash</h2>
+        <h2>Yangilik joylash</h2>
         <form method="POST" action="{{ route('admin.announcements.store') }}" class="form">
             @csrf
             <label>Sarlavha</label>
             <input type="text" name="title" required>
             <label>Matn</label>
             <textarea name="body" rows="4" required></textarea>
-            <label class="row gap"><input type="checkbox" value="1" name="is_pinned"> Muhim e'lon</label>
+            <label class="row gap"><input type="checkbox" value="1" name="is_pinned"> Muhim yangilik</label>
             <button class="btn" type="submit">Joylash</button>
         </form>
     </article>
@@ -541,7 +541,7 @@
 
     @if($section === 'announcements')
     <article class="card" id="admin-announcements">
-        <h2>E'lonlarni tahrirlash</h2>
+        <h2>Yangiliklarni tahrirlash</h2>
         <div class="resource-list">
             @forelse($announcements as $announcement)
                 <details class="resource-item">
@@ -561,7 +561,7 @@
                         <textarea name="body" rows="4" required>{{ $announcement->body }}</textarea>
                         <label>Chop etilgan vaqt</label>
                         <input type="datetime-local" name="published_at" value="{{ $announcement->published_at?->format('Y-m-d\TH:i') }}">
-                        <label class="row gap"><input type="checkbox" value="1" name="is_pinned" @checked($announcement->is_pinned)> Muhim e'lon</label>
+                        <label class="row gap"><input type="checkbox" value="1" name="is_pinned" @checked($announcement->is_pinned)> Muhim yangilik</label>
                         <button class="btn" type="submit">Yangilash</button>
                     </form>
                     <form method="POST" action="{{ route('admin.announcements.destroy', $announcement) }}" class="delete-form">
@@ -571,7 +571,7 @@
                     </form>
                 </details>
             @empty
-                <p>E'lonlar yo'q.</p>
+                <p>Yangiliklar yo'q.</p>
             @endforelse
         </div>
     </article>

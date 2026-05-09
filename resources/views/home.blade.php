@@ -98,6 +98,15 @@
                 'imageUrl' => $imageUrl,
             ];
         })->values(),
+        'announcements' => $announcements->map(function ($announcement) {
+            return [
+                'id' => $announcement->id,
+                'title' => $announcement->title,
+                'body' => $announcement->body,
+                'publishedAt' => $announcement->published_at?->toISOString(),
+                'isPinned' => (bool) $announcement->is_pinned,
+            ];
+        })->values(),
         'lessonSchedules' => $lessonSchedules->map(fn ($slot) => [
             'programId' => $slot->program_id,
             'title' => $slot->program?->title ?? 'Erkin mashg\'ulot',

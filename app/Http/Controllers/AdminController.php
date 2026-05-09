@@ -311,7 +311,7 @@ class AdminController extends Controller
             'published_at' => now(),
         ]);
 
-        return back()->with('ok', 'E\'lon joylandi.');
+        return back()->with('ok', 'Yangilik joylandi.');
     }
 
     public function updateAnnouncement(Request $request, Announcement $announcement): RedirectResponse
@@ -332,7 +332,7 @@ class AdminController extends Controller
             'published_at' => $validated['published_at'] ?? null,
         ]);
 
-        return back()->with('ok', 'E\'lon yangilandi.');
+        return back()->with('ok', 'Yangilik yangilandi.');
     }
 
     public function destroyAnnouncement(Announcement $announcement): RedirectResponse
@@ -341,7 +341,7 @@ class AdminController extends Controller
 
         $announcement->delete();
 
-        return back()->with('ok', 'E\'lon o\'chirildi.');
+        return back()->with('ok', 'Yangilik o\'chirildi.');
     }
 
     public function storeLessonSchedule(Request $request): RedirectResponse

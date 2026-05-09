@@ -57,6 +57,23 @@ const defaultLeadershipMembers = [
   },
 ];
 
+const defaultAnnouncements = [
+  {
+    id: 'a1',
+    title: "Kelajak markazida yangi o'quv mavsumi boshlandi",
+    body: "Yangi o'quv mavsumi uchun ro'yxatdan o'tish boshlandi. Dars jadvali va yo'nalishlar bo'yicha yangilangan ma'lumotlar admin panel orqali muntazam e'lon qilinadi.",
+    publishedAt: '2026-04-21T09:00:00+05:00',
+    isPinned: true,
+  },
+  {
+    id: 'a2',
+    title: "Mentorlar uchun ochiq seminar o'tkazildi",
+    body: "Hududdagi mentorlar ishtirokida tajriba almashish seminari o'tkazildi. Unda metodika, monitoring va o'quvchi bilan ishlash bo'yicha amaliy tavsiyalar berildi.",
+    publishedAt: '2026-04-19T14:30:00+05:00',
+    isPinned: false,
+  },
+];
+
 const toneClasses = {
   violet: 'from-violet-500 to-fuchsia-500 text-violet-600 dark:text-violet-200',
   blue: 'from-blue-500 to-cyan-400 text-blue-600 dark:text-blue-200',
@@ -95,7 +112,11 @@ function getRouteFromHash() {
     return 'leadership';
   }
 
-  return ['clubs', 'schedule', 'contact', 'leadership'].includes(route) ? route : 'home';
+  if (route === 'news') {
+    return 'news';
+  }
+
+  return ['clubs', 'schedule', 'contact', 'leadership', 'news'].includes(route) ? route : 'home';
 }
 
 function useHashRoute() {
@@ -164,11 +185,11 @@ function Header({ route }) {
   const aboutItems = [
     ['Rahbariyat', '#/leadership'],
     ["O'quvchilar kengashi", '#student-council'],
-    ['Yangiliklar', '#news'],
+    ['Yangiliklar', '#/news'],
     ['Biz haqimizda', '#about-us'],
   ];
   const currentHash = typeof window !== 'undefined' ? window.location.hash : '';
-  const aboutIsActive = route === 'leadership' || (route === 'home' && aboutItems.some(([, href]) => currentHash === href));
+  const aboutIsActive = ['leadership', 'news'].includes(route) || (route === 'home' && aboutItems.some(([, href]) => currentHash === href));
 
   return (
     <motion.header
@@ -304,8 +325,8 @@ function Header({ route }) {
       </div>
 
       <div
-        className={`overflow-hidden border-t border-slate-200/70 bg-white/96 px-4 transition-[max-height,opacity] duration-300 dark:border-white/10 dark:bg-slate-950/96 sm:hidden ${
-          mobileMenuOpen ? 'max-h-[420px] opacity-100' : 'max-h-0 opacity-0'
+        className={`border-t border-slate-200/70 bg-white/96 px-4 transition-[max-height,opacity] duration-300 dark:border-white/10 dark:bg-slate-950/96 sm:hidden ${
+          mobileMenuOpen ? 'max-h-[calc(100vh-104px)] overflow-y-auto opacity-100' : 'max-h-0 overflow-hidden opacity-0'
         }`}
       >
         <nav className="grid gap-2 py-4">
@@ -1863,6 +1884,200 @@ function LeadershipPage({ members }) {
   );
 }
 
+function formatNewsDate(value) {
+  if (!value) {
+    return "Sana ko'rsatilmagan";
+  }
+
+  const parsed = new Date(value);
+
+  if (Number.isNaN(parsed.getTime())) {
+    return "Sana ko'rsatilmagan";
+  }
+
+  return new Intl.DateTimeFormat('uz-UZ', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(parsed);
+}
+
+function NewsPage({ announcements }) {
+  const [query, setQuery] = useState('');
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+  const [expandedId, setExpandedId] = useState(null);
+
+  const normalizedItems = useMemo(() => (
+    (announcements || [])
+      .map((item, index) => ({
+        id: item.id || `news-${index}`,
+        title: (item.title || "Nomsiz yangilik").trim(),
+        body: (item.body || '').trim(),
+        publishedAt: item.publishedAt || null,
+        isPinned: Boolean(item.isPinned),
+      }))
+      .sort((a, b) => {
+        if (a.isPinned !== b.isPinned) {
+          return a.isPinned ? -1 : 1;
+        }
+
+        const aTime = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+        const bTime = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+
+        return bTime - aTime;
+      })
+  ), [announcements]);
+
+  const filteredItems = useMemo(() => {
+    const queryValue = query.trim().toLowerCase();
+    const from = fromDate ? new Date(`${fromDate}T00:00:00`) : null;
+    const to = toDate ? new Date(`${toDate}T23:59:59`) : null;
+
+    return normalizedItems.filter((item) => {
+      if (queryValue) {
+        const source = `${item.title} ${item.body}`.toLowerCase();
+        if (!source.includes(queryValue)) {
+          return false;
+        }
+      }
+
+      if (!from && !to) {
+        return true;
+      }
+
+      if (!item.publishedAt) {
+        return false;
+      }
+
+      const published = new Date(item.publishedAt);
+
+      if (Number.isNaN(published.getTime())) {
+        return false;
+      }
+
+      if (from && published < from) {
+        return false;
+      }
+
+      if (to && published > to) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [normalizedItems, query, fromDate, toDate]);
+
+  const resetFilters = () => {
+    setQuery('');
+    setFromDate('');
+    setToDate('');
+  };
+
+  return (
+    <div className="bg-[#f4f5fb] text-slate-950">
+      <section className="relative overflow-hidden bg-[linear-gradient(130deg,#1f2e57_0%,#2f3d78_50%,#1f6a89_100%)]">
+        <div className="absolute inset-0 opacity-15 [background-image:linear-gradient(rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:34px_34px]" />
+        <div className="relative mx-auto max-w-[1536px] px-5 py-14 lg:px-16 lg:py-16">
+          <p className="inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-cyan-100">
+            Yangiliklar
+          </p>
+          <h1 className="mt-5 max-w-4xl text-4xl font-black leading-tight text-white sm:text-5xl">
+            Markaz yangiliklari va e'lonlari
+          </h1>
+        </div>
+      </section>
+
+      <section className="mx-auto grid w-[calc(100%_-_28px)] max-w-[1180px] gap-6 py-10 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="grid gap-5">
+          <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Izlash"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base font-semibold text-slate-700 outline-none transition focus:border-violet-300 focus:bg-white"
+            />
+          </div>
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            {filteredItems.length ? filteredItems.map((item) => {
+              const expanded = expandedId === item.id;
+              const shortBody = item.body.length > 160 ? `${item.body.slice(0, 160)}...` : item.body;
+
+              return (
+                <article key={item.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                  <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+                    <img
+                      src={payload.heroImageUrl || payload.logoUrl}
+                      alt={item.title}
+                      className="h-full w-full object-cover"
+                    />
+                    <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-slate-950/65 to-transparent px-3 py-2 text-xs font-bold text-white">
+                      <span>{formatNewsDate(item.publishedAt)}</span>
+                      {item.isPinned ? <span className="rounded-full bg-fuchsia-500/90 px-2 py-0.5 text-[11px] font-black">Muhim</span> : null}
+                    </div>
+                  </div>
+                  <div className="grid gap-3 p-4">
+                    <h2 className="text-2xl font-black leading-tight text-slate-950">{item.title}</h2>
+                    <p className="whitespace-pre-line text-sm font-semibold leading-7 text-slate-600">
+                      {expanded ? item.body : shortBody}
+                    </p>
+                    {item.body.length > 160 ? (
+                      <button
+                        type="button"
+                        onClick={() => setExpandedId((current) => (current === item.id ? null : item.id))}
+                        className="mt-1 inline-flex w-full items-center justify-center rounded-xl bg-violet-200 px-4 py-2 text-lg font-bold text-[#3a1b78] transition hover:bg-violet-300"
+                      >
+                        {expanded ? 'Yopish' : 'Batafsil'}
+                      </button>
+                    ) : null}
+                  </div>
+                </article>
+              );
+            }) : (
+              <article className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-base font-semibold text-slate-500 sm:col-span-2">
+                So'rovingiz bo'yicha yangilik topilmadi.
+              </article>
+            )}
+          </div>
+        </div>
+
+        <aside className="h-fit rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:sticky lg:top-24">
+          <h3 className="text-3xl font-black text-slate-950">Filter</h3>
+          <div className="mt-5 grid gap-3">
+            <label className="grid gap-2">
+              <span className="text-sm font-bold text-slate-600">Davr oralig'i</span>
+              <input
+                type="date"
+                value={fromDate}
+                onChange={(event) => setFromDate(event.target.value)}
+                className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base font-semibold text-slate-700 outline-none transition focus:border-violet-300 focus:bg-white"
+              />
+            </label>
+            <label className="grid gap-2">
+              <span className="text-sm font-bold text-slate-600">Davr gacha</span>
+              <input
+                type="date"
+                value={toDate}
+                onChange={(event) => setToDate(event.target.value)}
+                className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base font-semibold text-slate-700 outline-none transition focus:border-violet-300 focus:bg-white"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={resetFilters}
+              className="mt-2 inline-flex w-full items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base font-bold text-slate-700 transition hover:bg-white"
+            >
+              Filtrlarni tozalash
+            </button>
+          </div>
+        </aside>
+      </section>
+    </div>
+  );
+}
+
 function Hero({ stats, schedules }) {
   return (
     <section id="top" className="mx-auto w-full max-w-[1208px] min-w-0 px-3.5 pb-16 pt-10 lg:pb-24 lg:pt-16">
@@ -1924,6 +2139,7 @@ function AboutCenterSection() {
       id: 'news',
       title: 'Yangiliklar',
       text: "Markazda bo'layotgan tadbirlar, tanlovlar va yangi imkoniyatlar bo'yicha e'lonlar.",
+      href: '#/news',
     },
     {
       id: 'about-us',
@@ -1965,6 +2181,7 @@ function Footer() {
     ["To'garaklar", '#clubs'],
     ['Dars jadvali', '#lessonSchedule'],
     ['Kontaktlar', '#our-contact'],
+    ['Yangiliklar', '#/news'],
     ['Rahbariyat', '#/leadership'],
     ['Maxsus katalog', '#special'],
     ['Markaz haqida', '#cta'],
@@ -2044,6 +2261,7 @@ function App() {
   const clubs = payload.clubs?.length ? payload.clubs : [];
   const schedules = payload.lessonSchedules?.length ? payload.lessonSchedules : [];
   const leadershipMembers = payload.leadershipMembers?.length ? payload.leadershipMembers : defaultLeadershipMembers;
+  const announcements = payload.announcements?.length ? payload.announcements : defaultAnnouncements;
 
   return (
     <main className="premium-bg relative min-h-screen overflow-hidden text-slate-950 transition-colors duration-500 dark:text-white">
@@ -2077,6 +2295,11 @@ function App() {
         ) : route === 'leadership' ? (
           <>
             <LeadershipPage members={leadershipMembers} />
+            <Footer />
+          </>
+        ) : route === 'news' ? (
+          <>
+            <NewsPage announcements={announcements} />
             <Footer />
           </>
         ) : (

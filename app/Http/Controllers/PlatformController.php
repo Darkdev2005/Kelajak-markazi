@@ -6,6 +6,7 @@ use App\Models\Announcement;
 use App\Models\ApplicationRequest;
 use App\Models\ContactMessage;
 use App\Models\Event;
+use App\Models\LeadershipMember;
 use App\Models\LessonSchedule;
 use App\Models\PortfolioItem;
 use App\Models\Program;
@@ -14,6 +15,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 class PlatformController extends Controller
@@ -47,6 +49,14 @@ class PlatformController extends Controller
             ->latest()
             ->get();
 
+        $leadershipMembers = Schema::hasTable('leadership_members')
+            ? LeadershipMember::query()
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->latest()
+                ->get()
+            : collect();
+
         $statistics = [
             ['value' => '9 809', 'label' => 'Hamkor tashkilotlar', 'tone' => 'violet'],
             ['value' => number_format(max(27397, $programs->count() * 5480), 0, '.', ' '), 'label' => 'Faol to\'garak o\'rinlari', 'tone' => 'blue'],
@@ -73,6 +83,7 @@ class PlatformController extends Controller
             'announcements',
             'lessonSchedules',
             'specialCourses',
+            'leadershipMembers',
             'statistics',
             'directions',
             'roadmap'

@@ -1,6 +1,7 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
+@php($section = $activeSection ?? 'programs')
 <section class="dashboard-hero card glow reveal">
     <div>
         <span class="eyebrow">Admin markaz</span>
@@ -12,6 +13,7 @@
         <article class="mini-card"><strong>{{ $stats['programs'] }}</strong><span>Dastur</span></article>
         <article class="mini-card"><strong>{{ $stats['lessons'] }}</strong><span>Dars sloti</span></article>
         <article class="mini-card"><strong>{{ $stats['special_courses'] }}</strong><span>Maxsus katalog</span></article>
+        <article class="mini-card"><strong>{{ $stats['leadership_members'] }}</strong><span>Rahbariyat</span></article>
         <article class="mini-card"><strong>{{ $stats['events'] }}</strong><span>Tadbir</span></article>
         <article class="mini-card"><strong>{{ $stats['announcements'] }}</strong><span>E'lon</span></article>
         <article class="mini-card"><strong>{{ $stats['contacts'] }}</strong><span>Yangi murojaat</span></article>
@@ -19,16 +21,19 @@
 </section>
 
 <section class="admin-tabs reveal">
-    <a href="#admin-programs">Dasturlar</a>
-    <a href="#admin-special">Maxsus katalog</a>
-    <a href="#admin-lessons">Dars jadvali</a>
-    <a href="#admin-events">Tadbirlar</a>
-    <a href="#admin-announcements">E'lonlar</a>
-    <a href="#admin-requests">Arizalar</a>
-    <a href="#admin-contacts">Murojaatlar</a>
+    <a href="{{ route('admin.index', ['section' => 'programs']) }}" class="{{ $section === 'programs' ? 'active' : '' }}">Dasturlar</a>
+    <a href="{{ route('admin.index', ['section' => 'special']) }}" class="{{ $section === 'special' ? 'active' : '' }}">Maxsus katalog</a>
+    <a href="{{ route('admin.index', ['section' => 'lessons']) }}" class="{{ $section === 'lessons' ? 'active' : '' }}">Dars jadvali</a>
+    <a href="{{ route('admin.index', ['section' => 'events']) }}" class="{{ $section === 'events' ? 'active' : '' }}">Tadbirlar</a>
+    <a href="{{ route('admin.index', ['section' => 'announcements']) }}" class="{{ $section === 'announcements' ? 'active' : '' }}">E'lonlar</a>
+    <a href="{{ route('admin.index', ['section' => 'leadership']) }}" class="{{ $section === 'leadership' ? 'active' : '' }}">Rahbariyat</a>
+    <a href="{{ route('admin.index', ['section' => 'requests']) }}" class="{{ $section === 'requests' ? 'active' : '' }}">Arizalar</a>
+    <a href="{{ route('admin.index', ['section' => 'contacts']) }}" class="{{ $section === 'contacts' ? 'active' : '' }}">Murojaatlar</a>
 </section>
 
+@if(in_array($section, ['programs', 'events', 'special', 'announcements'], true))
 <section class="grid three section-block reveal">
+    @if($section === 'programs')
     <article class="card">
         <h2>To'garak qo'shish</h2>
         <form method="POST" action="{{ route('admin.programs.store') }}" class="form" enctype="multipart/form-data">
@@ -79,7 +84,9 @@
             <button class="btn" type="submit">To'garakni saqlash</button>
         </form>
     </article>
+    @endif
 
+    @if($section === 'events')
     <article class="card">
         <h2>Tadbir qo'shish</h2>
         <form method="POST" action="{{ route('admin.events.store') }}" class="form">
@@ -95,7 +102,9 @@
             <button class="btn" type="submit">Saqlash</button>
         </form>
     </article>
+    @endif
 
+    @if($section === 'special')
     <article class="card">
         <h2>Maxsus katalog qo'shish</h2>
         <form method="POST" action="{{ route('admin.special-courses.store') }}" class="form">
@@ -124,7 +133,9 @@
             <button class="btn" type="submit">Katalogga qo'shish</button>
         </form>
     </article>
+    @endif
 
+    @if($section === 'announcements')
     <article class="card">
         <h2>E'lon joylash</h2>
         <form method="POST" action="{{ route('admin.announcements.store') }}" class="form">
@@ -137,8 +148,97 @@
             <button class="btn" type="submit">Joylash</button>
         </form>
     </article>
+    @endif
 </section>
+@endif
 
+@if($section === 'leadership')
+<section class="grid two section-block reveal" id="admin-leadership">
+    <article class="card">
+        <h2>Rahbariyat qo'shish</h2>
+        <form method="POST" action="{{ route('admin.leadership-members.store') }}" class="form" enctype="multipart/form-data">
+            @csrf
+            <label>F.I.Sh</label>
+            <input type="text" name="name" required placeholder="Ism Familiya">
+            <label>Lavozim</label>
+            <input type="text" name="position" required placeholder="Maktab direktori">
+            <label>Xodim ma'lumoti</label>
+            <textarea name="employee_info" rows="4" placeholder="Qisqacha ma'lumot"></textarea>
+            <label>Mehnat faoliyati</label>
+            <textarea name="work_activity" rows="5" placeholder="Mehnat faoliyati ma'lumoti"></textarea>
+            <div class="grid two compact">
+                <div>
+                    <label>Rasm yuklash</label>
+                    <input type="file" name="image" accept="image/*">
+                </div>
+                <div>
+                    <label>Tartib</label>
+                    <input type="number" name="sort_order" min="0" value="0">
+                </div>
+            </div>
+            <label>Yoki rasm yo'li/URL</label>
+            <input type="text" name="image_url" placeholder="images/leadership/director.jpg">
+            <label class="row gap"><input type="checkbox" value="1" name="is_active" checked> Saytda ko'rinsin</label>
+            <button class="btn" type="submit">Rahbariyatga qo'shish</button>
+        </form>
+    </article>
+
+    <article class="card">
+        <h2>Rahbariyatni boshqarish</h2>
+        <div class="resource-list">
+            @forelse($leadershipMembers as $member)
+                <details class="resource-item">
+                    <summary>
+                        <span>
+                            <strong>{{ $member->name }}</strong>
+                            <small>{{ $member->position }}</small>
+                        </span>
+                        <em>{{ $member->is_active ? 'Faol' : 'Yopiq' }}</em>
+                    </summary>
+                    @if($member->image_url)
+                        <img class="admin-preview" src="{{ \Illuminate\Support\Str::startsWith($member->image_url, ['http://', 'https://']) ? $member->image_url : asset($member->image_url) }}" alt="{{ $member->name }}">
+                    @endif
+                    <form method="POST" action="{{ route('admin.leadership-members.update', $member) }}" class="form edit-form" enctype="multipart/form-data">
+                        @csrf
+                        @method('PATCH')
+                        <label>F.I.Sh</label>
+                        <input type="text" name="name" value="{{ $member->name }}" required>
+                        <label>Lavozim</label>
+                        <input type="text" name="position" value="{{ $member->position }}" required>
+                        <label>Xodim ma'lumoti</label>
+                        <textarea name="employee_info" rows="4">{{ $member->bio }}</textarea>
+                        <label>Mehnat faoliyati</label>
+                        <textarea name="work_activity" rows="5">{{ $member->objective }}</textarea>
+                        <div class="grid two compact">
+                            <div>
+                                <label>Yangi rasm yuklash</label>
+                                <input type="file" name="image" accept="image/*">
+                            </div>
+                            <div>
+                                <label>Tartib</label>
+                                <input type="number" name="sort_order" min="0" value="{{ $member->sort_order }}">
+                            </div>
+                        </div>
+                        <label>Rasm yo'li yoki URL</label>
+                        <input type="text" name="image_url" value="{{ $member->image_url }}">
+                        <label class="row gap"><input type="checkbox" value="1" name="is_active" @checked($member->is_active)> Saytda ko'rinsin</label>
+                        <button class="btn" type="submit">Yangilash</button>
+                    </form>
+                    <form method="POST" action="{{ route('admin.leadership-members.destroy', $member) }}" class="delete-form">
+                        @csrf
+                        @method('DELETE')
+                        <button class="btn danger" type="submit">O'chirish</button>
+                    </form>
+                </details>
+            @empty
+                <p>Rahbariyat yozuvlari yo'q.</p>
+            @endforelse
+        </div>
+    </article>
+</section>
+@endif
+
+@if($section === 'lessons')
 <section class="grid two section-block reveal" id="admin-lessons">
     <article class="card">
         <h2>Dars jadvali qo'shish</h2>
@@ -195,8 +295,8 @@
                 <details class="resource-item">
                     <summary>
                         <span>
-                            <strong>{{ $slot->day_label }} · {{ $slot->start_time->format('H:i') }}</strong>
-                            <small>{{ $slot->program?->title ?? 'Erkin mashg\'ulot' }} · {{ $slot->mentor ?? 'Mentor belgilanmagan' }}</small>
+                            <strong>{{ $slot->day_label }} В· {{ $slot->start_time->format('H:i') }}</strong>
+                            <small>{{ $slot->program?->title ?? 'Erkin mashg\'ulot' }} В· {{ $slot->mentor ?? 'Mentor belgilanmagan' }}</small>
                         </span>
                         <em>{{ $slot->is_active ? 'Faol' : 'Yopiq' }}</em>
                     </summary>
@@ -260,7 +360,9 @@
         </div>
     </article>
 </section>
+@endif
 
+@if($section === 'special')
 <section class="section-block reveal" id="admin-special">
     <div class="section-head">
         <span class="eyebrow">Maxsus katalog</span>
@@ -273,7 +375,7 @@
                 <summary>
                     <span>
                         <strong>{{ $course->title }}</strong>
-                        <small>{{ number_format($course->price, 0, '.', ' ') }} so'm · {{ $course->category }}</small>
+                        <small>{{ number_format($course->price, 0, '.', ' ') }} so'm В· {{ $course->category }}</small>
                     </span>
                     <em>{{ $course->is_active ? 'Faol' : 'Yopiq' }}</em>
                 </summary>
@@ -314,7 +416,9 @@
         @endforelse
     </div>
 </section>
+@endif
 
+@if($section === 'programs')
 <section class="section-block reveal" id="admin-programs">
     <div class="section-head">
         <span class="eyebrow">To'garaklar</span>
@@ -327,7 +431,7 @@
                 <summary>
                     <span>
                         <strong>{{ $program->title }}</strong>
-                        <small>{{ number_format($program->price ?? 0, 0, '.', ' ') }} so'm · {{ $program->category ?? 'Yo\'nalish kiritilmagan' }}</small>
+                        <small>{{ number_format($program->price ?? 0, 0, '.', ' ') }} so'm В· {{ $program->category ?? 'Yo\'nalish kiritilmagan' }}</small>
                     </span>
                     <em>{{ $program->is_active ? 'Faol' : 'Yopiq' }}</em>
                 </summary>
@@ -393,8 +497,11 @@
         @endforelse
     </div>
 </section>
+@endif
 
+@if(in_array($section, ['events', 'announcements'], true))
 <section class="grid two section-block reveal" id="admin-events">
+    @if($section === 'events')
     <article class="card">
         <h2>Tadbirlarni tahrirlash</h2>
         <div class="resource-list">
@@ -403,7 +510,7 @@
                     <summary>
                         <span>
                             <strong>{{ $event->title }}</strong>
-                            <small>{{ $event->event_date->format('d.m.Y') }} · {{ $event->location }}</small>
+                            <small>{{ $event->event_date->format('d.m.Y') }} В· {{ $event->location }}</small>
                         </span>
                     </summary>
                     <form method="POST" action="{{ route('admin.events.update', $event) }}" class="form edit-form">
@@ -430,7 +537,9 @@
             @endforelse
         </div>
     </article>
+    @endif
 
+    @if($section === 'announcements')
     <article class="card" id="admin-announcements">
         <h2>E'lonlarni tahrirlash</h2>
         <div class="resource-list">
@@ -466,9 +575,13 @@
             @endforelse
         </div>
     </article>
+    @endif
 </section>
+@endif
 
+@if(in_array($section, ['requests', 'contacts'], true))
 <section class="grid two section-block reveal" id="admin-requests">
+    @if($section === 'requests')
     <article class="card">
         <h2>Arizalar</h2>
         <table class="table">
@@ -511,7 +624,9 @@
             </tbody>
         </table>
     </article>
+    @endif
 
+    @if($section === 'contacts')
     <article class="card" id="admin-contacts">
         <h2>Murojaatlar</h2>
         <table class="table">
@@ -561,5 +676,8 @@
             </tbody>
         </table>
     </article>
+    @endif
 </section>
+@endif
 @endsection
+

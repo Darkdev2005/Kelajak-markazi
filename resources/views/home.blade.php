@@ -84,6 +84,20 @@
                 'description' => $course->description,
             ];
         })->values(),
+        'leadershipMembers' => $leadershipMembers->map(function ($member) {
+            $imageUrl = $member->image_url
+                ? (\Illuminate\Support\Str::startsWith($member->image_url, ['http://', 'https://']) ? $member->image_url : asset($member->image_url))
+                : asset('images/kelajak-logo.png');
+
+            return [
+                'id' => $member->id,
+                'name' => $member->name,
+                'position' => $member->position,
+                'employeeInfo' => $member->bio,
+                'workActivity' => $member->objective,
+                'imageUrl' => $imageUrl,
+            ];
+        })->values(),
         'lessonSchedules' => $lessonSchedules->map(fn ($slot) => [
             'programId' => $slot->program_id,
             'title' => $slot->program?->title ?? 'Erkin mashg\'ulot',

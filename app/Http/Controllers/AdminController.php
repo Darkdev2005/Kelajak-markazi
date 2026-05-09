@@ -6,12 +6,14 @@ use App\Models\Announcement;
 use App\Models\ApplicationRequest;
 use App\Models\ContactMessage;
 use App\Models\Event;
+use App\Models\LeadershipMember;
 use App\Models\LessonSchedule;
 use App\Models\Program;
 use App\Models\SpecialCourse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -90,9 +92,79 @@ class AdminController extends Controller
         ];
     }
 
-    public function index(): View
+    private function leadershipValidationRules(): array
+    {
+        return [
+            'name' => ['required', 'string', 'max:180'],
+            'position' => ['required', 'string', 'max:220'],
+            'employee_info' => ['nullable', 'string', 'max:2500'],
+            'work_activity' => ['nullable', 'string', 'max:4000'],
+            'image_url' => ['nullable', 'string', 'max:255'],
+            'image' => ['nullable', 'image', 'max:4096'],
+            'sort_order' => ['nullable', 'integer', 'min:0', 'max:999'],
+            'is_active' => ['nullable', 'boolean'],
+        ];
+    }
+
+    private function resolveLeadershipImage(Request $request, ?LeadershipMember $member = null): ?string
+    {
+        if (! $request->hasFile('image')) {
+            return $request->filled('image_url') ? $request->string('image_url')->toString() : null;
+        }
+
+        $directory = public_path('images/leadership');
+
+        if (! is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
+
+        $file = $request->file('image');
+        $name = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) ?: 'leadership';
+        $filename = $name . '-' . Str::uuid() . '.' . $file->extension();
+
+        $file->move($directory, $filename);
+
+        $oldImage = $member?->image_url;
+
+        if ($oldImage && Str::startsWith($oldImage, 'images/leadership/') && is_file(public_path($oldImage))) {
+            @unlink(public_path($oldImage));
+        }
+
+        return 'images/leadership/' . $filename;
+    }
+
+    private function leadershipPayload(array $validated, ?string $imageUrl, bool $defaultActive): array
+    {
+        return [
+            'name' => $validated['name'],
+            'position' => $validated['position'],
+            'organization' => null,
+            'bio' => $validated['employee_info'] ?? null,
+            'objective' => $validated['work_activity'] ?? null,
+            'image_url' => $imageUrl,
+            'sort_order' => $validated['sort_order'] ?? 0,
+            'is_active' => (bool) ($validated['is_active'] ?? $defaultActive),
+        ];
+    }
+
+    public function index(Request $request): View
     {
         $this->ensureAdmin();
+
+        $allowedSections = [
+            'programs',
+            'special',
+            'lessons',
+            'events',
+            'announcements',
+            'leadership',
+            'requests',
+            'contacts',
+        ];
+        $activeSection = $request->string('section')->toString();
+        if (! in_array($activeSection, $allowedSections, true)) {
+            $activeSection = 'programs';
+        }
 
         $stats = [
             'users' => \App\Models\User::count(),
@@ -101,6 +173,7 @@ class AdminController extends Controller
             'announcements' => Announcement::count(),
             'lessons' => LessonSchedule::count(),
             'special_courses' => SpecialCourse::count(),
+            'leadership_members' => Schema::hasTable('leadership_members') ? LeadershipMember::count() : 0,
             'applications' => ApplicationRequest::count(),
             'contacts' => ContactMessage::query()->where('status', 'new')->count(),
         ];
@@ -123,6 +196,12 @@ class AdminController extends Controller
             ->orderBy('sort_order')
             ->latest()
             ->get();
+        $leadershipMembers = Schema::hasTable('leadership_members')
+            ? LeadershipMember::query()
+                ->orderBy('sort_order')
+                ->latest()
+                ->get()
+            : collect();
         $contactMessages = ContactMessage::query()->latest()->get();
 
         return view('admin.index', compact(
@@ -133,7 +212,9 @@ class AdminController extends Controller
             'announcements',
             'lessonSchedules',
             'specialCourses',
-            'contactMessages'
+            'leadershipMembers',
+            'contactMessages',
+            'activeSection'
         ));
     }
 
@@ -392,6 +473,43 @@ class AdminController extends Controller
         $specialCourse->delete();
 
         return back()->with('ok', 'Maxsus katalog elementi o\'chirildi.');
+    }
+
+    public function storeLeadershipMember(Request $request): RedirectResponse
+    {
+        $this->ensureAdmin();
+
+        $validated = $request->validate([
+            ...$this->leadershipValidationRules(),
+        ]);
+
+        LeadershipMember::create($this->leadershipPayload($validated, $this->resolveLeadershipImage($request), true));
+
+        return back()->with('ok', 'Rahbariyat a\'zosi qo\'shildi.');
+    }
+
+    public function updateLeadershipMember(Request $request, LeadershipMember $leadershipMember): RedirectResponse
+    {
+        $this->ensureAdmin();
+
+        $validated = $request->validate([
+            ...$this->leadershipValidationRules(),
+        ]);
+
+        $leadershipMember->update(
+            $this->leadershipPayload($validated, $this->resolveLeadershipImage($request, $leadershipMember), false)
+        );
+
+        return back()->with('ok', 'Rahbariyat ma\'lumoti yangilandi.');
+    }
+
+    public function destroyLeadershipMember(LeadershipMember $leadershipMember): RedirectResponse
+    {
+        $this->ensureAdmin();
+
+        $leadershipMember->delete();
+
+        return back()->with('ok', 'Rahbariyat ma\'lumoti o\'chirildi.');
     }
 
     public function updateApplicationStatus(Request $request, ApplicationRequest $application): RedirectResponse

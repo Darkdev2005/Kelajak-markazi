@@ -40,6 +40,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/special-courses', [AdminController::class, 'storeSpecialCourse'])->name('special-courses.store');
         Route::patch('/special-courses/{specialCourse}', [AdminController::class, 'updateSpecialCourse'])->name('special-courses.update');
         Route::delete('/special-courses/{specialCourse}', [AdminController::class, 'destroySpecialCourse'])->name('special-courses.destroy');
+        Route::post('/leadership-members', [AdminController::class, 'storeLeadershipMember'])->name('leadership-members.store');
+        Route::patch('/leadership-members/{leadershipMember}', [AdminController::class, 'updateLeadershipMember'])->name('leadership-members.update');
+        Route::delete('/leadership-members/{leadershipMember}', [AdminController::class, 'destroyLeadershipMember'])->name('leadership-members.destroy');
         Route::patch('/applications/{application}', [AdminController::class, 'updateApplicationStatus'])->name('applications.status');
         Route::delete('/applications/{application}', [AdminController::class, 'destroyApplication'])->name('applications.destroy');
         Route::patch('/contact-messages/{contactMessage}', [AdminController::class, 'updateContactStatus'])->name('contacts.status');

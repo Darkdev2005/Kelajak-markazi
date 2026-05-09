@@ -30,6 +30,33 @@ const defaultContact = {
   mapEmbedUrl: 'https://www.google.com/maps?q=Toshkent%20Navoiy%202A&z=15&output=embed',
 };
 
+const defaultLeadershipMembers = [
+  {
+    id: 'd1',
+    name: 'Abdulla Xasanov',
+    position: 'Maktab direktori',
+    employeeInfo: "Ta'lim sifati va boshqaruv bo'yicha mas'ul.",
+    workActivity: "Markaz boshqaruvi, ta'lim jarayonlari nazorati va strategik rejalashtirish bo'yicha faoliyat yuritadi.",
+    imageUrl: payload.logoUrl,
+  },
+  {
+    id: 'd2',
+    name: 'Madina Karimova',
+    position: "O'quv ishlari bo'yicha direktor o'rinbosari",
+    employeeInfo: "Dars jarayonlari va metodika sifatini nazorat qiladi.",
+    workActivity: "O'quv rejalari, ichki monitoring va mentorlar metodik ishlarini muvofiqlashtiradi.",
+    imageUrl: payload.logoUrl,
+  },
+  {
+    id: 'd3',
+    name: 'Jasur Norqulov',
+    position: "Tashkiliy ishlar bo'yicha direktor o'rinbosari",
+    employeeInfo: 'Tashkiliy jarayonlar va ichki koordinatsiyani yuritadi.',
+    workActivity: "Tashkiliy ishlar, jamoa koordinatsiyasi hamda tadbirlarni rejalashtirish bilan shug'ullanadi.",
+    imageUrl: payload.logoUrl,
+  },
+];
+
 const toneClasses = {
   violet: 'from-violet-500 to-fuchsia-500 text-violet-600 dark:text-violet-200',
   blue: 'from-blue-500 to-cyan-400 text-blue-600 dark:text-blue-200',
@@ -71,7 +98,11 @@ function getRouteFromHash() {
     return 'contact';
   }
 
-  return ['clubs', 'schedule', 'contact'].includes(route) ? route : 'home';
+  if (route === 'leadership') {
+    return 'leadership';
+  }
+
+  return ['clubs', 'schedule', 'contact', 'leadership'].includes(route) ? route : 'home';
 }
 
 function useHashRoute() {
@@ -135,9 +166,16 @@ function Header({ route }) {
     ['Asosiy sahifa', '#top'],
     ["To'garaklar", '#clubs'],
     ['Dars jadvali', '#lessonSchedule'],
-    ['Markaz haqida', '#cta'],
     ['Kontaktlar', '#our-contact'],
   ];
+  const aboutItems = [
+    ['Rahbariyat', '#/leadership'],
+    ["O'quvchilar kengashi", '#student-council'],
+    ['Yangiliklar', '#news'],
+    ['Biz haqimizda', '#about-us'],
+  ];
+  const currentHash = typeof window !== 'undefined' ? window.location.hash : '';
+  const aboutIsActive = route === 'leadership' || (route === 'home' && aboutItems.some(([, href]) => currentHash === href));
 
   return (
     <motion.header
@@ -188,7 +226,7 @@ function Header({ route }) {
           </svg>
         </button>
 
-        <nav className="hidden justify-self-center rounded-2xl border border-slate-200/80 bg-white/62 p-1 shadow-inner shadow-slate-950/5 backdrop-blur-xl dark:border-white/10 dark:bg-white/8 xl:flex">
+        <nav className="hidden items-center justify-self-center rounded-2xl border border-slate-200/80 bg-white/62 p-1 shadow-inner shadow-slate-950/5 backdrop-blur-xl dark:border-white/10 dark:bg-white/8 xl:flex">
           {navItems.map(([label, href], index) => {
             const isActive =
               (route === 'clubs' && href === '#clubs')
@@ -210,6 +248,35 @@ function Header({ route }) {
             </a>
             );
           })}
+
+          <div className="group relative">
+            <button
+              type="button"
+              className={`inline-flex items-center gap-2 whitespace-nowrap rounded-xl px-4 py-3 text-base font-bold tracking-normal transition-all duration-300 ${
+                aboutIsActive
+                  ? 'bg-slate-950 text-white shadow-lg shadow-violet-500/15 dark:bg-white dark:text-slate-950'
+                  : 'text-slate-700 hover:bg-violet-50 hover:text-[#3a1b78] dark:text-slate-200 dark:hover:bg-white/10 dark:hover:text-cyan-100'
+              }`}
+              aria-haspopup="menu"
+              aria-label="Markaz haqida bo'limlari"
+            >
+              Markaz haqida
+              <span className="text-xs">▼</span>
+            </button>
+            <div className="pointer-events-none absolute left-0 top-full z-50 pt-2 opacity-0 transition-all duration-200 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100">
+              <div className="min-w-[300px] rounded-2xl border border-slate-200 bg-slate-50 p-2 shadow-2xl dark:border-white/10 dark:bg-slate-900">
+                {aboutItems.map(([label, href]) => (
+                  <a
+                    key={href}
+                    href={href}
+                    className="block rounded-xl px-4 py-3 text-2xl font-bold text-slate-700 transition hover:bg-white hover:text-[#3a1b78] dark:text-slate-100 dark:hover:bg-white/10 dark:hover:text-cyan-200"
+                  >
+                    {label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
         </nav>
 
         <div className="hidden shrink-0 items-center justify-self-end gap-2 sm:flex sm:gap-3">
@@ -271,6 +338,22 @@ function Header({ route }) {
               </a>
             );
           })}
+
+          <div className="grid gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2 dark:border-white/10 dark:bg-white/6">
+            <div className="px-2 pb-1 text-sm font-black uppercase tracking-[0.12em] text-slate-500 dark:text-slate-300">
+              Markaz haqida
+            </div>
+            {aboutItems.map(([label, href]) => (
+              <a
+                key={href}
+                href={href}
+                onClick={() => setMobileMenuOpen(false)}
+                className="rounded-xl bg-white px-4 py-3 text-base font-bold text-slate-700 transition hover:bg-violet-50 hover:text-[#3a1b78] dark:bg-white/8 dark:text-slate-100 dark:hover:bg-white/14 dark:hover:text-cyan-100"
+              >
+                {label}
+              </a>
+            ))}
+          </div>
 
           <div className="mt-2 grid gap-2 border-t border-slate-200 pt-4 dark:border-white/10">
             <button
@@ -1671,6 +1754,122 @@ function ContactPage() {
   );
 }
 
+function EmployeeInfo({ text }) {
+  const [expanded, setExpanded] = useState(false);
+  const content = (text || '').trim();
+
+  if (!content) {
+    return null;
+  }
+
+  return (
+    <div className="grid gap-2">
+      <p
+        className="text-sm font-semibold leading-6 text-slate-600 whitespace-pre-line"
+        style={expanded ? undefined : {
+          display: '-webkit-box',
+          WebkitBoxOrient: 'vertical',
+          WebkitLineClamp: 5,
+          overflow: 'hidden',
+          minHeight: '7.5rem',
+        }}
+      >
+        {content}
+      </p>
+      {content.length > 220 ? (
+        <button
+          type="button"
+          onClick={() => setExpanded((current) => !current)}
+          className="mx-auto w-fit rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-black uppercase tracking-[0.12em] text-slate-700 transition hover:bg-slate-100"
+        >
+          {expanded ? 'Yopish' : 'Batafsil'}
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+function WorkActivityToggle({ text }) {
+  const [expanded, setExpanded] = useState(false);
+  const content = (text || '').trim();
+
+  if (!content) {
+    return null;
+  }
+
+  return (
+    <div className="grid gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+      <button
+        type="button"
+        onClick={() => setExpanded((current) => !current)}
+        className="mx-auto w-fit rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-black uppercase tracking-[0.12em] text-slate-700 transition hover:bg-slate-100"
+      >
+        {expanded ? 'Yopish' : "Mehnat faoliyati"}
+      </button>
+      {expanded ? (
+        <p className="text-sm font-semibold leading-6 text-slate-600 whitespace-pre-line">
+          {content}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function LeadershipPage({ members }) {
+  return (
+    <div className="bg-[#f4f5fb] text-slate-950">
+      <section className="relative overflow-hidden bg-[linear-gradient(130deg,#1f2e57_0%,#2f3d78_50%,#1f6a89_100%)]">
+        <div className="absolute inset-0 opacity-15 [background-image:linear-gradient(rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:34px_34px]" />
+        <div className="relative mx-auto max-w-[1536px] px-5 py-14 lg:px-16 lg:py-16">
+          <p className="inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-cyan-100">
+            Rahbariyat
+          </p>
+          <h1 className="mt-5 max-w-4xl text-4xl font-black leading-tight text-white sm:text-5xl">
+            Samarqand viloyat "Kelajak" markazi boshqaruv jamoasi
+          </h1>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-[1536px] px-5 py-10 lg:px-16 lg:py-14">
+        <div className="grid gap-5 justify-items-center md:grid-cols-2 xl:grid-cols-3">
+          {members.map((member, index) => {
+            const name = (member.name || '').trim();
+            const position = (member.position || '').trim();
+            const nameLower = name.toLowerCase();
+            const positionLower = position.toLowerCase();
+            const showName = name && position && !nameLower.includes(positionLower) && !positionLower.includes(nameLower);
+
+            return (
+            <motion.article
+              key={member.id || `${member.name || member.position}-${index}`}
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-90px' }}
+              transition={{ delay: index * 0.06, duration: 0.42 }}
+              className="flex h-full w-full max-w-[540px] flex-col overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white shadow-sm"
+            >
+              <div className="aspect-[4/5] overflow-hidden bg-slate-100">
+                <img
+                  src={member.imageUrl || payload.logoUrl}
+                  alt={member.position || member.name || 'Rahbar'}
+                  className="h-full w-full object-cover object-top"
+                />
+              </div>
+              <div className="grid flex-1 content-start gap-3 p-5">
+                <h2 className="min-h-[5.6rem] text-2xl font-black leading-tight text-slate-950">{member.position}</h2>
+                {showName ? <p className="min-h-[2rem] text-base font-semibold text-slate-700">{member.name}</p> : <div className="min-h-[2rem]" />}
+                <EmployeeInfo text={member.employeeInfo} />
+                <WorkActivityToggle text={member.workActivity} />
+              </div>
+            </motion.article>
+            );
+          })}
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function Hero({ stats, schedules }) {
   return (
     <section id="top" className="mx-auto w-full max-w-[1208px] min-w-0 px-3.5 pb-16 pt-10 lg:pb-24 lg:pt-16">
@@ -1715,6 +1914,56 @@ function Hero({ stats, schedules }) {
   );
 }
 
+function AboutCenterSection() {
+  const blocks = [
+    {
+      id: 'leadership',
+      title: 'Rahbariyat',
+      text: "Markaz strategiyasi, boshqaruv qarorlari va yo'nalishlar bo'yicha mas'ul jamoa.",
+      href: '#/leadership',
+    },
+    {
+      id: 'student-council',
+      title: "O'quvchilar kengashi",
+      text: "O'quvchi tashabbuslarini yig'ib, tadbirlar va ijtimoiy loyihalarni hamkorlikda olib boradigan kengash.",
+    },
+    {
+      id: 'news',
+      title: 'Yangiliklar',
+      text: "Markazda bo'layotgan tadbirlar, tanlovlar va yangi imkoniyatlar bo'yicha e'lonlar.",
+    },
+    {
+      id: 'about-us',
+      title: 'Biz haqimizda',
+      text: "Kelajak Markazining maqsadi, qadriyatlari va ta'limni natijaga aylantirish yondashuvi.",
+    },
+  ];
+
+  return (
+    <section className="mx-auto w-[calc(100%_-_28px)] max-w-[1180px] py-12">
+      <div className="mb-8 max-w-3xl">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-600 dark:text-cyan-200">Markaz haqida</p>
+        <h2 className="mt-3 text-3xl font-black text-slate-950 dark:text-white sm:text-5xl">Asosiy bo'limlar</h2>
+      </div>
+
+      <div className="grid gap-5 md:grid-cols-2">
+        {blocks.map((block) => (
+          <article
+            key={block.id}
+            id={block.id}
+            className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-lg hover:shadow-slate-900/5 dark:border-white/10 dark:bg-white/8"
+          >
+            <h3 className="text-2xl font-black text-slate-950 dark:text-white">
+              {block.href ? <a href={block.href}>{block.title}</a> : block.title}
+            </h3>
+            <p className="mt-3 text-base font-semibold leading-7 text-slate-600 dark:text-slate-300">{block.text}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function Footer() {
   const year = new Date().getFullYear();
   const contact = payload.contact || defaultContact;
@@ -1723,6 +1972,7 @@ function Footer() {
     ["To'garaklar", '#clubs'],
     ['Dars jadvali', '#lessonSchedule'],
     ['Kontaktlar', '#our-contact'],
+    ['Rahbariyat', '#/leadership'],
     ['Maxsus katalog', '#special'],
     ['Markaz haqida', '#cta'],
   ];
@@ -1800,6 +2050,7 @@ function App() {
   const features = payload.features || [];
   const clubs = payload.clubs?.length ? payload.clubs : [];
   const schedules = payload.lessonSchedules?.length ? payload.lessonSchedules : [];
+  const leadershipMembers = payload.leadershipMembers?.length ? payload.leadershipMembers : defaultLeadershipMembers;
 
   return (
     <main className="premium-bg relative min-h-screen overflow-hidden text-slate-950 transition-colors duration-500 dark:text-white">
@@ -1828,6 +2079,11 @@ function App() {
         ) : route === 'contact' ? (
           <>
             <ContactPage />
+            <Footer />
+          </>
+        ) : route === 'leadership' ? (
+          <>
+            <LeadershipPage members={leadershipMembers} />
             <Footer />
           </>
         ) : (
@@ -1862,6 +2118,8 @@ function App() {
                 ))}
               </div>
             </section>
+
+            <AboutCenterSection />
 
             <SpecialStrip items={payload.specialCourses} />
 

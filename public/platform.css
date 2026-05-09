@@ -861,6 +861,85 @@ img {
   margin-top: 26px;
 }
 
+.admin-clean {
+  background: #f3f5f9;
+  color: #0f172a;
+}
+
+.admin-clean .topbar {
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid #d8dee9;
+}
+
+.admin-clean .admin-main {
+  padding-bottom: 48px;
+}
+
+.admin-clean .card,
+.admin-clean .resource-item,
+.admin-clean .mini-card {
+  border-color: #d6dde8;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+.admin-clean .dashboard-hero {
+  border: 1px solid #d6dde8;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 22px;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+}
+
+.admin-clean .admin-tabs {
+  border-color: #d6dde8;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+}
+
+.admin-clean .admin-tabs a {
+  color: #1f3f7f;
+  background: #eef3ff;
+}
+
+.admin-clean .admin-tabs a.active {
+  background: #1f3f7f;
+  color: #fff;
+}
+
+.admin-clean .admin-tabs a:hover {
+  color: #0f172a;
+  background: #dfe9ff;
+}
+
+.admin-clean .btn {
+  border-color: #1f3f7f;
+  background: #1f3f7f;
+}
+
+.admin-clean .btn:hover {
+  background: #183366;
+  box-shadow: 0 10px 22px rgba(31, 63, 127, 0.22);
+}
+
+.admin-clean .btn.ghost {
+  color: #1f3f7f;
+  border-color: #b8c8ea;
+  background: #f7faff;
+}
+
+.admin-clean .btn.ghost:hover {
+  background: #ebf2ff;
+}
+
+.admin-clean .btn.danger {
+  border-color: #b4232b;
+  background: #b4232b;
+}
+
+.admin-clean .btn.danger:hover {
+  background: #8d1e24;
+}
+
 .admin-tabs {
   position: sticky;
   top: 86px;
@@ -882,6 +961,11 @@ img {
   background: #f8fafc;
   color: var(--violet);
   font-weight: 900;
+}
+
+.admin-tabs a.active {
+  background: var(--violet);
+  color: #fff;
 }
 
 .resource-list {

@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('platform.css') }}">
 </head>
-<body>
+<body class="{{ request()->routeIs('admin.*') ? 'admin-clean' : '' }}">
 <header class="topbar">
     <div class="container nav-shell">
         <a href="{{ route('home') }}#/home" class="brand" aria-label="Kelajak Markazi">
@@ -46,7 +46,7 @@
     </div>
 </header>
 
-<main class="container">
+<main class="container {{ request()->routeIs('admin.*') ? 'admin-main' : '' }}">
     @if(session('ok'))
         <div class="alert ok">{{ session('ok') }}</div>
     @endif

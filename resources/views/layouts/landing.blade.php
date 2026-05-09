@@ -6,8 +6,7 @@
     <title>Kelajak Markazi</title>
     <script>
         (function () {
-            const stored = localStorage.getItem('kelajak-theme');
-            const theme = stored === 'dark' || stored === 'light' ? stored : 'light';
+            const theme = 'light';
             document.documentElement.classList.toggle('dark', theme === 'dark');
             document.documentElement.style.colorScheme = theme;
         })();

@@ -65,12 +65,6 @@ const toneClasses = {
 };
 
 function getInitialTheme() {
-  const stored = localStorage.getItem('kelajak-theme');
-
-  if (stored === 'light' || stored === 'dark') {
-    return stored;
-  }
-
   return 'light';
 }
 
@@ -81,7 +75,6 @@ function useTheme() {
     const isDark = theme === 'dark';
     document.documentElement.classList.toggle('dark', isDark);
     document.documentElement.style.colorScheme = theme;
-    localStorage.setItem('kelajak-theme', theme);
   }, [theme]);
 
   return [theme, () => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))];

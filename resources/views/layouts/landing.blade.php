@@ -7,8 +7,7 @@
     <script>
         (function () {
             const stored = localStorage.getItem('kelajak-theme');
-            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const theme = stored || (systemDark ? 'dark' : 'light');
+            const theme = stored === 'dark' || stored === 'light' ? stored : 'light';
             document.documentElement.classList.toggle('dark', theme === 'dark');
             document.documentElement.style.colorScheme = theme;
         })();

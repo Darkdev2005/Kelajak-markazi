@@ -99,10 +99,15 @@
             ];
         })->values(),
         'announcements' => $announcements->map(function ($announcement) {
+            $imageUrl = $announcement->image_url
+                ? (\Illuminate\Support\Str::startsWith($announcement->image_url, ['http://', 'https://']) ? $announcement->image_url : asset($announcement->image_url))
+                : null;
+
             return [
                 'id' => $announcement->id,
                 'title' => $announcement->title,
                 'body' => $announcement->body,
+                'imageUrl' => $imageUrl,
                 'publishedAt' => $announcement->published_at?->toISOString(),
                 'isPinned' => (bool) $announcement->is_pinned,
             ];

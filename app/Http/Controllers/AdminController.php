@@ -147,6 +147,52 @@ class AdminController extends Controller
         ];
     }
 
+    private function announcementValidationRules(bool $withPublishedAt = false): array
+    {
+        $rules = [
+            'title' => ['required', 'string', 'max:180'],
+            'body' => ['required', 'string', 'max:2000'],
+            'image_url' => ['nullable', 'string', 'max:255'],
+            'image' => ['nullable', 'image', 'max:4096'],
+            'is_pinned' => ['nullable', 'boolean'],
+        ];
+
+        if ($withPublishedAt) {
+            $rules['published_at'] = ['nullable', 'date'];
+        }
+
+        return $rules;
+    }
+
+    private function resolveAnnouncementImage(Request $request, ?Announcement $announcement = null): ?string
+    {
+        if (! $request->hasFile('image')) {
+            return $request->filled('image_url')
+                ? $request->string('image_url')->toString()
+                : ($announcement?->image_url ?? null);
+        }
+
+        $directory = public_path('images/announcements');
+
+        if (! is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
+
+        $file = $request->file('image');
+        $name = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) ?: 'announcement';
+        $filename = $name . '-' . Str::uuid() . '.' . $file->extension();
+
+        $file->move($directory, $filename);
+
+        $oldImage = $announcement?->image_url;
+
+        if ($oldImage && Str::startsWith($oldImage, 'images/announcements/') && is_file(public_path($oldImage))) {
+            @unlink(public_path($oldImage));
+        }
+
+        return 'images/announcements/' . $filename;
+    }
+
     public function index(Request $request): View
     {
         $this->ensureAdmin();
@@ -298,15 +344,12 @@ class AdminController extends Controller
     {
         $this->ensureAdmin();
 
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:180'],
-            'body' => ['required', 'string', 'max:2000'],
-            'is_pinned' => ['nullable', 'boolean'],
-        ]);
+        $validated = $request->validate($this->announcementValidationRules());
 
         Announcement::create([
             'title' => $validated['title'],
             'body' => $validated['body'],
+            'image_url' => $this->resolveAnnouncementImage($request),
             'is_pinned' => (bool) ($validated['is_pinned'] ?? false),
             'published_at' => now(),
         ]);
@@ -318,16 +361,12 @@ class AdminController extends Controller
     {
         $this->ensureAdmin();
 
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:180'],
-            'body' => ['required', 'string', 'max:2000'],
-            'is_pinned' => ['nullable', 'boolean'],
-            'published_at' => ['nullable', 'date'],
-        ]);
+        $validated = $request->validate($this->announcementValidationRules(true));
 
         $announcement->update([
             'title' => $validated['title'],
             'body' => $validated['body'],
+            'image_url' => $this->resolveAnnouncementImage($request, $announcement),
             'is_pinned' => (bool) ($validated['is_pinned'] ?? false),
             'published_at' => $validated['published_at'] ?? null,
         ]);
@@ -338,6 +377,10 @@ class AdminController extends Controller
     public function destroyAnnouncement(Announcement $announcement): RedirectResponse
     {
         $this->ensureAdmin();
+
+        if ($announcement->image_url && Str::startsWith($announcement->image_url, 'images/announcements/') && is_file(public_path($announcement->image_url))) {
+            @unlink(public_path($announcement->image_url));
+        }
 
         $announcement->delete();
 

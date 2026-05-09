@@ -1914,6 +1914,7 @@ function NewsPage({ announcements }) {
         id: item.id || `news-${index}`,
         title: (item.title || "Nomsiz yangilik").trim(),
         body: (item.body || '').trim(),
+        imageUrl: item.imageUrl || payload.heroImageUrl || payload.logoUrl,
         publishedAt: item.publishedAt || null,
         isPinned: Boolean(item.isPinned),
       }))
@@ -2009,7 +2010,7 @@ function NewsPage({ announcements }) {
                 <article key={item.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                   <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
                     <img
-                      src={payload.heroImageUrl || payload.logoUrl}
+                      src={item.imageUrl}
                       alt={item.title}
                       className="h-full w-full object-cover"
                     />

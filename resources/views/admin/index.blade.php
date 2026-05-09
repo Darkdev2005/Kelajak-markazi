@@ -138,12 +138,16 @@
     @if($section === 'announcements')
     <article class="card">
         <h2>Yangilik joylash</h2>
-        <form method="POST" action="{{ route('admin.announcements.store') }}" class="form">
+        <form method="POST" action="{{ route('admin.announcements.store') }}" class="form" enctype="multipart/form-data">
             @csrf
             <label>Sarlavha</label>
             <input type="text" name="title" required>
             <label>Matn</label>
             <textarea name="body" rows="4" required></textarea>
+            <label>Rasm yuklash</label>
+            <input type="file" name="image" accept="image/*">
+            <label>Yoki rasm yo'li/URL</label>
+            <input type="text" name="image_url" placeholder="images/announcements/news.jpg">
             <label class="row gap"><input type="checkbox" value="1" name="is_pinned"> Muhim yangilik</label>
             <button class="btn" type="submit">Joylash</button>
         </form>
@@ -552,13 +556,20 @@
                         </span>
                         <em>{{ $announcement->is_pinned ? 'Muhim' : 'Oddiy' }}</em>
                     </summary>
-                    <form method="POST" action="{{ route('admin.announcements.update', $announcement) }}" class="form edit-form">
+                    @if($announcement->image_url)
+                        <img class="admin-preview" src="{{ \Illuminate\Support\Str::startsWith($announcement->image_url, ['http://', 'https://']) ? $announcement->image_url : asset($announcement->image_url) }}" alt="{{ $announcement->title }}">
+                    @endif
+                    <form method="POST" action="{{ route('admin.announcements.update', $announcement) }}" class="form edit-form" enctype="multipart/form-data">
                         @csrf
                         @method('PATCH')
                         <label>Sarlavha</label>
                         <input type="text" name="title" value="{{ $announcement->title }}" required>
                         <label>Matn</label>
                         <textarea name="body" rows="4" required>{{ $announcement->body }}</textarea>
+                        <label>Yangi rasm yuklash</label>
+                        <input type="file" name="image" accept="image/*">
+                        <label>Rasm yo'li yoki URL</label>
+                        <input type="text" name="image_url" value="{{ $announcement->image_url }}">
                         <label>Chop etilgan vaqt</label>
                         <input type="datetime-local" name="published_at" value="{{ $announcement->published_at?->format('Y-m-d\TH:i') }}">
                         <label class="row gap"><input type="checkbox" value="1" name="is_pinned" @checked($announcement->is_pinned)> Muhim yangilik</label>

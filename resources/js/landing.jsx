@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+﻿import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { motion } from 'framer-motion';
 
@@ -14,20 +14,19 @@ const defaultStats = [
 const defaultDirections = [
   { title: 'IT va suniy intellekt', text: 'Kod, data, robototexnika va AI loyihalar.', meta: '6 oy' },
   { title: 'Xorijiy tillar', text: 'Speaking club va sertifikatga tayyorgarlik.', meta: '4 oy' },
-  { title: 'Fan olimpiadalari', text: 'Aniq reja, mentor nazorati va test tahlili.', meta: 'Doimiy' },
+  { title: 'Fan olimpiadalari', text: "Aniq reja, o'qituvchi nazorati va test tahlili.", meta: 'Doimiy' },
   { title: 'Ijod va media', text: 'Dizayn, video, sahna va raqamli portfolio.', meta: '3 oy' },
 ];
 
 const defaultContact = {
   storeUrl: '/contact-messages',
-  phone: '+998 (71) 217-18-71',
-  phoneRaw: '+998712171871',
+  phone: '+998 93 534 90 80',
+  phoneRaw: '+998935349080',
   email: 'kelajakmarkazlari@gmail.com',
-  address: "100011, O'zbekiston, Toshkent, Shayxontohur tumani, Navoiy ko'chasi, 2A-uy",
+  address: "140129, Samarqand sh. Maxmud Qoshg‘ariy, 52-uy. Mo‘ljal: Xotira maydoni",
   hours: 'Dushanba - Shanba · 09:00 - 18:00',
-  responseTime: 'Odatda 30 daqiqa ichida javob',
-  mapUrl: 'https://maps.google.com/?q=Toshkent%20Navoiy%202A',
-  mapEmbedUrl: 'https://www.google.com/maps?q=Toshkent%20Navoiy%202A&z=15&output=embed',
+  mapUrl: 'https://maps.google.com/maps?q=39.655984,66.949152&ll=39.655984,66.949152&z=16',
+  mapEmbedUrl: 'https://www.google.com/maps?q=39.655984,66.949152&z=16&output=embed',
 };
 
 const defaultLeadershipMembers = [
@@ -44,7 +43,7 @@ const defaultLeadershipMembers = [
     name: 'Madina Karimova',
     position: "O'quv ishlari bo'yicha direktor o'rinbosari",
     employeeInfo: "Dars jarayonlari va metodika sifatini nazorat qiladi.",
-    workActivity: "O'quv rejalari, ichki monitoring va mentorlar metodik ishlarini muvofiqlashtiradi.",
+    workActivity: "O'quv rejalari, ichki monitoring va o'qituvchilar metodik ishlarini muvofiqlashtiradi.",
     imageUrl: payload.logoUrl,
   },
   {
@@ -67,12 +66,47 @@ const defaultAnnouncements = [
   },
   {
     id: 'a2',
-    title: "Mentorlar uchun ochiq seminar o'tkazildi",
-    body: "Hududdagi mentorlar ishtirokida tajriba almashish seminari o'tkazildi. Unda metodika, monitoring va o'quvchi bilan ishlash bo'yicha amaliy tavsiyalar berildi.",
+    title: "O'qituvchilar uchun ochiq seminar o'tkazildi",
+    body: "Hududdagi o'qituvchilar ishtirokida tajriba almashish seminari o'tkazildi. Unda metodika, monitoring va o'quvchi bilan ishlash bo'yicha amaliy tavsiyalar berildi.",
     publishedAt: '2026-04-19T14:30:00+05:00',
     isPinned: false,
   },
 ];
+
+const defaultStudentCouncilMembers = [
+  {
+    id: 'sc1',
+    name: 'Abdullayeva Mohira',
+    work: "Maktabda kitobxonlik haftaligini tashkil etdi va 120+ o'quvchini jalb qildi.",
+    imageUrl: payload.heroImageUrl,
+  },
+  {
+    id: 'sc2',
+    name: 'Karimov Azizbek',
+    work: "Robototexnika to'garagi uchun ichki mini-musobaqa o'tkazib, jamoalarni tayyorladi.",
+    imageUrl: payload.heroImageUrl,
+  },
+  {
+    id: 'sc3',
+    name: 'Jumayeva Madina',
+    work: "O'quvchilar kengashi ijtimoiy loyihasi doirasida ekologik aksiyani boshqardi.",
+    imageUrl: payload.heroImageUrl,
+  },
+  {
+    id: 'sc4',
+    name: 'Nazarov Shohruh',
+    work: "IT yo'nalishida yangi a'zolar uchun onboarding darsi va mentorlik sessiyalarini o'tdi.",
+    imageUrl: payload.heroImageUrl,
+  },
+];
+
+const defaultStudentCouncilAdvisor = {
+  fullName: 'Abdullaeva Sevinch Rustamovna',
+  title: 'Maslahatchi haqida',
+  description:
+    "O‘quvchilarning shaxsiy rivojlanishi, o‘qishdagi muvaffaqiyati va ruhiy holatini qo‘llab-quvvatlaydi. Har bir bolaning qiziqishi va qobiliyatiga mos yo‘nalish topishda yordam beradi. O‘quvchi, o‘qituvchi va ota-onalar o‘rtasida ishonchli aloqa o‘rnatadi.",
+  imageUrl: payload.heroImageUrl,
+};
 
 const toneClasses = {
   violet: 'from-violet-500 to-fuchsia-500 text-violet-600 dark:text-violet-200',
@@ -80,6 +114,77 @@ const toneClasses = {
   orange: 'from-orange-500 to-amber-400 text-orange-600 dark:text-orange-200',
   green: 'from-emerald-500 to-teal-400 text-emerald-600 dark:text-emerald-200',
 };
+
+const I18N = {
+  uz: {
+    navHome: 'Asosiy sahifa',
+    navClubs: "To'garaklar",
+    navSchedule: 'Dars jadvali',
+    navContacts: 'Kontaktlar',
+    aboutMenu: 'Markaz haqida',
+    aboutLeadership: 'Rahbariyat',
+    aboutCouncil: "O'quvchilar kengashi",
+    aboutNews: 'Yangiliklar',
+    aboutUs: 'Biz haqimizda',
+    langUz: "O'z",
+    langRu: 'Ru',
+    heroBadge: "Ta’lim bilan porloq kelajak sari",
+    heroTitle: 'Kelajagingiz sari ilk qadamni bugundan boshlang',
+    heroText: "Kelajak Markazi platformasi orqali o‘quvchilar va o‘qituvchilarni boshqarish, darslarni tashkil etish va natijalarni kuzatish imkoniyati yaratiladi.",
+    sectionNews: 'Yangiliklar',
+    sectionNewsTitle: "So'nggi e'lonlardan birinchi 3 ta",
+    allNews: 'Barcha yangiliklar',
+    clubsLabel: "To'garaklar",
+    clubsTitle: "Siz uchun mos to'garaklar",
+    clubsText: "Har bir to'garak mentor, jadval va amaliy mashg'ulotlar bilan olib boriladi.",
+    footerSections: "Bo'limlar",
+    footerContact: 'Aloqa',
+    footerQuick: 'Tezkor kirish',
+    newsSearch: 'Izlash',
+    filter: 'Filter',
+    periodFrom: "Davr oralig'i",
+    periodTo: 'Davr gacha',
+    clearFilters: 'Filtrlarni tozalash',
+    details: 'Batafsil',
+    close: 'Yopish',
+  },
+  ru: {
+    navHome: 'Главная',
+    navClubs: 'Кружки',
+    navSchedule: 'Расписание',
+    navContacts: 'Контакты',
+    aboutMenu: 'О центре',
+    aboutLeadership: 'Руководство',
+    aboutCouncil: 'Совет учащихся',
+    aboutNews: 'Новости',
+    aboutUs: 'О нас',
+    langUz: "Уз",
+    langRu: 'Ru',
+    heroBadge: 'Национальная образовательная экосистема',
+    heroTitle: 'Сделайте первый шаг к будущему уже сегодня',
+    heroText: 'Платформа центра Kelajak позволяет управлять учащимися и преподавателями, организовывать занятия и отслеживать результаты.',
+    sectionNews: 'Новости',
+    sectionNewsTitle: 'Первые 3 из последних объявлений',
+    allNews: 'Все новости',
+    clubsLabel: 'Кружки',
+    clubsTitle: 'Подходящие кружки для вас',
+    clubsText: 'Каждый кружок ведется с наставником, расписанием и практическими занятиями.',
+    footerSections: 'Разделы',
+    footerContact: 'Контакты',
+    footerQuick: 'Быстрый вход',
+    newsSearch: 'Поиск',
+    filter: 'Фильтр',
+    periodFrom: 'Период от',
+    periodTo: 'Период до',
+    clearFilters: 'Сбросить фильтры',
+    details: 'Подробнее',
+    close: 'Закрыть',
+  },
+};
+
+function t(lang, key) {
+  return I18N[lang]?.[key] ?? I18N.uz[key] ?? key;
+}
 
 function getInitialTheme() {
   return 'light';
@@ -95,6 +200,19 @@ function useTheme() {
   }, [theme]);
 
   return [theme, () => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))];
+}
+
+function useLanguage() {
+  const [lang, setLang] = useState(() => {
+    const stored = localStorage.getItem('kelajak-lang');
+    return stored === 'ru' ? 'ru' : 'uz';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('kelajak-lang', lang);
+  }, [lang]);
+
+  return [lang, () => setLang((current) => (current === 'uz' ? 'ru' : 'uz'))];
 }
 
 function getRouteFromHash() {
@@ -116,7 +234,15 @@ function getRouteFromHash() {
     return 'news';
   }
 
-  return ['clubs', 'schedule', 'contact', 'leadership', 'news'].includes(route) ? route : 'home';
+  if (route === 'student-council') {
+    return 'student-council';
+  }
+
+  if (route === 'about-us') {
+    return 'about-us';
+  }
+
+  return ['clubs', 'schedule', 'contact', 'leadership', 'news', 'student-council', 'about-us'].includes(route) ? route : 'home';
 }
 
 function useHashRoute() {
@@ -158,11 +284,10 @@ function ThemeToggle({ theme, onToggle }) {
       aria-label="Rang rejimini almashtirish"
     >
       <span
-        className={`absolute top-1 h-9 w-9 rounded-lg bg-gradient-to-br transition-all duration-300 ${
-          theme === 'dark'
-            ? 'translate-x-[35px] from-cyan-300 to-violet-500 shadow-lg shadow-cyan-400/25'
-            : 'translate-x-0 from-amber-300 to-orange-400 shadow-lg shadow-orange-400/25'
-        }`}
+        className={`absolute top-1 h-9 w-9 rounded-lg bg-gradient-to-br transition-all duration-300 ${theme === 'dark'
+          ? 'translate-x-[35px] from-cyan-300 to-violet-500 shadow-lg shadow-cyan-400/25'
+          : 'translate-x-0 from-amber-300 to-orange-400 shadow-lg shadow-orange-400/25'
+          }`}
       />
       <span className={`relative z-10 flex-1 text-[11px] font-black transition-colors ${theme === 'light' ? 'text-slate-950' : 'text-slate-400'}`}>
         Kun
@@ -174,22 +299,38 @@ function ThemeToggle({ theme, onToggle }) {
   );
 }
 
-function Header({ route }) {
+function LanguageToggle({ lang, onToggle }) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      className="inline-flex min-h-12 items-center gap-2 rounded-2xl border border-slate-200/90 bg-white/74 px-4 text-base font-bold text-slate-800 shadow-lg shadow-slate-950/5 backdrop-blur transition hover:-translate-y-0.5 hover:border-[#3a1b78]/30 hover:shadow-xl dark:border-white/10 dark:bg-white/8 dark:text-white"
+      aria-label="Til tanlash"
+    >
+      <span>{lang === 'uz' ? I18N.uz.langUz : I18N.ru.langUz}</span>
+      <span className="text-slate-400">/</span>
+      <span>{lang === 'ru' ? I18N.ru.langRu : I18N.uz.langRu}</span>
+    </button>
+  );
+}
+
+function Header({ route, lang, onToggleLanguage }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [aboutMenuOpen, setAboutMenuOpen] = useState(false);
   const navItems = [
-    ['Asosiy sahifa', '#top'],
-    ["To'garaklar", '#clubs'],
-    ['Dars jadvali', '#lessonSchedule'],
-    ['Kontaktlar', '#our-contact'],
+    [t(lang, 'navHome'), '#top'],
+    [t(lang, 'navClubs'), '#clubs'],
+    [t(lang, 'navSchedule'), '#lessonSchedule'],
+    [t(lang, 'navContacts'), '#our-contact'],
   ];
   const aboutItems = [
-    ['Rahbariyat', '#/leadership'],
-    ["O'quvchilar kengashi", '#student-council'],
-    ['Yangiliklar', '#/news'],
-    ['Biz haqimizda', '#about-us'],
+    [t(lang, 'aboutLeadership'), '#/leadership'],
+    [t(lang, 'aboutCouncil'), '#/student-council'],
+    [t(lang, 'aboutNews'), '#/news'],
+    [t(lang, 'aboutUs'), '#/about-us'],
   ];
   const currentHash = typeof window !== 'undefined' ? window.location.hash : '';
-  const aboutIsActive = ['leadership', 'news'].includes(route) || (route === 'home' && aboutItems.some(([, href]) => currentHash === href));
+  const aboutIsActive = ['leadership', 'news', 'student-council', 'about-us'].includes(route) || (route === 'home' && aboutItems.some(([, href]) => currentHash === href));
 
   return (
     <motion.header
@@ -249,40 +390,40 @@ function Header({ route }) {
               || (route === 'home' && index === 0);
 
             return (
-            <a
-              key={href}
-              href={href}
-              className={`whitespace-nowrap rounded-xl px-4 py-3 text-base font-bold tracking-normal transition-all duration-300 ${
-                isActive
+              <a
+                key={href}
+                href={href}
+                className={`whitespace-nowrap rounded-xl px-4 py-3 text-base font-bold tracking-normal transition-all duration-300 ${isActive
                   ? 'bg-slate-950 text-white shadow-lg shadow-violet-500/15 dark:bg-white dark:text-slate-950'
                   : 'text-slate-700 hover:bg-violet-50 hover:text-[#3a1b78] dark:text-slate-200 dark:hover:bg-white/10 dark:hover:text-cyan-100'
-              }`}
-            >
-              {label}
-            </a>
+                  }`}
+              >
+                {label}
+              </a>
             );
           })}
 
           <div className="group relative">
             <button
               type="button"
-              className={`inline-flex items-center gap-2 whitespace-nowrap rounded-xl px-4 py-3 text-base font-bold tracking-normal transition-all duration-300 ${
-                aboutIsActive
-                  ? 'bg-slate-950 text-white shadow-lg shadow-violet-500/15 dark:bg-white dark:text-slate-950'
-                  : 'text-slate-700 hover:bg-violet-50 hover:text-[#3a1b78] dark:text-slate-200 dark:hover:bg-white/10 dark:hover:text-cyan-100'
-              }`}
+              onClick={() => setAboutMenuOpen((current) => !current)}
+              className={`inline-flex items-center gap-2 whitespace-nowrap rounded-xl px-4 py-3 text-base font-bold tracking-normal transition-all duration-300 ${aboutIsActive
+                ? 'bg-slate-950 text-white shadow-lg shadow-violet-500/15 dark:bg-white dark:text-slate-950'
+                : 'text-slate-700 hover:bg-violet-50 hover:text-[#3a1b78] dark:text-slate-200 dark:hover:bg-white/10 dark:hover:text-cyan-100'
+                }`}
               aria-haspopup="menu"
               aria-label="Markaz haqida bo'limlari"
             >
-              Markaz haqida
-              <span className="text-xs">▼</span>
+              {t(lang, 'aboutMenu')}
+              <span className={`text-xs transition-transform ${aboutMenuOpen ? 'rotate-180' : ''}`}>v</span>
             </button>
-            <div className="pointer-events-none absolute left-0 top-full z-50 pt-2 opacity-0 transition-all duration-200 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100">
+            <div className={`absolute left-0 top-full z-50 pt-2 transition-all duration-200 ${aboutMenuOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100'}`}>
               <div className="min-w-[300px] rounded-2xl border border-slate-200 bg-slate-50 p-2 shadow-2xl dark:border-white/10 dark:bg-slate-900">
                 {aboutItems.map(([label, href]) => (
                   <a
                     key={href}
                     href={href}
+                    onClick={() => setAboutMenuOpen(false)}
                     className="block rounded-xl px-4 py-3 text-2xl font-bold text-slate-700 transition hover:bg-white hover:text-[#3a1b78] dark:text-slate-100 dark:hover:bg-white/10 dark:hover:text-cyan-200"
                   >
                     {label}
@@ -294,21 +435,9 @@ function Header({ route }) {
         </nav>
 
         <div className="hidden shrink-0 items-center justify-self-end gap-2 sm:flex sm:gap-3">
-          <button
-            type="button"
-            className="hidden min-h-12 items-center gap-2 rounded-2xl border border-slate-200/90 bg-white/74 px-4 text-base font-bold text-slate-800 shadow-lg shadow-slate-950/5 backdrop-blur transition hover:-translate-y-0.5 hover:border-[#3a1b78]/30 hover:shadow-xl dark:border-white/10 dark:bg-white/8 dark:text-white sm:inline-flex"
-            aria-label="Til tanlash"
-          >
-            <span className="relative block h-5 w-7 overflow-hidden rounded-[4px] shadow-sm ring-1 ring-black/5">
-              <span className="absolute inset-x-0 top-0 h-1/3 bg-[#0099b5]" />
-              <span className="absolute inset-x-0 top-1/3 h-1/3 bg-white" />
-              <span className="absolute inset-x-0 bottom-0 h-1/3 bg-[#1eb53a]" />
-              <span className="absolute left-0 right-0 top-[31%] h-[1px] bg-[#ce1126]" />
-              <span className="absolute left-0 right-0 top-[64%] h-[1px] bg-[#ce1126]" />
-            </span>
-            <span>O'z</span>
-            <span className="text-lg leading-none text-slate-500">⌄</span>
-          </button>
+          <div className="hidden sm:inline-flex">
+            <LanguageToggle lang={lang} onToggle={onToggleLanguage} />
+          </div>
           <a
             href={payload.isAuthenticated ? payload.dashboardUrl : payload.loginUrl}
             className="inline-flex min-h-12 items-center gap-2 rounded-2xl border border-slate-950 bg-slate-950 px-3 text-base font-bold text-white shadow-xl shadow-violet-500/18 transition hover:-translate-y-0.5 hover:bg-[#3a1b78] hover:shadow-2xl dark:border-white dark:bg-white dark:text-slate-950 dark:hover:bg-cyan-100 sm:px-5 sm:text-lg"
@@ -325,9 +454,8 @@ function Header({ route }) {
       </div>
 
       <div
-        className={`border-t border-slate-200/70 bg-white/96 px-4 transition-[max-height,opacity] duration-300 dark:border-white/10 dark:bg-slate-950/96 sm:hidden ${
-          mobileMenuOpen ? 'max-h-[calc(100vh-104px)] overflow-y-auto opacity-100' : 'max-h-0 overflow-hidden opacity-0'
-        }`}
+        className={`border-t border-slate-200/70 bg-white/96 px-4 transition-[max-height,opacity] duration-300 dark:border-white/10 dark:bg-slate-950/96 sm:hidden ${mobileMenuOpen ? 'max-h-[calc(100vh-104px)] overflow-y-auto opacity-100' : 'max-h-0 overflow-hidden opacity-0'
+          }`}
       >
         <nav className="grid gap-2 py-4">
           {navItems.map(([label, href], index) => {
@@ -342,11 +470,10 @@ function Header({ route }) {
                 key={href}
                 href={href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`rounded-2xl px-4 py-3 text-base font-bold transition ${
-                  isActive
-                    ? 'bg-slate-950 text-white'
-                    : 'bg-slate-50 text-slate-700 hover:bg-violet-50 hover:text-[#3a1b78] dark:bg-white/6 dark:text-slate-200'
-                }`}
+                className={`rounded-2xl px-4 py-3 text-base font-bold transition ${isActive
+                  ? 'bg-slate-950 text-white'
+                  : 'bg-slate-50 text-slate-700 hover:bg-violet-50 hover:text-[#3a1b78] dark:bg-white/6 dark:text-slate-200'
+                  }`}
               >
                 {label}
               </a>
@@ -355,7 +482,7 @@ function Header({ route }) {
 
           <div className="grid gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2 dark:border-white/10 dark:bg-white/6">
             <div className="px-2 pb-1 text-sm font-black uppercase tracking-[0.12em] text-slate-500 dark:text-slate-300">
-              Markaz haqida
+              {t(lang, 'aboutMenu')}
             </div>
             {aboutItems.map(([label, href]) => (
               <a
@@ -370,23 +497,7 @@ function Header({ route }) {
           </div>
 
           <div className="mt-2 grid gap-2 border-t border-slate-200 pt-4 dark:border-white/10">
-            <button
-              type="button"
-              className="inline-flex min-h-12 items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 text-base font-bold text-slate-800 dark:border-white/10 dark:bg-white/8 dark:text-white"
-              aria-label="Til tanlash"
-            >
-              <span className="inline-flex items-center gap-2">
-                <span className="relative block h-5 w-7 overflow-hidden rounded-[4px] shadow-sm ring-1 ring-black/5">
-                  <span className="absolute inset-x-0 top-0 h-1/3 bg-[#0099b5]" />
-                  <span className="absolute inset-x-0 top-1/3 h-1/3 bg-white" />
-                  <span className="absolute inset-x-0 bottom-0 h-1/3 bg-[#1eb53a]" />
-                  <span className="absolute left-0 right-0 top-[31%] h-[1px] bg-[#ce1126]" />
-                  <span className="absolute left-0 right-0 top-[64%] h-[1px] bg-[#ce1126]" />
-                </span>
-                O'z
-              </span>
-              <span className="text-lg leading-none text-slate-500">⌄</span>
-            </button>
+            <LanguageToggle lang={lang} onToggle={onToggleLanguage} />
 
             <a
               href={payload.isAuthenticated ? payload.dashboardUrl : payload.loginUrl}
@@ -426,11 +537,7 @@ function StatCard({ stat, index }) {
   );
 }
 
-function HeroStudentVisual({ imageUrl, schedules }) {
-  const lessons = schedules?.length ? schedules : [
-    { title: 'IT va Suniy Intellekt', time: 'Dushanba · 09:00', mentor: 'Azizbek mentor' },
-    { title: 'Xorijiy Tillar', time: 'Seshanba · 14:00', mentor: 'Madina mentor' },
-  ];
+function HeroStudentVisual({ imageUrl }) {
 
   return (
     <motion.div
@@ -457,27 +564,6 @@ function HeroStudentVisual({ imageUrl, schedules }) {
           Kelajak sen bilan boshlanadi
         </div>
 
-        <div className="relative z-10 grid gap-3 p-3 sm:absolute sm:bottom-6 sm:left-6 sm:right-auto sm:w-[360px] sm:p-0">
-          <div className="rounded-3xl border border-white/24 bg-white/18 p-4 text-white shadow-2xl backdrop-blur-xl">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-cyan-100">Premium profil</p>
-                <h3 className="mt-2 text-xl font-black">Kelajak o'quvchisi</h3>
-              </div>
-              <span className="rounded-full bg-emerald-400/20 px-3 py-1 text-xs font-black text-emerald-100">faol</span>
-            </div>
-            <p className="mt-3 text-sm font-bold leading-6 text-white/78">{lessons[0].title} · {lessons[0].time}</p>
-            <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/18">
-              <motion.div
-                initial={{ width: 0 }}
-                whileInView={{ width: '84%' }}
-                viewport={{ once: true }}
-                transition={{ duration: 1, delay: 0.2 }}
-                className="h-full rounded-full bg-gradient-to-r from-cyan-300 to-violet-300"
-              />
-            </div>
-          </div>
-        </div>
       </motion.figure>
     </motion.div>
   );
@@ -599,9 +685,8 @@ function FilterSelect({ value, onChange, options, placeholder, compact = false }
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className={`w-full appearance-none border border-slate-200 bg-white px-4 pr-11 text-sm font-bold text-slate-700 shadow-sm outline-none transition focus:border-violet-300 focus:ring-4 focus:ring-violet-100 ${
-          compact ? 'h-11 rounded-xl' : 'h-12 rounded-2xl'
-        }`}
+        className={`w-full appearance-none border border-slate-200 bg-white px-4 pr-11 text-sm font-bold text-slate-700 shadow-sm outline-none transition focus:border-violet-300 focus:ring-4 focus:ring-violet-100 ${compact ? 'h-11 rounded-xl' : 'h-12 rounded-2xl'
+          }`}
       >
         <option value="all">{placeholder}</option>
         {options.map((option) => (
@@ -610,7 +695,7 @@ function FilterSelect({ value, onChange, options, placeholder, compact = false }
           </option>
         ))}
       </select>
-      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">⌄</span>
+      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">v</span>
     </label>
   );
 }
@@ -634,7 +719,7 @@ function ClubDetailsModal({ club, onClose }) {
           className="absolute right-4 top-4 z-10 inline-grid h-11 w-11 place-items-center rounded-full bg-white/90 text-lg font-black text-slate-700 shadow-lg transition hover:bg-white"
           aria-label="Yopish"
         >
-          ✕
+          вњ•
         </button>
 
         <div className="grid max-h-[90vh] overflow-y-auto lg:grid-cols-[1.05fr_1fr]">
@@ -741,7 +826,7 @@ function ClubCard({ club, onSelect }) {
 
           <div className="min-w-0">
             <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold text-slate-800">
-              <span className="grid h-6 w-6 place-items-center rounded-full bg-[#43207f] text-white">⌖</span>
+              <span className="grid h-6 w-6 place-items-center rounded-full bg-[#43207f] text-white">›</span>
               <span className="truncate">{club.locationName}</span>
             </div>
             {club.description ? (
@@ -787,7 +872,7 @@ function ClubsHeroPreview({ clubs, categories, regions }) {
       <div className="relative mx-auto grid min-h-[280px] max-w-[1536px] gap-8 px-5 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:px-16 lg:py-12">
         <div className="flex flex-col justify-center">
           <div className="flex items-center gap-3 text-lg font-black text-white/90">
-            <span className="grid h-8 w-8 place-items-center rounded-xl border border-white/10 bg-cyan-400/95 text-[13px] font-black text-[#23114f] shadow-lg shadow-cyan-400/20">⌂</span>
+            <span className="grid h-8 w-8 place-items-center rounded-xl border border-white/10 bg-cyan-400/95 text-[13px] font-black text-[#23114f] shadow-lg shadow-cyan-400/20">*</span>
             <span>›</span>
             <span>To'garaklar</span>
           </div>
@@ -946,26 +1031,24 @@ function ClubsPage({ clubs }) {
               <button
                 type="button"
                 onClick={() => setViewMode('list')}
-                className={`inline-grid h-11 w-11 place-items-center rounded-xl border text-lg transition ${
-                  viewMode === 'list'
-                    ? 'border-violet-200 bg-violet-50 text-[#43207f]'
-                    : 'border-slate-200 bg-white text-slate-400 hover:border-violet-100 hover:text-[#43207f]'
-                }`}
+                className={`inline-grid h-11 w-11 place-items-center rounded-xl border text-lg transition ${viewMode === 'list'
+                  ? 'border-violet-200 bg-violet-50 text-[#43207f]'
+                  : 'border-slate-200 bg-white text-slate-400 hover:border-violet-100 hover:text-[#43207f]'
+                  }`}
                 aria-label="Ro'yxat ko'rinishi"
               >
-                ☷
+                в·
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
-                className={`inline-grid h-11 w-11 place-items-center rounded-xl border text-lg transition ${
-                  viewMode === 'grid'
-                    ? 'border-violet-200 bg-violet-50 text-[#43207f]'
-                    : 'border-slate-200 bg-white text-slate-400 hover:border-violet-100 hover:text-[#43207f]'
-                }`}
+                className={`inline-grid h-11 w-11 place-items-center rounded-xl border text-lg transition ${viewMode === 'grid'
+                  ? 'border-violet-200 bg-violet-50 text-[#43207f]'
+                  : 'border-slate-200 bg-white text-slate-400 hover:border-violet-100 hover:text-[#43207f]'
+                  }`}
                 aria-label="Katak ko'rinishi"
               >
-                ▦
+                •
               </button>
             </div>
           </div>
@@ -977,7 +1060,7 @@ function ClubsPage({ clubs }) {
             </div>
 
             <div className="mt-5 inline-flex rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-600">
-              ⓘ To'garakni tanlang, so'ng ariza yoki batafsil ma'lumot bo'limiga o'ting
+              в“ To'garakni tanlang, so'ng ariza yoki batafsil ma'lumot bo'limiga o'ting
             </div>
 
             <div className={`mt-5 grid gap-4 ${viewMode === 'grid' ? 'xl:grid-cols-2' : ''}`}>
@@ -1020,11 +1103,10 @@ function ClubsPage({ clubs }) {
                     key={pageNumber}
                     type="button"
                     onClick={() => setPage(pageNumber)}
-                    className={`inline-grid h-11 w-11 place-items-center rounded-xl border text-sm font-black transition ${
-                      pageNumber === safePage
-                        ? 'border-orange-200 bg-white text-orange-500'
-                        : 'border-slate-200 bg-white text-slate-500 hover:border-violet-200 hover:text-violet-700'
-                    }`}
+                    className={`inline-grid h-11 w-11 place-items-center rounded-xl border text-sm font-black transition ${pageNumber === safePage
+                      ? 'border-orange-200 bg-white text-orange-500'
+                      : 'border-slate-200 bg-white text-slate-500 hover:border-violet-200 hover:text-violet-700'
+                      }`}
                   >
                     {pageNumber}
                   </button>
@@ -1055,7 +1137,7 @@ function ClubsPage({ clubs }) {
           <div className="relative h-44 overflow-hidden rounded-[1.1rem] border border-slate-200 bg-white shadow-sm">
             <div className="absolute inset-0 bg-[linear-gradient(45deg,#e9eef8_25%,transparent_25%),linear-gradient(-45deg,#e9eef8_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#e9eef8_75%),linear-gradient(-45deg,transparent_75%,#e9eef8_75%)] bg-[length:28px_28px] opacity-80" />
             <div className="absolute inset-4 rounded-xl border border-violet-200 bg-white/60" />
-            <span className="absolute left-1/2 top-1/2 grid h-12 w-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[#3a1b78] text-2xl text-white shadow-xl">⌖</span>
+            <span className="absolute left-1/2 top-1/2 grid h-12 w-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[#3a1b78] text-2xl text-white shadow-xl">›</span>
             <a href={filtered[0]?.mapUrl || 'https://maps.google.com'} target="_blank" rel="noreferrer" className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-xl bg-[#43207f] px-5 py-3 text-base font-bold text-white">
               Xaritadan ko'rish
             </a>
@@ -1117,7 +1199,7 @@ function ScheduleProgramModal({ club, slots, onClose }) {
           className="absolute right-4 top-4 z-10 inline-grid h-11 w-11 place-items-center rounded-full bg-white/90 text-lg font-black text-slate-700 shadow-lg transition hover:bg-white"
           aria-label="Yopish"
         >
-          ✕
+          вњ•
         </button>
 
         <div className="border-b border-slate-200 bg-[#3a1b78] px-6 py-6 text-white sm:px-8">
@@ -1149,7 +1231,7 @@ function ScheduleProgramModal({ club, slots, onClose }) {
 
                 <dl className="mt-4 grid gap-3 text-sm font-semibold text-slate-600">
                   <div className="flex items-center justify-between gap-4 rounded-xl bg-white px-3 py-2">
-                    <dt>Mentor</dt>
+                    <dt>O'qituvchi</dt>
                     <dd className="font-black text-slate-900">{slot.mentor}</dd>
                   </div>
                   <div className="flex items-center justify-between gap-4 rounded-xl bg-white px-3 py-2">
@@ -1229,7 +1311,7 @@ function ScheduleProgramCard({ item, onOpen }) {
             Batafsil ma'lumot ›
           </button>
           <a href={applicationUrl} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-orange-200 bg-orange-50 px-5 text-base font-bold text-orange-600 transition hover:-translate-y-0.5 hover:bg-orange-100">
-            ✎ Ariza qoldirish
+            вњЋ Ariza qoldirish
           </a>
         </div>
       </div>
@@ -1238,20 +1320,21 @@ function ScheduleProgramCard({ item, onOpen }) {
 }
 
 function ScheduleHeroPreview({ schedules }) {
-  const previewSlots = schedules.slice(0, 3);
-  const onlineCount = schedules.filter((slot) => slot.isOnline).length;
-  const uniqueDays = new Set(schedules.map((slot) => slot.dayLabel || slot.time?.split('·')[0]?.trim()).filter(Boolean)).size;
-
   return (
     <section className="relative overflow-hidden bg-[linear-gradient(135deg,#241047_0%,#3a1b78_42%,#1f4f7a_100%)]">
       <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:34px_34px]" />
       <div className="absolute -left-20 top-10 h-56 w-56 rounded-full bg-cyan-400/18 blur-3xl" />
       <div className="absolute bottom-0 right-20 h-64 w-64 rounded-full bg-fuchsia-400/12 blur-3xl" />
 
-      <div className="relative mx-auto grid min-h-[280px] max-w-[1536px] gap-8 px-5 py-10 lg:grid-cols-[1.1fr_0.95fr] lg:px-16 lg:py-12">
+      <div className="relative mx-auto min-h-[280px] max-w-[1536px] px-5 py-10 lg:px-16 lg:py-12">
         <div className="flex flex-col justify-center">
           <div className="flex items-center gap-3 text-lg font-black text-white/90">
-            <span className="grid h-8 w-8 place-items-center rounded-xl border border-white/10 bg-cyan-400/95 text-[13px] font-black text-[#23114f] shadow-lg shadow-cyan-400/20">◔</span>
+            <span className="grid h-8 w-8 place-items-center rounded-xl border border-white/10 bg-cyan-400/95 text-[#23114f] shadow-lg shadow-cyan-400/20">
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect x="4" y="5" width="16" height="15" rx="3" stroke="currentColor" strokeWidth="1.8" />
+                <path d="M8 3v4M16 3v4M4 10h16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
+            </span>
             <span>›</span>
             <span>Dars jadvali</span>
           </div>
@@ -1260,66 +1343,9 @@ function ScheduleHeroPreview({ schedules }) {
             Dars jadvali
           </h1>
           <p className="mt-4 max-w-2xl text-base font-semibold leading-7 text-white/75">
-            Har bir to'garak bo'yicha dars kunlari, mentorlar va mavjud slotlar bir joyda jamlangan.
+            Har bir to'garak bo'yicha dars kunlari, o'qituvchilar va mavjud slotlar bir joyda jamlangan.
             Avval yo'nalishni tanlang, keyin jadvalni batafsil ko'ring.
           </p>
-
-          <div className="mt-6 flex flex-wrap gap-3">
-            <span className="rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-sm font-black text-white backdrop-blur">
-              {schedules.length} ta faol slot
-            </span>
-            <span className="rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-sm font-black text-white/90 backdrop-blur">
-              {uniqueDays} kunlik jadval
-            </span>
-            <span className="rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-sm font-black text-white/90 backdrop-blur">
-              {onlineCount} ta online dars
-            </span>
-          </div>
-        </div>
-
-        <div className="relative flex items-center justify-end">
-          <div className="grid w-full max-w-[560px] gap-4 rounded-[2rem] border border-white/12 bg-white/8 p-4 shadow-2xl shadow-slate-950/25 backdrop-blur-xl lg:grid-cols-[1fr_190px]">
-            <div className="rounded-[1.5rem] border border-white/10 bg-slate-950/18 p-4">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-xs font-black uppercase tracking-[0.16em] text-cyan-100">Hafta preview</p>
-                  <h3 className="mt-2 text-xl font-black text-white">Yaqin darslar</h3>
-                </div>
-                <span className="rounded-full bg-emerald-400/18 px-3 py-1 text-xs font-black text-emerald-100">Real vaqt</span>
-              </div>
-
-              <div className="mt-4 grid gap-3">
-                {previewSlots.map((slot, index) => (
-                  <div key={`${slot.programId || slot.title}-${slot.time}-${index}`} className="grid grid-cols-[88px_1fr] items-center gap-3 rounded-2xl border border-white/10 bg-white/8 px-3 py-3">
-                    <div className="rounded-xl bg-white/10 px-3 py-2 text-center text-sm font-black text-white">
-                      {slot.startTime || slot.time?.split('·')[1]?.trim() || '09:00'}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-black text-white">{slot.title}</p>
-                      <p className="mt-1 truncate text-xs font-bold text-white/65">{slot.dayLabel || slot.time?.split('·')[0]?.trim()} · {slot.mentor}</p>
-                    </div>
-                  </div>
-                ))}
-
-                {!previewSlots.length ? (
-                  <div className="rounded-2xl border border-dashed border-white/18 px-4 py-6 text-center text-sm font-bold text-white/60">
-                    Dars slotlari admin paneldan qo'shiladi
-                  </div>
-                ) : null}
-              </div>
-            </div>
-
-            <div className="relative overflow-hidden rounded-[1.5rem] border border-white/12 bg-slate-950/20">
-              <img src={payload.heroImageUrl} alt="Dars jadvali preview" className="h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 via-slate-950/10 to-transparent" />
-              <div className="absolute bottom-3 left-3 right-3 rounded-2xl border border-white/12 bg-slate-950/38 px-3 py-3 backdrop-blur">
-                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-cyan-100">Kelasi slot</p>
-                <p className="mt-2 text-sm font-black text-white">
-                  {previewSlots[0]?.dayLabel || 'Dushanba'} · {previewSlots[0]?.startTime || '09:00'}
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </section>
@@ -1442,7 +1468,7 @@ function SchedulePage({ schedules, clubs }) {
           </div>
 
           <div className="mt-5 inline-flex rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-600">
-            ⓘ Dars jadvalini ko'rish uchun to'garakni tanlang
+            • Dars jadvalini ko'rish uchun to'garakni tanlang
           </div>
 
           <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -1485,11 +1511,10 @@ function SchedulePage({ schedules, clubs }) {
                   key={pageNumber}
                   type="button"
                   onClick={() => setPage(pageNumber)}
-                  className={`inline-grid h-11 w-11 place-items-center rounded-xl border text-sm font-black transition ${
-                    pageNumber === safePage
-                      ? 'border-orange-200 bg-white text-orange-500'
-                      : 'border-slate-200 bg-white text-slate-500 hover:border-violet-200 hover:text-violet-700'
-                  }`}
+                  className={`inline-grid h-11 w-11 place-items-center rounded-xl border text-sm font-black transition ${pageNumber === safePage
+                    ? 'border-orange-200 bg-white text-orange-500'
+                    : 'border-slate-200 bg-white text-slate-500 hover:border-violet-200 hover:text-violet-700'
+                    }`}
                 >
                   {pageNumber}
                 </button>
@@ -1524,7 +1549,7 @@ function SchedulePage({ schedules, clubs }) {
                     </option>
                   ))}
                 </select>
-                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">⌄</span>
+                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">v</span>
               </label>
             </div>
           </div>
@@ -1536,17 +1561,21 @@ function SchedulePage({ schedules, clubs }) {
   );
 }
 
-function ContactHeroPreview({ contact }) {
+function ContactHeroPreview() {
   return (
     <section id="our-contact" className="relative overflow-hidden bg-[linear-gradient(135deg,#2d1459_0%,#43207f_52%,#244a9a_100%)]">
       <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:34px_34px]" />
       <div className="absolute -left-16 top-8 h-56 w-56 rounded-full bg-cyan-400/14 blur-3xl" />
       <div className="absolute bottom-0 right-0 h-72 w-72 rounded-full bg-fuchsia-500/12 blur-3xl" />
 
-      <div className="relative mx-auto grid min-h-[290px] max-w-[1536px] gap-8 px-5 py-10 lg:grid-cols-[1fr_0.96fr] lg:px-16 lg:py-12">
+      <div className="relative mx-auto max-w-[1536px] px-5 py-10 lg:px-16 lg:py-12">
         <div className="flex flex-col justify-center">
           <div className="flex items-center gap-3 text-lg font-black text-white/90">
-            <span className="grid h-8 w-8 place-items-center rounded-xl border border-white/10 bg-cyan-400/95 text-[13px] font-black text-[#23114f] shadow-lg shadow-cyan-400/20">◔</span>
+            <span className="grid h-8 w-8 place-items-center rounded-xl border border-white/10 bg-cyan-400/95 text-[#23114f] shadow-lg shadow-cyan-400/20">
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M5 5h3l2 5-2 1.5a16.2 16.2 0 004.5 4.5L14 14l5 2v3a2 2 0 01-2.2 2A17 17 0 015 7.2 2 2 0 015 5z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
             <span>›</span>
             <span>Kontaktlar</span>
           </div>
@@ -1557,48 +1586,6 @@ function ContactHeroPreview({ contact }) {
           <p className="mt-4 max-w-2xl text-base font-semibold leading-7 text-white/78">
             Savol, taklif yoki hamkorlik bo'lsa, murojaatni shu yerdan yuboring. Platforma, to'garaklar va dars jarayonlari bo'yicha jamoamiz tezkor javob beradi.
           </p>
-
-          <div className="mt-6 flex flex-wrap gap-3">
-            <span className="rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-sm font-black text-white backdrop-blur">
-              {contact.responseTime}
-            </span>
-            <span className="rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-sm font-black text-white/90 backdrop-blur">
-              {contact.hours}
-            </span>
-          </div>
-        </div>
-
-        <div className="relative flex items-center justify-end">
-          <div className="grid w-full max-w-[560px] gap-4 rounded-[2rem] border border-white/12 bg-white/8 p-4 shadow-2xl shadow-slate-950/25 backdrop-blur-xl lg:grid-cols-[1fr_210px]">
-            <div className="rounded-[1.5rem] border border-white/10 bg-slate-950/18 p-4">
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-cyan-100">Aloqa markazi</p>
-              <h3 className="mt-2 text-2xl font-black text-white">Bir nechta kanal, bitta javob markazi</h3>
-
-              <div className="mt-5 grid gap-3">
-                <a href={`tel:${contact.phoneRaw}`} className="rounded-2xl border border-white/10 bg-white/8 px-4 py-3 text-white transition hover:bg-white/12">
-                  <span className="block text-[11px] font-black uppercase tracking-[0.16em] text-white/55">Telefon</span>
-                  <span className="mt-2 block text-lg font-black">{contact.phone}</span>
-                </a>
-                <a href={`mailto:${contact.email}`} className="rounded-2xl border border-white/10 bg-white/8 px-4 py-3 text-white transition hover:bg-white/12">
-                  <span className="block text-[11px] font-black uppercase tracking-[0.16em] text-white/55">Elektron manzil</span>
-                  <span className="mt-2 block break-words text-lg font-black">{contact.email}</span>
-                </a>
-                <div className="rounded-2xl border border-white/10 bg-white/8 px-4 py-3 text-white">
-                  <span className="block text-[11px] font-black uppercase tracking-[0.16em] text-white/55">Ish vaqti</span>
-                  <span className="mt-2 block text-lg font-black">{contact.hours}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="relative overflow-hidden rounded-[1.5rem] border border-white/12 bg-slate-950/20">
-              <img src={payload.heroImageUrl} alt="Kelajak Markazi aloqa preview" className="h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-slate-950/12 to-transparent" />
-              <div className="absolute bottom-3 left-3 right-3 rounded-2xl border border-white/12 bg-slate-950/40 px-3 py-3 backdrop-blur">
-                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-cyan-100">Qabul punkti</p>
-                <p className="mt-2 text-sm font-bold leading-6 text-white/88">Murojaatlar bir nuqtada yig'iladi, keyin tegishli jamoaga yo'naltiriladi.</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </section>
@@ -1659,7 +1646,7 @@ function ContactPage() {
 
   return (
     <div className="bg-[#f4f5fb] text-slate-950">
-      <ContactHeroPreview contact={contact} />
+      <ContactHeroPreview />
 
       <section className="mx-auto grid max-w-[1536px] gap-6 px-5 py-12 lg:grid-cols-[0.92fr_1.08fr] lg:px-16">
         <div className="grid gap-4">
@@ -1706,11 +1693,8 @@ function ContactPage() {
               <p className="text-xs font-black uppercase tracking-[0.16em] text-violet-600">Murojaat qoldirish</p>
               <h2 className="mt-2 text-3xl font-black text-slate-950 sm:text-[2.4rem]">Savolingizni yozing, biz javob beramiz</h2>
               <p className="mt-3 text-base font-semibold leading-7 text-slate-600">
-                To'garak, dars jadvali, hamkorlik yoki texnik masala bo'lsa, shu formadan yuboring. Xabar admin panelga tushadi.
+                To'garak, dars jadvali, hamkorlik yoki texnik masala bo'lsa, shu formadan yuboring.
               </p>
-            </div>
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-black text-emerald-700">
-              {contact.responseTime}
             </div>
           </div>
 
@@ -1752,7 +1736,7 @@ function ContactPage() {
 
             <div className="flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
               <p className="max-w-xl text-sm font-semibold leading-6 text-slate-500">
-                Yuborilgan murojaatlar admin paneldagi “Murojaatlar” bo'limida ko'rinadi va status bilan boshqariladi.
+                Yuborilgan murojaatlar admin paneldagi "Murojaatlar" bo'limida ko'rinadi va status bilan boshqariladi.
               </p>
               <button
                 type="submit"
@@ -1854,28 +1838,28 @@ function LeadershipPage({ members }) {
             const showName = name && position && !nameLower.includes(positionLower) && !positionLower.includes(nameLower);
 
             return (
-            <motion.article
-              key={member.id || `${member.name || member.position}-${index}`}
-              initial={{ opacity: 0, y: 18 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-90px' }}
-              transition={{ delay: index * 0.06, duration: 0.42 }}
-              className="flex h-full w-full max-w-[540px] flex-col overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white shadow-sm"
-            >
-              <div className="aspect-[4/5] overflow-hidden bg-slate-100">
-                <img
-                  src={member.imageUrl || payload.logoUrl}
-                  alt={member.position || member.name || 'Rahbar'}
-                  className="h-full w-full object-cover object-top"
-                />
-              </div>
-              <div className="grid flex-1 content-start gap-3 p-5">
-                <h2 className="min-h-[5.6rem] text-2xl font-black leading-tight text-slate-950">{member.position}</h2>
-                {showName ? <p className="min-h-[2rem] text-base font-semibold text-slate-700">{member.name}</p> : <div className="min-h-[2rem]" />}
-                <EmployeeInfo text={member.employeeInfo} />
-                <WorkActivityToggle text={member.workActivity} />
-              </div>
-            </motion.article>
+              <motion.article
+                key={member.id || `${member.name || member.position}-${index}`}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-90px' }}
+                transition={{ delay: index * 0.06, duration: 0.42 }}
+                className="flex h-full w-full max-w-[540px] flex-col overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white shadow-sm"
+              >
+                <div className="aspect-[4/5] overflow-hidden bg-slate-100">
+                  <img
+                    src={member.imageUrl || payload.logoUrl}
+                    alt={member.position || member.name || 'Rahbar'}
+                    className="h-full w-full object-cover object-top"
+                  />
+                </div>
+                <div className="grid flex-1 content-start gap-3 p-5">
+                  <h2 className="min-h-[5.6rem] text-2xl font-black leading-tight text-slate-950">{member.position}</h2>
+                  {showName ? <p className="min-h-[2rem] text-base font-semibold text-slate-700">{member.name}</p> : <div className="min-h-[2rem]" />}
+                  <EmployeeInfo text={member.employeeInfo} />
+                  <WorkActivityToggle text={member.workActivity} />
+                </div>
+              </motion.article>
             );
           })}
         </div>
@@ -1902,7 +1886,7 @@ function formatNewsDate(value) {
   }).format(parsed);
 }
 
-function NewsPage({ announcements }) {
+function NewsPage({ announcements, lang }) {
   const [query, setQuery] = useState('');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
@@ -1996,7 +1980,7 @@ function NewsPage({ announcements }) {
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Izlash"
+              placeholder={t(lang, 'newsSearch')}
               className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base font-semibold text-slate-700 outline-none transition focus:border-violet-300 focus:bg-white"
             />
           </div>
@@ -2030,7 +2014,7 @@ function NewsPage({ announcements }) {
                         onClick={() => setExpandedId((current) => (current === item.id ? null : item.id))}
                         className="mt-1 inline-flex w-full items-center justify-center rounded-xl bg-violet-200 px-4 py-2 text-lg font-bold text-[#3a1b78] transition hover:bg-violet-300"
                       >
-                        {expanded ? 'Yopish' : 'Batafsil'}
+                        {expanded ? t(lang, 'close') : t(lang, 'details')}
                       </button>
                     ) : null}
                   </div>
@@ -2038,17 +2022,17 @@ function NewsPage({ announcements }) {
               );
             }) : (
               <article className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-base font-semibold text-slate-500 sm:col-span-2">
-                So'rovingiz bo'yicha yangilik topilmadi.
+                {lang === 'ru' ? 'По вашему запросу новости не найдены.' : "So'rovingiz bo'yicha yangilik topilmadi."}
               </article>
             )}
           </div>
         </div>
 
         <aside className="h-fit rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:sticky lg:top-24">
-          <h3 className="text-3xl font-black text-slate-950">Filter</h3>
+          <h3 className="text-3xl font-black text-slate-950">{t(lang, 'filter')}</h3>
           <div className="mt-5 grid gap-3">
             <label className="grid gap-2">
-              <span className="text-sm font-bold text-slate-600">Davr oralig'i</span>
+              <span className="text-sm font-bold text-slate-600">{t(lang, 'periodFrom')}</span>
               <input
                 type="date"
                 value={fromDate}
@@ -2057,7 +2041,7 @@ function NewsPage({ announcements }) {
               />
             </label>
             <label className="grid gap-2">
-              <span className="text-sm font-bold text-slate-600">Davr gacha</span>
+              <span className="text-sm font-bold text-slate-600">{t(lang, 'periodTo')}</span>
               <input
                 type="date"
                 value={toDate}
@@ -2070,7 +2054,7 @@ function NewsPage({ announcements }) {
               onClick={resetFilters}
               className="mt-2 inline-flex w-full items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base font-bold text-slate-700 transition hover:bg-white"
             >
-              Filtrlarni tozalash
+              {t(lang, 'clearFilters')}
             </button>
           </div>
         </aside>
@@ -2079,47 +2063,107 @@ function NewsPage({ announcements }) {
   );
 }
 
-function Hero({ stats, schedules }) {
+function Hero({ stats, schedules, lang }) {
   return (
     <section id="top" className="mx-auto w-full max-w-[1208px] min-w-0 px-3.5 pb-16 pt-10 lg:pb-24 lg:pt-16">
+      <HeroStudentVisual imageUrl={payload.heroImageUrl} schedules={schedules} />
+
       <motion.div
         initial={{ opacity: 0, y: 28 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.65, ease: 'easeOut' }}
-        className="mx-auto max-w-5xl text-center"
+        className="mx-auto mt-10 max-w-5xl text-center"
       >
         <div className="inline-flex rounded-full border border-violet-300/50 bg-white/60 px-4 py-2 text-sm font-black uppercase tracking-[0.16em] text-violet-700 shadow-lg shadow-violet-500/10 backdrop-blur dark:border-cyan-300/20 dark:bg-white/8 dark:text-cyan-100">
-          Milliy ta'lim ekotizimi
+          {t(lang, 'heroBadge')}
         </div>
         <h1 className="mx-auto mt-7 max-w-[21rem] text-[1.42rem] font-black leading-[1.18] tracking-normal text-slate-950 dark:text-white sm:hidden">
-          <span className="block">Istalgan joyda va vaqtda</span>
-          <span className="block">o'rganing,</span>
-          <span className="block">kelajagingizni biz bilan quring</span>
+          <span className="block">{t(lang, 'heroTitle')}</span>
         </h1>
         <h1 className="mx-auto mt-7 hidden max-w-[58rem] text-6xl font-black leading-[0.98] tracking-normal text-slate-950 dark:text-white sm:block lg:text-7xl">
-          Istalgan joyda va vaqtda o'rganing, kelajagingizni biz bilan quring
+          {t(lang, 'heroTitle')}
         </h1>
         <p
           className="mx-auto mt-7 max-w-[21rem] text-base font-semibold leading-7 text-slate-600 dark:text-slate-300 sm:max-w-[48rem] sm:text-lg sm:leading-8"
           style={{ overflowWrap: 'anywhere' }}
         >
-          Kelajak Markazi to'garak, mentor, dars jadvali, ariza va yutuqlarni bitta premium platformaga jamlaydi. Natija ko'rinadi, jarayon boshqariladi, imkoniyatlar yaqinlashadi.
+          {t(lang, 'heroText')}
         </p>
 
-        <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
-          <Button href={payload.isAuthenticated ? payload.dashboardUrl : payload.registerUrl} variant="glow">Platformaga kirish</Button>
-          <Button href="#features" variant="ghost">Imkoniyatlarni ko'rish</Button>
-        </div>
       </motion.div>
 
-      <HeroStudentVisual imageUrl={payload.heroImageUrl} schedules={schedules} />
-
-      <div className="relative z-20 -mt-8 grid grid-cols-2 gap-3 sm:-mt-12 sm:grid-cols-4">
+      <div className="relative z-20 mt-6 grid grid-cols-2 gap-3 sm:mt-8 sm:grid-cols-4">
         {stats.map((stat, index) => (
           <StatCard key={stat.label} stat={stat} index={index} />
         ))}
       </div>
     </section>
+  );
+}
+
+function StudentCouncilSection({ members, hideHeading = false }) {
+  return (
+    <section id="student-council" className="mx-auto w-[calc(100%_-_28px)] max-w-[1180px] py-12">
+      {!hideHeading ? (
+        <div className="mb-8 max-w-3xl">
+          <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-600 dark:text-cyan-200">O'quvchilar kengashi</p>
+          <h2 className="mt-3 text-3xl font-black text-slate-950 dark:text-white sm:text-5xl">Amalga oshirilgan ishlar</h2>
+        </div>
+      ) : null}
+
+      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        {members.map((member, index) => (
+          <motion.article
+            key={member.id || `${member.name}-${index}`}
+            initial={{ y: 18, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ delay: index * 0.08, duration: 0.45 }}
+            className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"
+          >
+            <div className="mb-4 aspect-[4/3] overflow-hidden rounded-2xl bg-slate-100">
+              <img src={member.imageUrl || payload.logoUrl} alt={member.name} className="h-full w-full object-cover" />
+            </div>
+            <h3 className="text-2xl font-black text-slate-950">{member.name}</h3>
+            <p className="mt-4 text-base font-semibold leading-7 text-slate-600">{member.work}</p>
+          </motion.article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function StudentCouncilPage({ members }) {
+  const advisor = payload.studentCouncilAdvisor || defaultStudentCouncilAdvisor;
+
+  return (
+    <div className="bg-[#f4f5fb] text-slate-950">
+      <section className="relative overflow-hidden bg-[linear-gradient(130deg,#1f2e57_0%,#2f3d78_50%,#1f6a89_100%)]">
+        <div className="absolute inset-0 opacity-15 [background-image:linear-gradient(rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:34px_34px]" />
+        <div className="relative mx-auto max-w-[1536px] px-5 py-14 lg:px-16 lg:py-16">
+          <p className="inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-cyan-100">
+            O'quvchilar kengashi
+          </p>
+          <h1 className="mt-5 max-w-4xl text-4xl font-black leading-tight text-white sm:text-5xl">
+            O'quvchilar kengashi faoliyati
+          </h1>
+        </div>
+      </section>
+      <section className="mx-auto w-[calc(100%_-_28px)] max-w-[1180px] py-10">
+        <article className="grid gap-5 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:grid-cols-[250px_minmax(0,1fr)] md:items-start">
+          <div className="overflow-hidden rounded-2xl bg-slate-100">
+            <img src={advisor.imageUrl || payload.logoUrl} alt={advisor.fullName} className="h-full w-full object-cover" />
+          </div>
+          <div>
+            <h2 className="text-4xl font-black leading-tight text-slate-950">{advisor.fullName}</h2>
+            <div className="my-5 h-px bg-slate-200" />
+            <h3 className="text-2xl font-bold text-slate-900">{advisor.title}</h3>
+            <p className="mt-3 text-base font-semibold leading-8 text-slate-700">{advisor.description}</p>
+          </div>
+        </article>
+      </section>
+      <StudentCouncilSection members={members} hideHeading />
+    </div>
   );
 }
 
@@ -2135,6 +2179,7 @@ function AboutCenterSection() {
       id: 'student-council',
       title: "O'quvchilar kengashi",
       text: "O'quvchi tashabbuslarini yig'ib, tadbirlar va ijtimoiy loyihalarni hamkorlikda olib boradigan kengash.",
+      href: '#/student-council',
     },
     {
       id: 'news',
@@ -2146,6 +2191,7 @@ function AboutCenterSection() {
       id: 'about-us',
       title: 'Biz haqimizda',
       text: "Kelajak Markazining maqsadi, qadriyatlari va ta'limni natijaga aylantirish yondashuvi.",
+      href: '#/about-us',
     },
   ];
 
@@ -2174,6 +2220,51 @@ function AboutCenterSection() {
   );
 }
 
+function AboutUsPage() {
+  return (
+    <div className="bg-[#f4f5fb] text-slate-950">
+      <section className="relative overflow-hidden bg-[linear-gradient(130deg,#1f2e57_0%,#2f3d78_50%,#1f6a89_100%)]">
+        <div className="absolute inset-0 opacity-15 [background-image:linear-gradient(rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:34px_34px]" />
+        <div className="relative mx-auto max-w-[1536px] px-5 py-14 lg:px-16 lg:py-16">
+          
+          <h1 className="mt-5 max-w-4xl text-4xl font-black leading-tight text-white sm:text-5xl">
+            Kelajak markazlari haqida
+          </h1>
+        </div>
+      </section>
+
+      <section className="mx-auto w-[calc(100%_-_28px)] max-w-[1180px] py-10">
+        <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+          <p className="text-lg font-semibold leading-8 text-slate-800">
+            “Kelajak markazlari” — bu bolalarning ijodiy, intellektual va ijtimoiy salohiyatini rivojlantirishga xizmat qiluvchi ochiq makon.
+          </p>
+          <p className="mt-5 text-lg font-semibold leading-8 text-slate-800">
+            Bu markazlarda har bir o‘quvchining qiziqishi, iste’dodi va tashabbusiga e’tibor qaratiladi.
+          </p>
+          <p className="mt-5 text-lg font-semibold leading-8 text-slate-800">
+            Bizning maqsad — bolalarga bilimni faqat darslikdan emas, balki hayotdan, amaliy faoliyatdan o‘rganish imkonini yaratishdir.
+          </p>
+          <p className="mt-5 text-xl font-black leading-8 text-slate-950">
+            Kelajak ta’limdan boshlanadi!
+          </p>
+
+          <div className="mt-7 rounded-2xl border border-violet-200 bg-violet-50 p-4">
+            <p className="text-sm font-black uppercase tracking-[0.14em] text-violet-700">Hujjat</p>
+            <a
+              href="https://search.app/p2sKoQoEcN743Wps9"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-2 inline-flex items-center gap-2 text-base font-black text-violet-800 transition hover:text-violet-950"
+            >
+              “Kelajak” markazi nizomi <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </article>
+      </section>
+    </div>
+  );
+}
+
 function Footer() {
   const year = new Date().getFullYear();
   const contact = payload.contact || defaultContact;
@@ -2184,7 +2275,6 @@ function Footer() {
     ['Kontaktlar', '#our-contact'],
     ['Yangiliklar', '#/news'],
     ['Rahbariyat', '#/leadership'],
-    ['Maxsus katalog', '#special'],
     ['Markaz haqida', '#cta'],
   ];
 
@@ -2205,7 +2295,7 @@ function Footer() {
             </div>
           </a>
           <p className="mt-5 max-w-sm text-sm font-semibold leading-7 text-slate-600 dark:text-slate-300">
-            To'garaklar, dars jadvali, maxsus katalog va murojaatlarni yagona raqamli tajribaga jamlaydigan zamonaviy ta'lim platformasi.
+            To'garaklar, dars jadvali va murojaatlarni yagona raqamli tajribaga jamlaydigan zamonaviy ta'lim platformasi.
           </p>
         </div>
 
@@ -2255,14 +2345,15 @@ function Footer() {
 
 function App() {
   const [theme, toggleTheme] = useTheme();
+  const [lang, toggleLanguage] = useLanguage();
   const route = useHashRoute();
   const stats = useMemo(() => payload.stats?.length ? payload.stats : defaultStats, []);
   const directions = useMemo(() => payload.directions?.length ? payload.directions : defaultDirections, []);
-  const features = payload.features || [];
   const clubs = payload.clubs?.length ? payload.clubs : [];
   const schedules = payload.lessonSchedules?.length ? payload.lessonSchedules : [];
   const leadershipMembers = payload.leadershipMembers?.length ? payload.leadershipMembers : defaultLeadershipMembers;
   const announcements = payload.announcements?.length ? payload.announcements : defaultAnnouncements;
+  const studentCouncilMembers = payload.studentCouncilMembers?.length ? payload.studentCouncilMembers : defaultStudentCouncilMembers;
 
   return (
     <main className="premium-bg relative min-h-screen overflow-hidden text-slate-950 transition-colors duration-500 dark:text-white">
@@ -2274,7 +2365,7 @@ function App() {
       </div>
 
       <div className="relative z-10">
-        <Header route={route} />
+        <Header route={route} lang={lang} onToggleLanguage={toggleLanguage} />
         <div className="fixed bottom-5 right-5 z-50">
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
         </div>
@@ -2300,45 +2391,86 @@ function App() {
           </>
         ) : route === 'news' ? (
           <>
-            <NewsPage announcements={announcements} />
+            <NewsPage announcements={announcements} lang={lang} />
+            <Footer />
+          </>
+        ) : route === 'student-council' ? (
+          <>
+            <StudentCouncilPage members={studentCouncilMembers} />
+            <Footer />
+          </>
+        ) : route === 'about-us' ? (
+          <>
+            <AboutUsPage />
             <Footer />
           </>
         ) : (
           <>
-            <Hero stats={stats} schedules={payload.lessonSchedules} />
+            <Hero stats={stats} schedules={payload.lessonSchedules} lang={lang} />
 
             <section className="mx-auto w-[calc(100%_-_28px)] max-w-[1180px] py-12">
               <div className="mb-8 max-w-3xl">
-                <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-600 dark:text-cyan-200">Nega bu platforma kuchli</p>
-                <h2 className="mt-3 text-3xl font-black text-slate-950 dark:text-white sm:text-5xl">Oddiy landing emas, markaz ishini yuritadigan raqamli boshqaruv</h2>
+                <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-600 dark:text-cyan-200">{t(lang, 'sectionNews')}</p>
               </div>
               <div className="grid gap-5 md:grid-cols-3">
-                {features.map((feature, index) => (
-                  <FeatureCard key={feature.title} feature={feature} index={index} />
+                {announcements.slice(0, 3).map((item, index) => (
+                  <motion.article
+                    key={item.id || `home-news-${index}`}
+                    initial={{ y: 18, opacity: 0 }}
+                    whileInView={{ y: 0, opacity: 1 }}
+                    viewport={{ once: true, margin: '-80px' }}
+                    transition={{ delay: index * 0.08, duration: 0.45 }}
+                    className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+                  >
+                    <div className="aspect-[16/10] overflow-hidden bg-slate-100">
+                      <img src={item.imageUrl || payload.heroImageUrl || payload.logoUrl} alt={item.title} className="h-full w-full object-cover" />
+                    </div>
+                    <div className="grid gap-3 p-5">
+                      <p className="text-xs font-black uppercase tracking-[0.14em] text-violet-700">{formatNewsDate(item.publishedAt)}</p>
+                      <h3 className="line-clamp-2 text-2xl font-black leading-tight text-slate-950">{item.title}</h3>
+                      <p className="line-clamp-3 text-sm font-semibold leading-7 text-slate-600">{item.body}</p>
+                      <a href="#/news" className="mt-1 inline-flex items-center gap-2 text-sm font-black text-violet-700 hover:text-violet-900">
+                        {t(lang, 'details')} <span aria-hidden="true">›</span>
+                      </a>
+                    </div>
+                  </motion.article>
                 ))}
+              </div>
+              <div className="mt-7">
+                <a href="#/news" className="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 text-sm font-black text-slate-800 transition hover:-translate-y-0.5 hover:border-violet-300 hover:text-violet-700">
+                  {t(lang, 'allNews')}
+                </a>
               </div>
             </section>
 
             <section id="directions" className="mx-auto w-[calc(100%_-_28px)] max-w-[1180px] py-12">
               <div className="mb-8 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
                 <div className="max-w-3xl">
-                  <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-600 dark:text-cyan-200">Yo'nalishlar</p>
-                  <h2 className="mt-3 text-3xl font-black text-slate-950 dark:text-white sm:text-5xl">Qiziqishdan kasbgacha olib boradigan yo'nalishlar</h2>
+                  <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-600 dark:text-cyan-200">{t(lang, 'clubsLabel')}</p>
+                  <h2 className="mt-3 text-3xl font-black text-slate-950 dark:text-white sm:text-5xl">{t(lang, 'clubsTitle')}</h2>
                 </div>
                 <p className="max-w-sm text-base font-semibold leading-7 text-slate-600 dark:text-slate-300">
-                  Har bir guruh mentor, jadval va progress bilan boshqariladi. O'quvchi qayerdan boshlaganini ham, qayerga ketayotganini ham ko'radi.
+                  {t(lang, 'clubsText')}
                 </p>
               </div>
               <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-                {directions.map((item, index) => (
-                  <DirectionCard key={item.title} item={item} index={index} />
+                {clubs.slice(0, 4).map((club, index) => (
+                  <DirectionCard
+                    key={club.id || club.title}
+                    item={{
+                      title: club.title,
+                      text: club.description,
+                      meta: club.priceText || club.clubType || club.category || "To'garak",
+                    }}
+                    index={index}
+                  />
                 ))}
               </div>
             </section>
 
-            <AboutCenterSection />
+            <StudentCouncilSection members={studentCouncilMembers} />
 
-            <SpecialStrip items={payload.specialCourses} />
+            <AboutCenterSection />
 
             <section id="cta" className="mx-auto w-[calc(100%_-_28px)] max-w-[1180px] py-16">
               <motion.div

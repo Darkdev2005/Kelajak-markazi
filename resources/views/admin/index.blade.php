@@ -16,6 +16,7 @@
         <article class="mini-card"><strong>{{ $stats['leadership_members'] }}</strong><span>Rahbariyat</span></article>
         <article class="mini-card"><strong>{{ $stats['events'] }}</strong><span>Tadbir</span></article>
         <article class="mini-card"><strong>{{ $stats['announcements'] }}</strong><span>Yangilik</span></article>
+        <article class="mini-card"><strong>{{ $stats['student_council_members'] ?? 0 }}</strong><span>O'quvchilar kengashi</span></article>
         <article class="mini-card"><strong>{{ $stats['contacts'] }}</strong><span>Yangi murojaat</span></article>
     </div>
 </section>
@@ -27,6 +28,7 @@
     <a href="{{ route('admin.index', ['section' => 'events']) }}" class="{{ $section === 'events' ? 'active' : '' }}">Tadbirlar</a>
     <a href="{{ route('admin.index', ['section' => 'announcements']) }}" class="{{ $section === 'announcements' ? 'active' : '' }}">Yangiliklar</a>
     <a href="{{ route('admin.index', ['section' => 'leadership']) }}" class="{{ $section === 'leadership' ? 'active' : '' }}">Rahbariyat</a>
+    <a href="{{ route('admin.index', ['section' => 'student-council']) }}" class="{{ $section === 'student-council' ? 'active' : '' }}">O'quvchilar kengashi</a>
     <a href="{{ route('admin.index', ['section' => 'requests']) }}" class="{{ $section === 'requests' ? 'active' : '' }}">Arizalar</a>
     <a href="{{ route('admin.index', ['section' => 'contacts']) }}" class="{{ $section === 'contacts' ? 'active' : '' }}">Murojaatlar</a>
 </section>
@@ -156,6 +158,109 @@
 </section>
 @endif
 
+@if($section === 'student-council')
+<section class="grid two section-block reveal" id="admin-student-council">
+    <article class="card">
+        <h2>O'quvchilar kengashi maslahatchisi</h2>
+        <form method="POST" action="{{ route('admin.student-council-advisor.upsert') }}" class="form" enctype="multipart/form-data">
+            @csrf
+            <label>Ism familiya</label>
+            <input type="text" name="full_name" value="{{ $studentCouncilAdvisor->full_name ?? '' }}" required>
+            <label>Lavozim</label>
+            <input type="text" name="title" value="{{ $studentCouncilAdvisor->title ?? 'Maslahatchi haqida' }}">
+            <label>Ma'lumot</label>
+            <textarea name="description" rows="4">{{ $studentCouncilAdvisor->description ?? '' }}</textarea>
+            <div class="grid two compact">
+                <div>
+                    <label>Rasm yuklash</label>
+                    <input type="file" name="image" accept="image/*">
+                </div>
+                <div>
+                    <label>Yoki rasm yo'li/URL</label>
+                    <input type="text" name="image_url" value="{{ $studentCouncilAdvisor->image_url ?? '' }}" placeholder="images/student-council/advisor.jpg">
+                </div>
+            </div>
+            <label class="row gap"><input type="checkbox" value="1" name="is_active" @checked(($studentCouncilAdvisor->is_active ?? true))> Saytda ko'rinsin</label>
+            <button class="btn" type="submit">Maslahatchini saqlash</button>
+        </form>
+    </article>
+
+    <article class="card">
+        <h2>O'quvchilar kengashi a'zosini qo'shish</h2>
+        <form method="POST" action="{{ route('admin.student-council-members.store') }}" class="form" enctype="multipart/form-data">
+            @csrf
+            <label>Ism familiya</label>
+            <input type="text" name="full_name" required>
+            <label>Qilgan ishlari</label>
+            <textarea name="achievement" rows="4" required></textarea>
+            <div class="grid two compact">
+                <div>
+                    <label>Rasm yuklash</label>
+                    <input type="file" name="image" accept="image/*">
+                </div>
+                <div>
+                    <label>Tartib</label>
+                    <input type="number" name="sort_order" min="0" value="0">
+                </div>
+            </div>
+            <label>Yoki rasm yo'li/URL</label>
+            <input type="text" name="image_url" placeholder="images/student-council/member.jpg">
+            <label class="row gap"><input type="checkbox" value="1" name="is_active" checked> Saytda ko'rinsin</label>
+            <button class="btn" type="submit">Saqlash</button>
+        </form>
+    </article>
+
+    <article class="card">
+        <h2>O'quvchilar kengashini boshqarish</h2>
+        <div class="resource-list">
+            @forelse($studentCouncilMembers as $member)
+                <details class="resource-item">
+                    <summary>
+                        <span>
+                            <strong>{{ $member->full_name }}</strong>
+                            <small>{{ \Illuminate\Support\Str::limit($member->achievement, 80) }}</small>
+                        </span>
+                        <em>{{ $member->is_active ? 'Faol' : 'Yopiq' }}</em>
+                    </summary>
+                    @if($member->image_url)
+                        <img class="admin-preview" src="{{ \Illuminate\Support\Str::startsWith($member->image_url, ['http://', 'https://']) ? $member->image_url : asset($member->image_url) }}" alt="{{ $member->full_name }}">
+                    @endif
+                    <form method="POST" action="{{ route('admin.student-council-members.update', $member) }}" class="form edit-form" enctype="multipart/form-data">
+                        @csrf
+                        @method('PATCH')
+                        <label>Ism familiya</label>
+                        <input type="text" name="full_name" value="{{ $member->full_name }}" required>
+                        <label>Qilgan ishlari</label>
+                        <textarea name="achievement" rows="4" required>{{ $member->achievement }}</textarea>
+                        <div class="grid two compact">
+                            <div>
+                                <label>Yangi rasm yuklash</label>
+                                <input type="file" name="image" accept="image/*">
+                            </div>
+                            <div>
+                                <label>Tartib</label>
+                                <input type="number" name="sort_order" min="0" value="{{ $member->sort_order }}">
+                            </div>
+                        </div>
+                        <label>Rasm yo'li yoki URL</label>
+                        <input type="text" name="image_url" value="{{ $member->image_url }}">
+                        <label class="row gap"><input type="checkbox" value="1" name="is_active" @checked($member->is_active)> Saytda ko'rinsin</label>
+                        <button class="btn" type="submit">Yangilash</button>
+                    </form>
+                    <form method="POST" action="{{ route('admin.student-council-members.destroy', $member) }}" class="delete-form">
+                        @csrf
+                        @method('DELETE')
+                        <button class="btn danger" type="submit">O'chirish</button>
+                    </form>
+                </details>
+            @empty
+                <p>O'quvchilar kengashi ma'lumotlari yo'q.</p>
+            @endforelse
+        </div>
+    </article>
+</section>
+@endif
+
 @if($section === 'leadership')
 <section class="grid two section-block reveal" id="admin-leadership">
     <article class="card">
@@ -275,7 +380,7 @@
             </div>
             <label>Xona</label>
             <input type="text" name="room" placeholder="A-204">
-            <label>Mentor</label>
+            <label>O'qituvchi</label>
             <input type="text" name="mentor">
             <div class="grid two compact">
                 <div>
@@ -300,7 +405,7 @@
                     <summary>
                         <span>
                             <strong>{{ $slot->day_label }} В· {{ $slot->start_time->format('H:i') }}</strong>
-                            <small>{{ $slot->program?->title ?? 'Erkin mashg\'ulot' }} В· {{ $slot->mentor ?? 'Mentor belgilanmagan' }}</small>
+                            <small>{{ $slot->program?->title ?? 'Erkin mashg\'ulot' }} В· {{ $slot->mentor ?? "O'qituvchi belgilanmagan" }}</small>
                         </span>
                         <em>{{ $slot->is_active ? 'Faol' : 'Yopiq' }}</em>
                     </summary>
@@ -334,7 +439,7 @@
                         </div>
                         <label>Xona</label>
                         <input type="text" name="room" value="{{ $slot->room }}">
-                        <label>Mentor</label>
+                        <label>O'qituvchi</label>
                         <input type="text" name="mentor" value="{{ $slot->mentor }}">
                         <div class="grid two compact">
                             <div>

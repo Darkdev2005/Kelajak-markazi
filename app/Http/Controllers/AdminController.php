@@ -10,6 +10,8 @@ use App\Models\LeadershipMember;
 use App\Models\LessonSchedule;
 use App\Models\Program;
 use App\Models\SpecialCourse;
+use App\Models\StudentCouncilAdvisor;
+use App\Models\StudentCouncilMember;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -193,6 +195,82 @@ class AdminController extends Controller
         return 'images/announcements/' . $filename;
     }
 
+    private function studentCouncilValidationRules(): array
+    {
+        return [
+            'full_name' => ['required', 'string', 'max:180'],
+            'achievement' => ['required', 'string', 'max:2500'],
+            'image_url' => ['nullable', 'string', 'max:255'],
+            'image' => ['nullable', 'image', 'max:4096'],
+            'sort_order' => ['nullable', 'integer', 'min:0', 'max:999'],
+            'is_active' => ['nullable', 'boolean'],
+        ];
+    }
+
+    private function studentCouncilAdvisorValidationRules(): array
+    {
+        return [
+            'full_name' => ['required', 'string', 'max:180'],
+            'title' => ['nullable', 'string', 'max:220'],
+            'description' => ['nullable', 'string', 'max:2500'],
+            'image_url' => ['nullable', 'string', 'max:255'],
+            'image' => ['nullable', 'image', 'max:4096'],
+            'is_active' => ['nullable', 'boolean'],
+        ];
+    }
+
+    private function resolveStudentCouncilImage(Request $request, ?StudentCouncilMember $member = null): ?string
+    {
+        if (! $request->hasFile('image')) {
+            return $request->filled('image_url')
+                ? $request->string('image_url')->toString()
+                : ($member?->image_url ?? null);
+        }
+
+        $directory = public_path('images/student-council');
+        if (! is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
+
+        $file = $request->file('image');
+        $name = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) ?: 'student-council';
+        $filename = $name . '-' . Str::uuid() . '.' . $file->extension();
+        $file->move($directory, $filename);
+
+        $oldImage = $member?->image_url;
+        if ($oldImage && Str::startsWith($oldImage, 'images/student-council/') && is_file(public_path($oldImage))) {
+            @unlink(public_path($oldImage));
+        }
+
+        return 'images/student-council/' . $filename;
+    }
+
+    private function resolveStudentCouncilAdvisorImage(Request $request, ?StudentCouncilAdvisor $advisor = null): ?string
+    {
+        if (! $request->hasFile('image')) {
+            return $request->filled('image_url')
+                ? $request->string('image_url')->toString()
+                : ($advisor?->image_url ?? null);
+        }
+
+        $directory = public_path('images/student-council');
+        if (! is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
+
+        $file = $request->file('image');
+        $name = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) ?: 'student-council-advisor';
+        $filename = $name . '-' . Str::uuid() . '.' . $file->extension();
+        $file->move($directory, $filename);
+
+        $oldImage = $advisor?->image_url;
+        if ($oldImage && Str::startsWith($oldImage, 'images/student-council/') && is_file(public_path($oldImage))) {
+            @unlink(public_path($oldImage));
+        }
+
+        return 'images/student-council/' . $filename;
+    }
+
     public function index(Request $request): View
     {
         $this->ensureAdmin();
@@ -204,6 +282,7 @@ class AdminController extends Controller
             'events',
             'announcements',
             'leadership',
+            'student-council',
             'requests',
             'contacts',
         ];
@@ -222,6 +301,7 @@ class AdminController extends Controller
             'leadership_members' => Schema::hasTable('leadership_members') ? LeadershipMember::count() : 0,
             'applications' => ApplicationRequest::count(),
             'contacts' => ContactMessage::query()->where('status', 'new')->count(),
+            'student_council_members' => Schema::hasTable('student_council_members') ? StudentCouncilMember::count() : 0,
         ];
 
         $latestApplications = ApplicationRequest::query()
@@ -249,6 +329,12 @@ class AdminController extends Controller
                 ->get()
             : collect();
         $contactMessages = ContactMessage::query()->latest()->get();
+        $studentCouncilMembers = Schema::hasTable('student_council_members')
+            ? StudentCouncilMember::query()->orderBy('sort_order')->latest()->get()
+            : collect();
+        $studentCouncilAdvisor = Schema::hasTable('student_council_advisors')
+            ? StudentCouncilAdvisor::query()->latest()->first()
+            : null;
 
         return view('admin.index', compact(
             'stats',
@@ -260,6 +346,8 @@ class AdminController extends Controller
             'specialCourses',
             'leadershipMembers',
             'contactMessages',
+            'studentCouncilMembers',
+            'studentCouncilAdvisor',
             'activeSection'
         ));
     }
@@ -553,6 +641,67 @@ class AdminController extends Controller
         $leadershipMember->delete();
 
         return back()->with('ok', 'Rahbariyat ma\'lumoti o\'chirildi.');
+    }
+
+    public function storeStudentCouncilMember(Request $request): RedirectResponse
+    {
+        $this->ensureAdmin();
+        $validated = $request->validate($this->studentCouncilValidationRules());
+
+        StudentCouncilMember::create([
+            'full_name' => $validated['full_name'],
+            'achievement' => $validated['achievement'],
+            'image_url' => $this->resolveStudentCouncilImage($request),
+            'sort_order' => $validated['sort_order'] ?? 0,
+            'is_active' => (bool) ($validated['is_active'] ?? true),
+        ]);
+
+        return back()->with('ok', "O'quvchilar kengashi a'zosi qo'shildi.");
+    }
+
+    public function updateStudentCouncilMember(Request $request, StudentCouncilMember $studentCouncilMember): RedirectResponse
+    {
+        $this->ensureAdmin();
+        $validated = $request->validate($this->studentCouncilValidationRules());
+
+        $studentCouncilMember->update([
+            'full_name' => $validated['full_name'],
+            'achievement' => $validated['achievement'],
+            'image_url' => $this->resolveStudentCouncilImage($request, $studentCouncilMember),
+            'sort_order' => $validated['sort_order'] ?? 0,
+            'is_active' => (bool) ($validated['is_active'] ?? false),
+        ]);
+
+        return back()->with('ok', "O'quvchilar kengashi ma'lumoti yangilandi.");
+    }
+
+    public function destroyStudentCouncilMember(StudentCouncilMember $studentCouncilMember): RedirectResponse
+    {
+        $this->ensureAdmin();
+        if ($studentCouncilMember->image_url && Str::startsWith($studentCouncilMember->image_url, 'images/student-council/') && is_file(public_path($studentCouncilMember->image_url))) {
+            @unlink(public_path($studentCouncilMember->image_url));
+        }
+        $studentCouncilMember->delete();
+        return back()->with('ok', "O'quvchilar kengashi ma'lumoti o'chirildi.");
+    }
+
+    public function upsertStudentCouncilAdvisor(Request $request): RedirectResponse
+    {
+        $this->ensureAdmin();
+        $validated = $request->validate($this->studentCouncilAdvisorValidationRules());
+
+        $advisor = StudentCouncilAdvisor::query()->latest()->first() ?? new StudentCouncilAdvisor();
+
+        $advisor->fill([
+            'full_name' => $validated['full_name'],
+            'title' => $validated['title'] ?? null,
+            'description' => $validated['description'] ?? null,
+            'image_url' => $this->resolveStudentCouncilAdvisorImage($request, $advisor->exists ? $advisor : null),
+            'is_active' => (bool) ($validated['is_active'] ?? true),
+        ]);
+        $advisor->save();
+
+        return back()->with('ok', "O'quvchilar kengashi maslahatchisi yangilandi.");
     }
 
     public function updateApplicationStatus(Request $request, ApplicationRequest $application): RedirectResponse

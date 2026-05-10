@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
         User::query()->updateOrCreate(
             ['email' => 'mentor@kelajak.uz'],
             [
-                'name' => 'Mentor User',
+                'name' => "O'qituvchi User",
                 'phone' => '+998900000002',
                 'password' => Hash::make('mentor12345'),
                 'role' => 'mentor',
@@ -176,7 +176,7 @@ class DatabaseSeeder extends Seeder
             [
                 'event_date' => now()->addWeeks(4)->toDateString(),
                 'location' => 'Kelajak Markazi',
-                'description' => 'O\'quvchilar yakuniy loyihalarini mentor va ota-onalar oldida himoya qiladi.',
+                'description' => 'O\'quvchilar yakuniy loyihalarini o\'qituvchi va ota-onalar oldida himoya qiladi.',
             ]
         );
 
@@ -185,7 +185,7 @@ class DatabaseSeeder extends Seeder
             [
                 'event_date' => now()->addDays(10)->toDateString(),
                 'location' => 'Online + markaz',
-                'description' => 'Ingliz tilida suhbat, mini challenge va mentor feedback sessiyasi.',
+                'description' => 'Ingliz tilida suhbat, mini challenge va o\'qituvchi feedback sessiyasi.',
             ]
         );
 
@@ -208,10 +208,10 @@ class DatabaseSeeder extends Seeder
         );
 
         $scheduleItems = [
-            [$itProgram->id, 'monday', 'Dushanba', '09:00', '10:30', 'Lab A-204', 'Azizbek mentor', 24, false, 1],
-            [$languageProgram->id, 'tuesday', 'Seshanba', '14:00', '15:30', 'Room B-110', 'Madina mentor', 18, false, 2],
-            [$mediaProgram->id, 'wednesday', 'Chorshanba', '16:00', '17:30', 'Media studio', 'Dilshod mentor', 16, false, 3],
-            [$leadershipProgram->id, 'friday', 'Juma', '10:00', '11:30', null, 'Mohira mentor', 32, true, 4],
+            [$itProgram->id, 'monday', 'Dushanba', '09:00', '10:30', 'Lab A-204', "Azizbek o'qituvchi", 24, false, 1],
+            [$languageProgram->id, 'tuesday', 'Seshanba', '14:00', '15:30', 'Room B-110', "Madina o'qituvchi", 18, false, 2],
+            [$mediaProgram->id, 'wednesday', 'Chorshanba', '16:00', '17:30', 'Media studio', "Dilshod o'qituvchi", 16, false, 3],
+            [$leadershipProgram->id, 'friday', 'Juma', '10:00', '11:30', null, "Mohira o'qituvchi", 32, true, 4],
         ];
 
         foreach ($scheduleItems as [$programId, $weekday, $dayLabel, $start, $end, $room, $mentor, $capacity, $isOnline, $order]) {

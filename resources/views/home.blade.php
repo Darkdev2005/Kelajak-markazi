@@ -1,10 +1,10 @@
-@extends('layouts.landing')
+﻿@extends('layouts.landing')
 
 @php
     $landingPayload = [
         'logoUrl' => asset('images/kelajak-logo.png'),
         'navLogoUrl' => asset('images/kelajak-logo.png'),
-        'heroImageUrl' => asset('images/kelajak-hero-student.webp'),
+        'heroImageUrl' => asset('images/kelajak-hero-student.png'),
         'loginUrl' => route('login'),
         'registerUrl' => route('register'),
         'dashboardUrl' => route('dashboard'),
@@ -13,14 +13,13 @@
         'flashMessage' => session('ok'),
         'contact' => [
             'storeUrl' => route('contacts.store'),
-            'phone' => '+998 (71) 217-18-71',
-            'phoneRaw' => '+998712171871',
+            'phone' => '+998 93 534 90 80',
+            'phoneRaw' => '+998935349080',
             'email' => 'kelajakmarkazlari@gmail.com',
-            'address' => '100011, O\'zbekiston, Toshkent, Shayxontohur tumani, Navoiy ko\'chasi, 2A-uy',
-            'hours' => 'Dushanba - Shanba · 09:00 - 18:00',
-            'responseTime' => 'Odatda 30 daqiqa ichida javob',
-            'mapUrl' => 'https://maps.google.com/?q=' . urlencode('100011, O\'zbekiston, Toshkent, Shayxontohur tumani, Navoiy ko\'chasi, 2A-uy'),
-            'mapEmbedUrl' => 'https://www.google.com/maps?q=' . urlencode('100011, O\'zbekiston, Toshkent, Shayxontohur tumani, Navoiy ko\'chasi, 2A-uy') . '&z=15&output=embed',
+            'address' => '140129, Samarqand sh. Maxmud Qoshg\'ariy, 52-uy. Mo\'ljal: Xotira maydoni',
+            'hours' => 'Dushanba - Shanba  09:00 - 18:00',
+            'mapUrl' => 'https://maps.google.com/maps?q=39.655984,66.949152&ll=39.655984,66.949152&z=16',
+            'mapEmbedUrl' => 'https://www.google.com/maps?q=39.655984,66.949152&z=16&output=embed',
         ],
         'stats' => $statistics,
         'features' => [
@@ -63,7 +62,7 @@
                 'clubType' => $program->club_type ?: 'Qo\'shimcha ta\'lim',
                 'price' => (int) ($program->price ?? 0),
                 'priceText' => number_format((int) ($program->price ?? 0), 0, '.', ' ') . ' so\'m',
-                'phone' => $program->phone ?: '+998 (71) 217-18-71',
+                'phone' => $program->phone ?: '+998 93 534 90 80',
                 'address' => $program->address ?: 'Samarqand viloyati, Kelajak markazi',
                 'locationName' => $program->location_name ?: $program->address ?: 'Kelajak Markazi',
                 'mapUrl' => $program->map_url ?: 'https://maps.google.com/?q=' . urlencode($program->address ?: 'Samarqand Kelajak Markazi'),
@@ -98,6 +97,26 @@
                 'imageUrl' => $imageUrl,
             ];
         })->values(),
+        'studentCouncilMembers' => $studentCouncilMembers->map(function ($member) {
+            $imageUrl = $member->image_url
+                ? (\Illuminate\Support\Str::startsWith($member->image_url, ['http://', 'https://']) ? $member->image_url : asset($member->image_url))
+                : asset('images/kelajak-logo.png');
+
+            return [
+                'id' => $member->id,
+                'name' => $member->full_name,
+                'work' => $member->achievement,
+                'imageUrl' => $imageUrl,
+            ];
+        })->values(),
+        'studentCouncilAdvisor' => $studentCouncilAdvisor ? [
+            'fullName' => $studentCouncilAdvisor->full_name,
+            'title' => $studentCouncilAdvisor->title ?: 'Maslahatchi haqida',
+            'description' => $studentCouncilAdvisor->description,
+            'imageUrl' => $studentCouncilAdvisor->image_url
+                ? (\Illuminate\Support\Str::startsWith($studentCouncilAdvisor->image_url, ['http://', 'https://']) ? $studentCouncilAdvisor->image_url : asset($studentCouncilAdvisor->image_url))
+                : asset('images/kelajak-logo.png'),
+        ] : null,
         'announcements' => $announcements->map(function ($announcement) {
             $imageUrl = $announcement->image_url
                 ? (\Illuminate\Support\Str::startsWith($announcement->image_url, ['http://', 'https://']) ? $announcement->image_url : asset($announcement->image_url))
@@ -115,11 +134,11 @@
         'lessonSchedules' => $lessonSchedules->map(fn ($slot) => [
             'programId' => $slot->program_id,
             'title' => $slot->program?->title ?? 'Erkin mashg\'ulot',
-            'time' => $slot->day_label . ' · ' . $slot->start_time->format('H:i'),
+            'time' => $slot->day_label . ' В· ' . $slot->start_time->format('H:i'),
             'dayLabel' => $slot->day_label,
             'startTime' => $slot->start_time->format('H:i'),
             'endTime' => $slot->end_time->format('H:i'),
-            'mentor' => $slot->mentor ?? 'Mentor belgilanadi',
+            'mentor' => $slot->mentor ?? "O'qituvchi belgilanadi",
             'room' => $slot->room,
             'capacity' => $slot->capacity,
             'isOnline' => (bool) $slot->is_online,
@@ -144,3 +163,4 @@
     window.__KELAJAK_DATA__ = @json($landingPayload);
 </script>
 @endsection
+

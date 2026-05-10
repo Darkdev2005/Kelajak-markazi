@@ -11,6 +11,8 @@ use App\Models\LessonSchedule;
 use App\Models\PortfolioItem;
 use App\Models\Program;
 use App\Models\SpecialCourse;
+use App\Models\StudentCouncilAdvisor;
+use App\Models\StudentCouncilMember;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -56,6 +58,19 @@ class PlatformController extends Controller
                 ->latest()
                 ->get()
             : collect();
+        $studentCouncilMembers = Schema::hasTable('student_council_members')
+            ? StudentCouncilMember::query()
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->latest()
+                ->get()
+            : collect();
+        $studentCouncilAdvisor = Schema::hasTable('student_council_advisors')
+            ? StudentCouncilAdvisor::query()
+                ->where('is_active', true)
+                ->latest()
+                ->first()
+            : null;
 
         $statistics = [
             ['value' => '9 809', 'label' => 'Hamkor tashkilotlar', 'tone' => 'violet'],
@@ -66,14 +81,14 @@ class PlatformController extends Controller
 
         $directions = [
             ['title' => 'IT, AI va robototexnika', 'text' => 'Kod, algoritm, data va real loyiha himoyasi.', 'meta' => '6 oy'],
-            ['title' => 'Xorijiy tillar', 'text' => 'Speaking club, sertifikatga tayyorlov va mentor nazorati.', 'meta' => '4 oy'],
+            ['title' => 'Xorijiy tillar', 'text' => 'Speaking club, sertifikatga tayyorlov va o\'qituvchi nazorati.', 'meta' => '4 oy'],
             ['title' => 'Media va ijod', 'text' => 'Dizayn, video montaj, kontent va sahna madaniyati.', 'meta' => '3 oy'],
             ['title' => 'Liderlik va olimpiada', 'text' => 'O\'quvchilar kengashi, debat va fan olimpiadasi.', 'meta' => 'Doimiy'],
         ];
 
         $roadmap = [
             ['step' => '01', 'title' => 'Qiziqishni aniqlash', 'text' => 'O\'quvchi yo\'nalish tanlaydi, markaz esa eng yaqin guruhni tavsiya qiladi.'],
-            ['step' => '02', 'title' => 'Jadvalga ulanish', 'text' => 'Dars va mentor slotlari bir joyda ko\'rinadi, ariza bazaga tushadi.'],
+            ['step' => '02', 'title' => 'Jadvalga ulanish', 'text' => 'Dars va o\'qituvchi slotlari bir joyda ko\'rinadi, ariza bazaga tushadi.'],
             ['step' => '03', 'title' => 'Progress va portfolio', 'text' => 'Har bir loyiha, sertifikat va tadbir shaxsiy profilda jamlanadi.'],
         ];
 
@@ -84,6 +99,8 @@ class PlatformController extends Controller
             'lessonSchedules',
             'specialCourses',
             'leadershipMembers',
+            'studentCouncilMembers',
+            'studentCouncilAdvisor',
             'statistics',
             'directions',
             'roadmap'

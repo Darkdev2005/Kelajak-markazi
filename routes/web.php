@@ -43,6 +43,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/leadership-members', [AdminController::class, 'storeLeadershipMember'])->name('leadership-members.store');
         Route::patch('/leadership-members/{leadershipMember}', [AdminController::class, 'updateLeadershipMember'])->name('leadership-members.update');
         Route::delete('/leadership-members/{leadershipMember}', [AdminController::class, 'destroyLeadershipMember'])->name('leadership-members.destroy');
+        Route::post('/student-council-members', [AdminController::class, 'storeStudentCouncilMember'])->name('student-council-members.store');
+        Route::patch('/student-council-members/{studentCouncilMember}', [AdminController::class, 'updateStudentCouncilMember'])->name('student-council-members.update');
+        Route::delete('/student-council-members/{studentCouncilMember}', [AdminController::class, 'destroyStudentCouncilMember'])->name('student-council-members.destroy');
+        Route::post('/student-council-advisor', [AdminController::class, 'upsertStudentCouncilAdvisor'])->name('student-council-advisor.upsert');
         Route::patch('/applications/{application}', [AdminController::class, 'updateApplicationStatus'])->name('applications.status');
         Route::delete('/applications/{application}', [AdminController::class, 'destroyApplication'])->name('applications.destroy');
         Route::patch('/contact-messages/{contactMessage}', [AdminController::class, 'updateContactStatus'])->name('contacts.status');

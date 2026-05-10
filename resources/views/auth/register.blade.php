@@ -17,7 +17,6 @@
         <label>Roli</label>
         <select name="role" required>
             <option value="student" @selected(old('role') === 'student')>O'quvchi</option>
-            <option value="mentor" @selected(old('role') === 'mentor')>Mentor</option>
         </select>
 
         <label>Parol</label>

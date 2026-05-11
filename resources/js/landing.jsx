@@ -869,10 +869,15 @@ function ClubsHeroPreview({ clubs, categories, regions }) {
       <div className="absolute -left-24 top-10 h-64 w-64 rounded-full bg-cyan-400/15 blur-3xl" />
       <div className="absolute bottom-0 right-10 h-72 w-72 rounded-full bg-fuchsia-400/10 blur-3xl" />
 
-      <div className="relative mx-auto grid min-h-[280px] max-w-[1536px] gap-8 px-5 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:px-16 lg:py-12">
+      <div className="relative mx-auto grid min-h-[260px] max-w-[1536px] gap-8 px-5 py-8 lg:grid-cols-[1.05fr_0.9fr] lg:px-16 lg:py-10">
         <div className="flex flex-col justify-center">
           <div className="flex items-center gap-3 text-lg font-black text-white/90">
-            <span className="grid h-8 w-8 place-items-center rounded-xl border border-white/10 bg-cyan-400/95 text-[13px] font-black text-[#23114f] shadow-lg shadow-cyan-400/20">*</span>
+            <span className="grid h-8 w-8 place-items-center rounded-xl border border-white/10 bg-cyan-400/95 text-[#23114f] shadow-lg shadow-cyan-400/20">
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M6 7.5L12 4l6 3.5v9L12 20l-6-3.5v-9z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+                <path d="M9.5 11.5h5M9.5 14.5h3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
+            </span>
             <span>›</span>
             <span>To'garaklar</span>
           </div>
@@ -885,38 +890,34 @@ function ClubsHeroPreview({ clubs, categories, regions }) {
             to'garakni tez topish, solishtirish va ariza yuborish shu yerda jamlangan.
           </p>
 
-          <div className="mt-6 flex flex-wrap gap-3">
-            <span className="rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-sm font-black text-white backdrop-blur">
-              {clubs.length} ta to'garak
-            </span>
-            <span className="rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-sm font-black text-white/90 backdrop-blur">
-              {regions.length} ta hudud
-            </span>
-            <span className="rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-sm font-black text-white/90 backdrop-blur">
+          <div className="mt-6">
+            <span className="inline-flex items-center gap-2 rounded-xl border border-white/14 bg-white/10 px-3.5 py-2.5 text-sm font-black text-white/92 backdrop-blur">
+              <span className="text-cyan-200">
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M12 4v16M16 8.5c0-1.7-1.8-3-4-3s-4 1.3-4 3 1.8 3 4 3 4 1.3 4 3-1.8 3-4 3-4-1.3-4-3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                </svg>
+              </span>
               O'rtacha {avgPrice.toLocaleString('en-US').replace(/,/g, ' ')} so'm
             </span>
           </div>
         </div>
 
-        <div className="relative flex items-center justify-end">
-          <div className="grid w-full max-w-[560px] gap-4 rounded-[2rem] border border-white/12 bg-white/8 p-4 shadow-2xl shadow-slate-950/25 backdrop-blur-xl lg:grid-cols-[1fr_190px]">
-            <div className="rounded-[1.5rem] border border-white/10 bg-slate-950/18 p-4">
+        <div className="hidden lg:flex lg:items-center lg:justify-end">
+          <div className="w-full max-w-[390px] rounded-[1.7rem] border border-white/12 bg-white/8 p-3 shadow-2xl shadow-slate-950/25 backdrop-blur-xl">
+            <div className="rounded-[1.3rem] border border-white/10 bg-slate-950/18 p-4">
               <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-xs font-black uppercase tracking-[0.16em] text-cyan-100">Katalog preview</p>
-                  <h3 className="mt-2 text-xl font-black text-white">Mashhur yo'nalishlar</h3>
-                </div>
-                <span className="rounded-full bg-amber-300/18 px-3 py-1 text-xs font-black text-amber-100">Top tanlov</span>
+                <h3 className="text-lg font-black text-white">Mashhur yo'nalishlar</h3>
+                <span className="rounded-full bg-amber-300/18 px-2.5 py-1 text-[11px] font-black text-amber-100">Top tanlov</span>
               </div>
 
-              <div className="mt-4 grid gap-3">
+              <div className="mt-3 grid gap-2.5">
                 {previewItems.map((club) => (
-                  <div key={club.id || club.title} className="grid grid-cols-[1fr_auto] items-center gap-3 rounded-2xl border border-white/10 bg-white/8 px-3 py-3">
+                  <div key={club.id || club.title} className="grid grid-cols-[1fr_auto] items-center gap-2 rounded-[1.05rem] border border-white/10 bg-white/8 px-3 py-2.5">
                     <div className="min-w-0">
                       <p className="truncate text-sm font-black text-white">{club.title}</p>
-                      <p className="mt-1 truncate text-xs font-bold text-white/65">{club.category} · {extractRegion(club)}</p>
+                      <p className="mt-0.5 truncate text-[11px] font-bold text-white/65">{club.category} · {extractRegion(club)}</p>
                     </div>
-                    <span className="rounded-xl bg-white/10 px-3 py-2 text-xs font-black text-white">
+                    <span className="rounded-lg bg-white/10 px-2.5 py-1.5 text-[11px] font-black text-white">
                       {club.priceText}
                     </span>
                   </div>
@@ -928,20 +929,14 @@ function ClubsHeroPreview({ clubs, categories, regions }) {
                   </div>
                 ) : null}
               </div>
-            </div>
 
-            <div className="relative overflow-hidden rounded-[1.5rem] border border-white/12 bg-slate-950/20">
-              <img src={payload.heroImageUrl} alt="To'garaklar preview" className="h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 via-slate-950/10 to-transparent" />
-              <div className="absolute bottom-3 left-3 right-3 rounded-2xl border border-white/12 bg-slate-950/38 px-3 py-3 backdrop-blur">
-                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-cyan-100">Asosiy yo'nalishlar</p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {categories.slice(0, 3).map((category) => (
-                    <span key={category} className="rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-black text-white">
-                      {category}
-                    </span>
-                  ))}
-                </div>
+              <div className="mt-3 grid grid-cols-3 gap-2">
+                {categories.slice(0, 3).map((category) => (
+                  <div key={category} className="rounded-xl border border-white/10 bg-white/8 px-2.5 py-2 text-center">
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em] text-cyan-100">Yo'nalish</p>
+                    <p className="mt-1 text-[11px] font-black leading-4 text-white">{category}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -953,7 +948,6 @@ function ClubsHeroPreview({ clubs, categories, regions }) {
 
 function ClubsPage({ clubs }) {
   const [query, setQuery] = useState('');
-  const [viewMode, setViewMode] = useState('list');
   const [category, setCategory] = useState('all');
   const [clubType, setClubType] = useState('all');
   const [region, setRegion] = useState('all');
@@ -1009,13 +1003,16 @@ function ClubsPage({ clubs }) {
     return Array.from({ length: end - adjustedStart + 1 }, (_, index) => adjustedStart + index);
   }, [safePage, totalPages]);
 
+  const mapEmbedUrl = payload.contact?.mapEmbedUrl || defaultContact.mapEmbedUrl;
+  const mapLinkUrl = filtered[0]?.mapUrl || payload.contact?.mapUrl || defaultContact.mapUrl;
+
   return (
     <div className="bg-[#f4f5fb] text-slate-950">
       <ClubsHeroPreview clubs={clubs} categories={categories} regions={regions} />
 
       <section className="mx-auto grid max-w-[1536px] gap-4 px-5 py-12 lg:grid-cols-[minmax(0,1fr)_300px] lg:px-16">
         <div className="min-w-0">
-          <div className="grid gap-3 xl:grid-cols-[1.2fr_0.9fr_0.9fr_auto]">
+          <div className="grid gap-3 xl:grid-cols-[1.2fr_0.9fr_0.9fr]">
             <label className="flex min-h-12 items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 shadow-sm">
               <span className="text-2xl text-[#3a1b78]">⌕</span>
               <input
@@ -1027,30 +1024,6 @@ function ClubsPage({ clubs }) {
             </label>
             <FilterSelect value={category} onChange={setCategory} options={categories} placeholder="To'garak yo'nalishlari" compact />
             <FilterSelect value={clubType} onChange={setClubType} options={clubTypes} placeholder="To'garak turi" compact />
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setViewMode('list')}
-                className={`inline-grid h-11 w-11 place-items-center rounded-xl border text-lg transition ${viewMode === 'list'
-                  ? 'border-violet-200 bg-violet-50 text-[#43207f]'
-                  : 'border-slate-200 bg-white text-slate-400 hover:border-violet-100 hover:text-[#43207f]'
-                  }`}
-                aria-label="Ro'yxat ko'rinishi"
-              >
-                в·
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('grid')}
-                className={`inline-grid h-11 w-11 place-items-center rounded-xl border text-lg transition ${viewMode === 'grid'
-                  ? 'border-violet-200 bg-violet-50 text-[#43207f]'
-                  : 'border-slate-200 bg-white text-slate-400 hover:border-violet-100 hover:text-[#43207f]'
-                  }`}
-                aria-label="Katak ko'rinishi"
-              >
-                •
-              </button>
-            </div>
           </div>
 
           <div className="mt-8">
@@ -1063,7 +1036,7 @@ function ClubsPage({ clubs }) {
               в“ To'garakni tanlang, so'ng ariza yoki batafsil ma'lumot bo'limiga o'ting
             </div>
 
-            <div className={`mt-5 grid gap-4 ${viewMode === 'grid' ? 'xl:grid-cols-2' : ''}`}>
+            <div className="mt-5 grid gap-4">
               {paginatedClubs.map((club) => (
                 <ClubCard key={club.id || club.title} club={club} onSelect={setSelectedClub} />
               ))}
@@ -1135,10 +1108,15 @@ function ClubsPage({ clubs }) {
 
         <aside className="grid h-fit gap-4 lg:sticky lg:top-36">
           <div className="relative h-44 overflow-hidden rounded-[1.1rem] border border-slate-200 bg-white shadow-sm">
-            <div className="absolute inset-0 bg-[linear-gradient(45deg,#e9eef8_25%,transparent_25%),linear-gradient(-45deg,#e9eef8_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#e9eef8_75%),linear-gradient(-45deg,transparent_75%,#e9eef8_75%)] bg-[length:28px_28px] opacity-80" />
-            <div className="absolute inset-4 rounded-xl border border-violet-200 bg-white/60" />
-            <span className="absolute left-1/2 top-1/2 grid h-12 w-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[#3a1b78] text-2xl text-white shadow-xl">›</span>
-            <a href={filtered[0]?.mapUrl || 'https://maps.google.com'} target="_blank" rel="noreferrer" className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-xl bg-[#43207f] px-5 py-3 text-base font-bold text-white">
+            <iframe
+              title="Kelajak Markazi xarita preview"
+              src={mapEmbedUrl}
+              className="absolute inset-0 h-full w-full"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/22 via-transparent to-white/10" />
+            <a href={mapLinkUrl} target="_blank" rel="noreferrer" className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-xl bg-[#43207f] px-5 py-3 text-base font-bold text-white shadow-xl">
               Xaritadan ko'rish
             </a>
           </div>
@@ -1401,9 +1379,6 @@ function SchedulePage({ schedules, clubs }) {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('all');
   const [clubType, setClubType] = useState('all');
-  const [region, setRegion] = useState('all');
-  const [district, setDistrict] = useState('all');
-  const [organization, setOrganization] = useState('all');
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(12);
   const [selectedProgram, setSelectedProgram] = useState(null);
@@ -1439,9 +1414,6 @@ function SchedulePage({ schedules, clubs }) {
 
   const categories = useMemo(() => [...new Set(schedulePrograms.map((item) => item.category).filter(Boolean))], [schedulePrograms]);
   const clubTypes = useMemo(() => [...new Set(schedulePrograms.map((item) => item.clubType).filter(Boolean))], [schedulePrograms]);
-  const regions = useMemo(() => [...new Set(schedulePrograms.map(extractRegion).filter(Boolean))], [schedulePrograms]);
-  const districts = useMemo(() => [...new Set(schedulePrograms.map(extractDistrict).filter(Boolean))], [schedulePrograms]);
-  const organizations = useMemo(() => [...new Set(schedulePrograms.map(getOrganizationLabel).filter(Boolean))], [schedulePrograms]);
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -1449,14 +1421,11 @@ function SchedulePage({ schedules, clubs }) {
     return schedulePrograms.filter((item) => {
       const matchesCategory = category === 'all' || item.category === category;
       const matchesClubType = clubType === 'all' || item.clubType === clubType;
-      const matchesRegion = region === 'all' || extractRegion(item) === region;
-      const matchesDistrict = district === 'all' || extractDistrict(item) === district;
-      const matchesOrganization = organization === 'all' || getOrganizationLabel(item) === organization;
       const haystack = `${item.title} ${item.address} ${item.category} ${item.phone} ${item.locationName} ${item.clubType}`.toLowerCase();
 
-      return matchesCategory && matchesClubType && matchesRegion && matchesDistrict && matchesOrganization && (!needle || haystack.includes(needle));
+      return matchesCategory && matchesClubType && (!needle || haystack.includes(needle));
     });
-  }, [category, clubType, district, organization, query, region, schedulePrograms]);
+  }, [category, clubType, query, schedulePrograms]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
   const safePage = Math.min(page, totalPages);
@@ -1467,7 +1436,7 @@ function SchedulePage({ schedules, clubs }) {
 
   useEffect(() => {
     setPage(1);
-  }, [query, category, clubType, region, district, organization, perPage]);
+  }, [query, category, clubType, perPage]);
 
   useEffect(() => {
     if (page > totalPages) {
@@ -1488,7 +1457,7 @@ function SchedulePage({ schedules, clubs }) {
       <ScheduleHeroPreview schedules={schedules} />
 
       <section className="mx-auto max-w-[1536px] px-5 py-12 lg:px-16">
-        <div className="grid gap-3 xl:grid-cols-[1.2fr_repeat(5,minmax(0,1fr))]">
+        <div className="grid gap-3 xl:grid-cols-[1.2fr_repeat(2,minmax(0,1fr))]">
           <label className="flex min-h-12 items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 shadow-sm">
             <span className="text-2xl text-[#3a1b78]">⌕</span>
             <input
@@ -1501,9 +1470,6 @@ function SchedulePage({ schedules, clubs }) {
 
           <FilterSelect value={category} onChange={setCategory} options={categories} placeholder="To'garak yo'nalishlari" compact />
           <FilterSelect value={clubType} onChange={setClubType} options={clubTypes} placeholder="To'garak turi" compact />
-          <FilterSelect value={region} onChange={setRegion} options={regions} placeholder="Hududni tanlang" compact />
-          <FilterSelect value={district} onChange={setDistrict} options={districts} placeholder="Tumanni tanlang" compact />
-          <FilterSelect value={organization} onChange={setOrganization} options={organizations} placeholder="Tashkilotni tanlang" compact />
         </div>
 
         <div className="mt-8">

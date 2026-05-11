@@ -719,7 +719,7 @@ function ClubDetailsModal({ club, onClose }) {
           className="absolute right-4 top-4 z-10 inline-grid h-11 w-11 place-items-center rounded-full bg-white/90 text-lg font-black text-slate-700 shadow-lg transition hover:bg-white"
           aria-label="Yopish"
         >
-          вњ•
+          X
         </button>
 
         <div className="grid max-h-[90vh] overflow-y-auto lg:grid-cols-[1.05fr_1fr]">
@@ -857,11 +857,8 @@ function ClubCard({ club, onSelect }) {
   );
 }
 
-function ClubsHeroPreview({ clubs, categories, regions }) {
+function ClubsHeroPreview({ clubs, categories }) {
   const previewItems = clubs.slice(0, 3);
-  const avgPrice = clubs.length
-    ? Math.round(clubs.reduce((sum, club) => sum + (club.price || 0), 0) / clubs.length)
-    : 0;
 
   return (
     <section className="relative overflow-hidden bg-[linear-gradient(135deg,#2a1453_0%,#43207f_44%,#5a2ea8_100%)]">
@@ -871,35 +868,21 @@ function ClubsHeroPreview({ clubs, categories, regions }) {
 
       <div className="relative mx-auto grid min-h-[260px] max-w-[1536px] gap-8 px-5 py-8 lg:grid-cols-[1.05fr_0.9fr] lg:px-16 lg:py-10">
         <div className="flex flex-col justify-center">
-          <div className="flex items-center gap-3 text-lg font-black text-white/90">
-            <span className="grid h-8 w-8 place-items-center rounded-xl border border-white/10 bg-cyan-400/95 text-[#23114f] shadow-lg shadow-cyan-400/20">
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <div className="flex items-center gap-4">
+            <span className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-cyan-400/95 text-[#23114f] shadow-lg shadow-cyan-400/20">
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M6 7.5L12 4l6 3.5v9L12 20l-6-3.5v-9z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
                 <path d="M9.5 11.5h5M9.5 14.5h3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
               </svg>
             </span>
-            <span>›</span>
-            <span>To'garaklar</span>
+            <h1 className="max-w-xl text-4xl font-black leading-tight text-white sm:text-5xl">
+              To'garaklar
+            </h1>
           </div>
-
-          <h1 className="mt-5 max-w-xl text-4xl font-black leading-tight text-white sm:text-5xl">
-            To'garaklar
-          </h1>
           <p className="mt-4 max-w-2xl text-base font-semibold leading-7 text-white/75">
             Yo'nalishlar, hududlar va narxlarni bitta tizimda ko'rib chiqing. O'quvchi uchun mos
             to'garakni tez topish, solishtirish va ariza yuborish shu yerda jamlangan.
           </p>
-
-          <div className="mt-6">
-            <span className="inline-flex items-center gap-2 rounded-xl border border-white/14 bg-white/10 px-3.5 py-2.5 text-sm font-black text-white/92 backdrop-blur">
-              <span className="text-cyan-200">
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M12 4v16M16 8.5c0-1.7-1.8-3-4-3s-4 1.3-4 3 1.8 3 4 3 4 1.3 4 3-1.8 3-4 3-4-1.3-4-3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                </svg>
-              </span>
-              O'rtacha {avgPrice.toLocaleString('en-US').replace(/,/g, ' ')} so'm
-            </span>
-          </div>
         </div>
 
         <div className="hidden lg:flex lg:items-center lg:justify-end">
@@ -950,18 +933,12 @@ function ClubsPage({ clubs }) {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('all');
   const [clubType, setClubType] = useState('all');
-  const [region, setRegion] = useState('all');
-  const [district, setDistrict] = useState('all');
-  const [organization, setOrganization] = useState('all');
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(12);
   const [selectedClub, setSelectedClub] = useState(null);
 
   const categories = useMemo(() => [...new Set(clubs.map((club) => club.category).filter(Boolean))], [clubs]);
   const clubTypes = useMemo(() => [...new Set(clubs.map((club) => club.clubType).filter(Boolean))], [clubs]);
-  const regions = useMemo(() => [...new Set(clubs.map(extractRegion).filter(Boolean))], [clubs]);
-  const districts = useMemo(() => [...new Set(clubs.map(extractDistrict).filter(Boolean))], [clubs]);
-  const organizations = useMemo(() => [...new Set(clubs.map(getOrganizationLabel).filter(Boolean))], [clubs]);
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -969,14 +946,11 @@ function ClubsPage({ clubs }) {
     return clubs.filter((club) => {
       const matchesCategory = category === 'all' || club.category === category;
       const matchesClubType = clubType === 'all' || club.clubType === clubType;
-      const matchesRegion = region === 'all' || extractRegion(club) === region;
-      const matchesDistrict = district === 'all' || extractDistrict(club) === district;
-      const matchesOrganization = organization === 'all' || getOrganizationLabel(club) === organization;
       const haystack = `${club.title} ${club.address} ${club.category} ${club.phone} ${club.locationName} ${club.clubType}`.toLowerCase();
 
-      return matchesCategory && matchesClubType && matchesRegion && matchesDistrict && matchesOrganization && (!needle || haystack.includes(needle));
+      return matchesCategory && matchesClubType && (!needle || haystack.includes(needle));
     });
-  }, [category, clubType, clubs, district, organization, query, region]);
+  }, [category, clubType, clubs, query]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
   const safePage = Math.min(page, totalPages);
@@ -987,7 +961,7 @@ function ClubsPage({ clubs }) {
 
   useEffect(() => {
     setPage(1);
-  }, [query, category, clubType, region, district, organization, perPage]);
+  }, [query, category, clubType, perPage]);
 
   useEffect(() => {
     if (page > totalPages) {
@@ -1008,7 +982,7 @@ function ClubsPage({ clubs }) {
 
   return (
     <div className="bg-[#f4f5fb] text-slate-950">
-      <ClubsHeroPreview clubs={clubs} categories={categories} regions={regions} />
+      <ClubsHeroPreview clubs={clubs} categories={categories} />
 
       <section className="mx-auto grid max-w-[1536px] gap-4 px-5 py-12 lg:grid-cols-[minmax(0,1fr)_300px] lg:px-16">
         <div className="min-w-0">
@@ -1033,7 +1007,7 @@ function ClubsPage({ clubs }) {
             </div>
 
             <div className="mt-5 inline-flex rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-600">
-              в“ To'garakni tanlang, so'ng ariza yoki batafsil ma'lumot bo'limiga o'ting
+              ⓘ To'garakni tanlang, so'ng ariza yoki batafsil ma'lumot bo'limiga o'ting
             </div>
 
             <div className="mt-5 grid gap-4">
@@ -1142,9 +1116,6 @@ function ClubsPage({ clubs }) {
 
               <div className="mt-6 grid gap-3 border-t border-slate-100 pt-5">
                 <FilterSelect value={clubType} onChange={setClubType} options={clubTypes} placeholder="To'garak turi" compact />
-                <FilterSelect value={region} onChange={setRegion} options={regions} placeholder="Hududni tanlang" compact />
-                <FilterSelect value={district} onChange={setDistrict} options={districts} placeholder="Tumanni tanlang" compact />
-                <FilterSelect value={organization} onChange={setOrganization} options={organizations} placeholder="Tashkilotni tanlang" compact />
               </div>
             </div>
           </div>
@@ -1177,7 +1148,7 @@ function ScheduleProgramModal({ club, slots, onClose }) {
           className="absolute right-4 top-4 z-10 inline-grid h-11 w-11 place-items-center rounded-full bg-white/90 text-lg font-black text-slate-700 shadow-lg transition hover:bg-white"
           aria-label="Yopish"
         >
-          вњ•
+          X
         </button>
 
         <div className="border-b border-slate-200 bg-[#3a1b78] px-6 py-6 text-white sm:px-8">
@@ -1289,7 +1260,7 @@ function ScheduleProgramCard({ item, onOpen }) {
             Batafsil ma'lumot ›
           </button>
           <a href={applicationUrl} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-orange-200 bg-orange-50 px-5 text-base font-bold text-orange-600 transition hover:-translate-y-0.5 hover:bg-orange-100">
-            вњЋ Ariza qoldirish
+            Ariza qoldirish
           </a>
         </div>
       </div>

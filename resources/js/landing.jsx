@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { motion } from 'framer-motion';
 
 const payload = window.__KELAJAK_DATA__ || {};
+const guestApplicationUrl = payload.registerUrl || payload.loginUrl || '/register';
 
 const defaultStats = [
   { value: '9 809', label: 'Hamkor tashkilotlar', tone: 'violet' },
@@ -775,7 +776,7 @@ function ClubDetailsModal({ club, onClose }) {
                 Xaritadan ko'rish
               </a>
               <a
-                href={payload.isAuthenticated ? payload.dashboardUrl : payload.loginUrl}
+                href={payload.isAuthenticated ? payload.dashboardUrl : guestApplicationUrl}
                 className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-violet-600 to-cyan-500 px-6 text-base font-black text-white transition hover:-translate-y-0.5"
               >
                 Ariza qoldirish
@@ -789,7 +790,7 @@ function ClubDetailsModal({ club, onClose }) {
 }
 
 function ClubCard({ club, onSelect }) {
-  const applicationUrl = payload.isAuthenticated ? payload.dashboardUrl : payload.loginUrl;
+  const applicationUrl = payload.isAuthenticated ? payload.dashboardUrl : guestApplicationUrl;
 
   return (
     <motion.article
@@ -1208,7 +1209,7 @@ function ScheduleProgramModal({ club, slots, onClose }) {
 }
 
 function ScheduleProgramCard({ item, onOpen }) {
-  const applicationUrl = payload.isAuthenticated ? payload.dashboardUrl : payload.loginUrl;
+  const applicationUrl = payload.isAuthenticated ? payload.dashboardUrl : guestApplicationUrl;
 
   return (
     <motion.article
@@ -2467,14 +2468,15 @@ function App() {
                 <div className="relative grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
                   <div>
                     <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-200 dark:text-violet-700">Kelajak shu yerdan boshlanadi</p>
-                    <h2 className="mt-4 max-w-3xl text-4xl font-black leading-tight sm:text-5xl">O'quvchi imkoniyatini sezdiradigan, ota-onaga ishonch beradigan platforma.</h2>
+                    <h2 className="mt-4 max-w-3xl text-4xl font-black leading-tight sm:text-5xl">Farzandingiz salohiyatini ochib beradigan, natijasi bilan ishonch uyg‘otadigan ta’lim markazi.</h2>
                     <p className="mt-5 max-w-2xl text-base font-semibold leading-8 text-white/70 dark:text-slate-600">
-                      Endi markaz faqat kurslar ro'yxati emas. Bu natija, nazorat, ilhom va real rivojlanish uchun milliy darajadagi raqamli tajriba.
+                      Zamonaviy metodika, tajribali o‘qituvchilar va doimiy nazorat orqali har bir o‘quvchining rivojlanishiga yordam beramiz.
                     </p>
                   </div>
                   <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
-                    <Button href={payload.isAuthenticated ? payload.dashboardUrl : payload.registerUrl} variant="glow">Boshlash</Button>
-                    <Button href={payload.isAuthenticated ? payload.dashboardUrl : payload.loginUrl} variant="ghost">Kirish</Button>
+                    <Button href={payload.isAuthenticated ? payload.dashboardUrl : guestApplicationUrl} variant="glow">To'garaklarga ariza qoldirish</Button>
+                    <Button href="#clubs" variant="ghost">To'garaklarni ko'rish</Button>
+                    <Button href="#lessonSchedule" variant="ghost">Dars jadvalini ko'rish</Button>
                   </div>
                 </div>
               </motion.div>

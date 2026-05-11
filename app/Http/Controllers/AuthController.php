@@ -11,14 +11,18 @@ use Illuminate\View\View;
 
 class AuthController extends Controller
 {
-    public function showLogin(): View
+    public function showLogin(Request $request): View
     {
-        return view('auth.login');
+        return view('auth.login', [
+            'next' => $this->resolveNext($request->input('next')),
+        ]);
     }
 
-    public function showRegister(): View
+    public function showRegister(Request $request): View
     {
-        return view('auth.register');
+        return view('auth.register', [
+            'next' => $this->resolveNext($request->input('next')),
+        ]);
     }
 
     public function register(Request $request): RedirectResponse
@@ -41,7 +45,8 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('dashboard')->with('ok', 'Xush kelibsiz! Profil yaratildi.');
+        return redirect()->to($this->nextRedirectUrl($request->input('next')))
+            ->with('ok', 'Xush kelibsiz! Profil yaratildi.');
     }
 
     public function login(Request $request): RedirectResponse
@@ -50,16 +55,21 @@ class AuthController extends Controller
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
         ]);
+        $next = $this->resolveNext($request->input('next'));
 
         if (!Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()->withErrors([
                 'email' => 'Email yoki parol noto\'g\'ri.',
-            ])->onlyInput('email');
+            ])->withInput([
+                'email' => $request->input('email'),
+                'next' => $next,
+            ]);
         }
 
         $request->session()->regenerate();
 
-        return redirect()->route('dashboard')->with('ok', 'Tizimga kirildi.');
+        return redirect()->to($this->nextRedirectUrl($next))
+            ->with('ok', 'Tizimga kirildi.');
     }
 
     public function logout(Request $request): RedirectResponse
@@ -69,5 +79,19 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('home')->with('ok', 'Chiqish bajarildi.');
+    }
+
+    private function resolveNext(?string $next): ?string
+    {
+        return in_array($next, ['applications'], true) ? $next : null;
+    }
+
+    private function nextRedirectUrl(?string $next): string
+    {
+        if ($this->resolveNext($next) === 'applications') {
+            return route('dashboard', ['tab' => 'applications']);
+        }
+
+        return route('dashboard');
     }
 }

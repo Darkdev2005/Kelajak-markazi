@@ -5,6 +5,7 @@
     <h1>Ro'yxatdan o'tish</h1>
     <form method="POST" action="{{ route('register.store') }}" class="card form">
         @csrf
+        <input type="hidden" name="next" value="{{ old('next', $next ?? '') }}">
         <label>Ism familiya</label>
         <input type="text" name="name" required value="{{ old('name') }}">
 
@@ -27,5 +28,9 @@
 
         <button class="btn" type="submit">Ro'yxatdan o'tish</button>
     </form>
+    <p style="margin-top:12px;">
+        Akkountingiz bormi?
+        <a href="{{ route('login', ['next' => $next]) }}">Kirish</a>
+    </p>
 </section>
 @endsection

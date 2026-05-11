@@ -107,9 +107,14 @@ class PlatformController extends Controller
         ));
     }
 
-    public function dashboard(): View
+    public function dashboard(Request $request): View
     {
         $user = Auth::user();
+        $activeTab = $request->string('tab')->toString();
+        $allowedTabs = ['overview', 'applications', 'portfolio', 'schedule'];
+        if (! in_array($activeTab, $allowedTabs, true)) {
+            $activeTab = 'overview';
+        }
 
         $applications = ApplicationRequest::query()
             ->with('program')
@@ -159,7 +164,8 @@ class PlatformController extends Controller
             'streakDays',
             'engagementScore',
             'level',
-            'missions'
+            'missions',
+            'activeTab'
         ));
     }
 
@@ -177,7 +183,7 @@ class PlatformController extends Controller
             'status' => 'new',
         ]);
 
-        return back()->with('ok', 'Ariza muvaffaqiyatli yuborildi.');
+        return redirect()->route('dashboard', ['tab' => 'applications'])->with('ok', 'Ariza muvaffaqiyatli yuborildi.');
     }
 
     public function submitContact(Request $request): RedirectResponse
@@ -216,7 +222,7 @@ class PlatformController extends Controller
             'achieved_at' => $validated['achieved_at'] ?? null,
         ]);
 
-        return back()->with('ok', 'Portfolio bandi qo\'shildi.');
+        return redirect()->route('dashboard', ['tab' => 'portfolio'])->with('ok', 'Portfolio bandi qo\'shildi.');
     }
 
     private function calculateStreakDays(int $userId): int

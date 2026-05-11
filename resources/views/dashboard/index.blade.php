@@ -1,6 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
+@php($currentTab = $activeTab ?? 'overview')
+
+<section class="admin-tabs reveal">
+    <a href="{{ route('dashboard', ['tab' => 'overview']) }}" class="{{ $currentTab === 'overview' ? 'active' : '' }}">Umumiy</a>
+    <a href="{{ route('dashboard', ['tab' => 'applications']) }}" class="{{ $currentTab === 'applications' ? 'active' : '' }}">Arizalar</a>
+    <a href="{{ route('dashboard', ['tab' => 'portfolio']) }}" class="{{ $currentTab === 'portfolio' ? 'active' : '' }}">Portfolio</a>
+    <a href="{{ route('dashboard', ['tab' => 'schedule']) }}" class="{{ $currentTab === 'schedule' ? 'active' : '' }}">Dars jadvali</a>
+</section>
+
+@if($currentTab === 'overview')
 <section class="dashboard-hero card glow reveal">
     <div>
         <span class="kicker">SHAXSIY MAYDON</span>
@@ -57,7 +67,9 @@
         @endif
     </article>
 </section>
+@endif
 
+@if($currentTab === 'applications')
 <section class="grid two reveal">
     <article class="card">
         <h2>Yangi Ariza</h2>
@@ -77,24 +89,6 @@
     </article>
 
     <article class="card">
-        <h2>Portfolio Qo'shish</h2>
-        <form method="POST" action="{{ route('portfolio.store') }}" class="form">
-            @csrf
-            <label>Sarlavha</label>
-            <input type="text" name="title" required>
-            <label>Tavsif</label>
-            <textarea name="description" rows="3"></textarea>
-            <label>Dalil havolasi</label>
-            <input type="url" name="proof_url" placeholder="https://...">
-            <label>Sana</label>
-            <input type="date" name="achieved_at">
-            <button type="submit" class="btn">Qo'shish</button>
-        </form>
-    </article>
-</section>
-
-<section class="grid two reveal">
-    <article class="card">
         <h2>Mening Arizalarim</h2>
         <table class="table">
             <thead>
@@ -113,31 +107,27 @@
             </tbody>
         </table>
     </article>
-
-    <article class="card">
-        <h2>Mening yaqin jadvalim</h2>
-        @forelse($lessonSchedules as $slot)
-            <div class="list-item">
-                <strong>{{ $slot->program?->title ?? 'Erkin mashg\'ulot' }}</strong>
-                <p>{{ $slot->day_label }} | {{ $slot->start_time->format('H:i') }} - {{ $slot->end_time->format('H:i') }} | {{ $slot->room ?? 'Online' }}</p>
-            </div>
-        @empty
-            <p>Dars jadvali topilmadi.</p>
-        @endforelse
-
-        <h2 class="subsection-title">Tadbirlar</h2>
-        @forelse($events as $event)
-            <div class="list-item">
-                <strong>{{ $event->title }}</strong>
-                <p>{{ $event->event_date->format('Y-m-d') }} | {{ $event->location }}</p>
-            </div>
-        @empty
-            <p>Tadbirlar topilmadi.</p>
-        @endforelse
-    </article>
 </section>
+@endif
 
-<section class="reveal">
+@if($currentTab === 'portfolio')
+<section class="grid two reveal">
+    <article class="card">
+        <h2>Portfolio Qo'shish</h2>
+        <form method="POST" action="{{ route('portfolio.store') }}" class="form">
+            @csrf
+            <label>Sarlavha</label>
+            <input type="text" name="title" required>
+            <label>Tavsif</label>
+            <textarea name="description" rows="3"></textarea>
+            <label>Dalil havolasi</label>
+            <input type="url" name="proof_url" placeholder="https://...">
+            <label>Sana</label>
+            <input type="date" name="achieved_at">
+            <button type="submit" class="btn">Qo'shish</button>
+        </form>
+    </article>
+
     <article class="card">
         <h2>Portfolio</h2>
         @forelse($portfolioItems as $item)
@@ -151,4 +141,33 @@
         @endforelse
     </article>
 </section>
+@endif
+
+@if($currentTab === 'schedule')
+<section class="grid two reveal">
+    <article class="card">
+        <h2>Mening yaqin jadvalim</h2>
+        @forelse($lessonSchedules as $slot)
+            <div class="list-item">
+                <strong>{{ $slot->program?->title ?? 'Erkin mashg\'ulot' }}</strong>
+                <p>{{ $slot->day_label }} | {{ $slot->start_time->format('H:i') }} - {{ $slot->end_time->format('H:i') }} | {{ $slot->room ?? 'Online' }}</p>
+            </div>
+        @empty
+            <p>Dars jadvali topilmadi.</p>
+        @endforelse
+    </article>
+
+    <article class="card">
+        <h2>Tadbirlar</h2>
+        @forelse($events as $event)
+            <div class="list-item">
+                <strong>{{ $event->title }}</strong>
+                <p>{{ $event->event_date->format('Y-m-d') }} | {{ $event->location }}</p>
+            </div>
+        @empty
+            <p>Tadbirlar topilmadi.</p>
+        @endforelse
+    </article>
+</section>
+@endif
 @endsection

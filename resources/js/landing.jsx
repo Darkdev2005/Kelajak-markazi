@@ -3,7 +3,19 @@ import { createRoot } from 'react-dom/client';
 import { motion } from 'framer-motion';
 
 const payload = window.__KELAJAK_DATA__ || {};
-const guestApplicationUrl = payload.registerUrl || payload.loginUrl || '/register';
+
+function appendQuery(url, key, value) {
+  const [path, hash = ''] = String(url || '').split('#');
+  const [base, query = ''] = path.split('?');
+  const params = new URLSearchParams(query);
+  params.set(key, value);
+  const queryString = params.toString();
+  const normalized = `${base || ''}${queryString ? `?${queryString}` : ''}`;
+  return hash ? `${normalized}#${hash}` : normalized;
+}
+
+const dashboardApplicationUrl = appendQuery(payload.dashboardUrl || '/dashboard', 'tab', 'applications');
+const guestApplicationUrl = appendQuery(payload.registerUrl || '/register', 'next', 'applications');
 
 const defaultStats = [
   { value: '9 809', label: 'Hamkor tashkilotlar', tone: 'violet' },
@@ -632,7 +644,7 @@ function SpecialStrip({ items }) {
           <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-600 dark:text-cyan-200">Maxsus katalog</p>
           <h2 className="mt-3 text-3xl font-black text-slate-950 dark:text-white sm:text-4xl">Ayrim toifadagi o'quvchilar uchun</h2>
         </div>
-        <Button href={payload.isAuthenticated ? payload.dashboardUrl : payload.registerUrl} variant="ghost">Ariza boshlash</Button>
+        <Button href={payload.isAuthenticated ? dashboardApplicationUrl : guestApplicationUrl} variant="ghost">Ariza boshlash</Button>
       </div>
 
       <div className="grid auto-cols-[minmax(250px,1fr)] grid-flow-col gap-4 overflow-x-auto pb-3 xl:grid-flow-row xl:grid-cols-5 xl:overflow-visible">
@@ -776,7 +788,7 @@ function ClubDetailsModal({ club, onClose }) {
                 Xaritadan ko'rish
               </a>
               <a
-                href={payload.isAuthenticated ? payload.dashboardUrl : guestApplicationUrl}
+                href={payload.isAuthenticated ? dashboardApplicationUrl : guestApplicationUrl}
                 className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-violet-600 to-cyan-500 px-6 text-base font-black text-white transition hover:-translate-y-0.5"
               >
                 Ariza qoldirish
@@ -790,7 +802,7 @@ function ClubDetailsModal({ club, onClose }) {
 }
 
 function ClubCard({ club, onSelect }) {
-  const applicationUrl = payload.isAuthenticated ? payload.dashboardUrl : guestApplicationUrl;
+  const applicationUrl = payload.isAuthenticated ? dashboardApplicationUrl : guestApplicationUrl;
 
   return (
     <motion.article
@@ -1209,7 +1221,7 @@ function ScheduleProgramModal({ club, slots, onClose }) {
 }
 
 function ScheduleProgramCard({ item, onOpen }) {
-  const applicationUrl = payload.isAuthenticated ? payload.dashboardUrl : guestApplicationUrl;
+  const applicationUrl = payload.isAuthenticated ? dashboardApplicationUrl : guestApplicationUrl;
 
   return (
     <motion.article
@@ -2474,7 +2486,7 @@ function App() {
                     </p>
                   </div>
                   <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
-                    <Button href={payload.isAuthenticated ? payload.dashboardUrl : guestApplicationUrl} variant="glow">To'garaklarga ariza qoldirish</Button>
+                    <Button href={payload.isAuthenticated ? dashboardApplicationUrl : guestApplicationUrl} variant="glow">To'garaklarga ariza qoldirish</Button>
                     <Button href="#clubs" variant="ghost">To'garaklarni ko'rish</Button>
                     <Button href="#lessonSchedule" variant="ghost">Dars jadvalini ko'rish</Button>
                   </div>

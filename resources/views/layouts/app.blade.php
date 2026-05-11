@@ -25,18 +25,20 @@
         <nav class="site-nav" data-site-nav>
             <a href="/#/home" data-route-link="home">Asosiy sahifa</a>
             <a href="/#/clubs" data-route-link="clubs">To'garaklar</a>
-            <a href="/#/special" data-route-link="special">Maxsus katalog</a>
             <a href="/#/lessonSchedule" data-route-link="lessonSchedule">Dars jadvali</a>
             <a href="/#/about-us" data-route-link="about-us">Markaz haqida</a>
             <a href="/#/our-contact" data-route-link="our-contact">Kontaktlar</a>
             @auth
-                <a href="{{ route('dashboard') }}" data-route-link="dashboard">Dashboard</a>
+                <a href="{{ route('dashboard') }}" data-route-link="dashboard">Profil</a>
                 @if(auth()->user()->isAdmin())
                     <a href="{{ route('admin.index') }}" data-route-link="admin">Admin</a>
                 @endif
                 <form method="POST" action="{{ route('logout') }}" class="nav-form">
                     @csrf
-                    <button type="submit" class="icon-btn" title="Chiqish">-&gt;</button>
+                    <button type="submit" class="logout-btn" title="Chiqish">
+                        <span class="logout-icon" aria-hidden="true">⏻</span>
+                        <span>Chiqish</span>
+                    </button>
                 </form>
             @else
                 <a href="/#/auth/login" data-route-link="auth/login">Kirish</a>
@@ -70,14 +72,13 @@
             <h3>Bo'limlar</h3>
             <a href="/#/home">Asosiy sahifa</a>
             <a href="/#/clubs">To'garaklar</a>
-            <a href="/#/special">Maxsus katalog</a>
             <a href="/#/lessonSchedule">Dars jadvali</a>
             <a href="/#/about-us">Markaz haqida</a>
         </div>
         <div>
             <h3>Aloqa</h3>
             <p>+998 (71) 217-18-71</p>
-            <p>kelajakmarkazlari@gmail.com</p>
+            <p>samarqandviloyatkelajakmarkazi@gmail.com</p>
             <p>Toshkent, Navoiy ko'chasi, 2A-uy</p>
         </div>
     </div>

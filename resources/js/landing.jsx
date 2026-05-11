@@ -35,7 +35,7 @@ const defaultContact = {
   storeUrl: '/contact-messages',
   phone: '+998 93 534 90 80',
   phoneRaw: '+998935349080',
-  email: 'kelajakmarkazlari@gmail.com',
+  email: 'samarqandviloyatkelajakmarkazi@gmail.com',
   address: "140129, Samarqand sh. Maxmud Qoshg‘ariy, 52-uy. Mo‘ljal: Xotira maydoni",
   hours: 'Dushanba - Shanba · 09:00 - 18:00',
   mapUrl: 'https://maps.google.com/maps?q=39.655984,66.949152&ll=39.655984,66.949152&z=16',
@@ -460,7 +460,7 @@ function Header({ route, lang, onToggleLanguage }) {
               <path d="M15 12H3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               <path d="M13 4h5a3 3 0 013 3v10a3 3 0 01-3 3h-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
-            <span className="hidden sm:inline">{payload.isAuthenticated ? 'Dashboard' : 'Kirish'}</span>
+            <span className="hidden sm:inline">{payload.isAuthenticated ? 'Profil' : 'Kirish'}</span>
             <span className="hidden text-2xl leading-none sm:inline">›</span>
           </a>
         </div>
@@ -522,7 +522,7 @@ function Header({ route, lang, onToggleLanguage }) {
                 <path d="M15 12H3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 <path d="M13 4h5a3 3 0 013 3v10a3 3 0 01-3 3h-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               </svg>
-              {payload.isAuthenticated ? 'Dashboard' : 'Kirish'}
+              {payload.isAuthenticated ? 'Profil' : 'Kirish'}
             </a>
           </div>
         </nav>
@@ -819,7 +819,7 @@ function ClubCard({ club, onSelect }) {
       <div className="grid min-w-0 gap-4">
         <div className="grid gap-3 xl:grid-cols-[1fr_360px]">
           <div className="min-w-0">
-            <h3 className="break-words text-[2rem] font-black leading-tight text-slate-950">{club.title}</h3>
+            <h3 className="break-words text-2xl font-black leading-tight text-slate-950 sm:text-[2rem]">{club.title}</h3>
             <p className="mt-3 text-base font-medium leading-7 text-slate-800">{club.address}</p>
             <a href={club.mapUrl} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-2 text-base font-bold text-[#4a3298] underline-offset-4 hover:underline">
               <span className="text-slate-300">•</span>
@@ -849,17 +849,17 @@ function ClubCard({ club, onSelect }) {
         </div>
 
         <div className="mt-auto flex flex-col gap-3 border-t border-slate-100 pt-3 sm:flex-row sm:items-center sm:justify-between">
-          <strong className="inline-flex w-fit rounded-xl border border-violet-100 bg-white px-4 py-2 text-2xl font-black text-violet-400">
+          <strong className="inline-flex w-fit rounded-xl border border-violet-100 bg-white px-4 py-2 text-xl font-black text-violet-400 sm:text-2xl">
             {club.priceText}
           </strong>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <a href={applicationUrl} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-orange-200 bg-orange-50 px-5 text-base font-bold text-orange-600 transition hover:-translate-y-0.5 hover:bg-orange-100">
+            <a href={applicationUrl} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-orange-200 bg-orange-50 px-4 text-sm font-bold text-orange-600 transition hover:-translate-y-0.5 hover:bg-orange-100 sm:px-5 sm:text-base">
               Ariza qoldirish
             </a>
             <button
               type="button"
               onClick={() => onSelect(club)}
-              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#c8b8ff] px-5 text-base font-bold text-[#43207f] transition hover:-translate-y-0.5 hover:bg-[#bbabfb]"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#c8b8ff] px-4 text-sm font-bold text-[#43207f] transition hover:-translate-y-0.5 hover:bg-[#bbabfb] sm:px-5 sm:text-base"
             >
               Batafsil ma'lumot ›
             </button>
@@ -1647,13 +1647,15 @@ function ContactPage() {
         <div className="grid gap-4">
           {infoCards.map((item) => {
             const content = (
-              <div className="grid gap-3 rounded-[1.35rem] border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-lg hover:shadow-slate-900/5">
-                <span className="inline-grid h-11 w-11 place-items-center rounded-2xl bg-violet-50 text-violet-700">
+              <div className="grid gap-3 rounded-[1.2rem] border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-lg hover:shadow-slate-900/5 sm:rounded-[1.35rem] sm:p-5">
+                <span className="inline-grid h-10 w-10 place-items-center rounded-xl bg-violet-50 text-violet-700 sm:h-11 sm:w-11 sm:rounded-2xl">
                   {item.icon}
                 </span>
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-400">{item.label}</p>
-                  <p className="mt-2 text-2xl font-black leading-tight text-slate-950">{item.value}</p>
+                  <p className="mt-2 text-lg font-black leading-tight text-slate-950 [overflow-wrap:anywhere] sm:text-2xl">
+                    {item.value}
+                  </p>
                 </div>
               </div>
             );
@@ -1667,15 +1669,15 @@ function ContactPage() {
             );
           })}
 
-          <div className="overflow-hidden rounded-[1.6rem] border border-slate-200 bg-white shadow-sm">
+          <div className="overflow-hidden rounded-[1.2rem] border border-slate-200 bg-white shadow-sm sm:rounded-[1.6rem]">
             <div className="border-b border-slate-100 px-5 py-4">
               <p className="text-xs font-black uppercase tracking-[0.16em] text-violet-600">Xarita</p>
-              <h3 className="mt-2 text-2xl font-black text-slate-950">Qabul punktiga yo'l</h3>
+              <h3 className="mt-2 text-xl font-black text-slate-950 sm:text-2xl">Qabul punktiga yo'l</h3>
             </div>
             <iframe
               title="Kelajak Markazi xarita"
               src={contact.mapEmbedUrl}
-              className="h-[320px] w-full"
+              className="h-[260px] w-full sm:h-[320px]"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
             />
@@ -1729,10 +1731,7 @@ function ContactPage() {
               <textarea className={`${fieldClass} min-h-[180px] py-4`} name="message" placeholder="Murojaatingizni batafsil yozing" required />
             </label>
 
-            <div className="flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
-              <p className="max-w-xl text-sm font-semibold leading-6 text-slate-500">
-                Yuborilgan murojaatlar admin paneldagi "Murojaatlar" bo'limida ko'rinadi va status bilan boshqariladi.
-              </p>
+            <div className="flex border-t border-slate-100 pt-5 sm:justify-end">
               <button
                 type="submit"
                 className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-violet-600 via-blue-600 to-cyan-500 px-7 text-base font-black text-white shadow-2xl shadow-cyan-500/20 transition hover:-translate-y-0.5 hover:shadow-violet-500/25"
@@ -2310,7 +2309,7 @@ function Footer() {
           <div className="mt-5 grid gap-3 text-sm font-bold text-slate-600 dark:text-slate-300">
             <a href={`tel:${contact.phoneRaw}`} className="transition hover:text-violet-700 dark:hover:text-cyan-200">{contact.phone}</a>
             <a href={`mailto:${contact.email}`} className="break-words transition hover:text-violet-700 dark:hover:text-cyan-200">{contact.email}</a>
-            <span>{contact.address}</span>
+            <span className="break-words leading-6">{contact.address}</span>
           </div>
         </div>
 
@@ -2321,7 +2320,7 @@ function Footer() {
           </p>
           <div className="mt-5 flex flex-col gap-3">
             <Button href={payload.isAuthenticated ? payload.dashboardUrl : payload.loginUrl} variant="glow">
-              {payload.isAuthenticated ? 'Dashboard' : 'Kirish'}
+              {payload.isAuthenticated ? 'Profil' : 'Kirish'}
             </Button>
             <Button href={payload.isAuthenticated ? payload.dashboardUrl : payload.registerUrl} variant="ghost">
               Ro'yxatdan o'tish
@@ -2361,7 +2360,7 @@ function App() {
 
       <div className="relative z-10">
         <Header route={route} lang={lang} onToggleLanguage={toggleLanguage} />
-        <div className="fixed bottom-5 right-5 z-50">
+        <div className="fixed bottom-4 right-3 z-50 hidden sm:block sm:bottom-5 sm:right-5">
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
         </div>
         {route === 'clubs' ? (

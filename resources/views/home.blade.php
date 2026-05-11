@@ -15,7 +15,7 @@
             'storeUrl' => route('contacts.store'),
             'phone' => '+998 93 534 90 80',
             'phoneRaw' => '+998935349080',
-            'email' => 'kelajakmarkazlari@gmail.com',
+            'email' => 'samarqandviloyatkelajakmarkazi@gmail.com',
             'address' => '140129, Samarqand sh. Maxmud Qoshg\'ariy, 52-uy. Mo\'ljal: Xotira maydoni',
             'hours' => 'Dushanba - Shanba  09:00 - 18:00',
             'mapUrl' => 'https://maps.google.com/maps?q=39.655984,66.949152&ll=39.655984,66.949152&z=16',
@@ -163,4 +163,3 @@
     window.__KELAJAK_DATA__ = @json($landingPayload);
 </script>
 @endsection
-

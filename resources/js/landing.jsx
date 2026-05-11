@@ -130,7 +130,7 @@ const I18N = {
     langRu: 'Ru',
     heroBadge: "Ta’lim bilan porloq kelajak sari",
     heroTitle: 'Kelajagingiz sari ilk qadamni bugundan boshlang',
-    heroText: "Kelajak Markazi platformasi orqali o‘quvchilar va o‘qituvchilarni boshqarish, darslarni tashkil etish va natijalarni kuzatish imkoniyati yaratiladi.",
+    heroText: "Kelajak Markazi platformasi orqali o‘quvchilar va o‘qituvchilarni boshqarish, darslarni tashkil etish va natijalarni kuzatish imkoniyati yaratadi.",
     sectionNews: 'Yangiliklar',
     sectionNewsTitle: "So'nggi e'lonlardan birinchi 3 ta",
     allNews: 'Barcha yangiliklar',
@@ -1352,6 +1352,51 @@ function ScheduleHeroPreview({ schedules }) {
   );
 }
 
+function TypewriterText({ text, speed = 120, restartDelay = 5000 }) {
+  const [visibleText, setVisibleText] = useState('');
+
+  useEffect(() => {
+    let typingTimer = null;
+    let restartTimer = null;
+    let stopped = false;
+
+    const startTyping = () => {
+      let index = 0;
+      setVisibleText('');
+
+      typingTimer = window.setInterval(() => {
+        if (stopped) {
+          window.clearInterval(typingTimer);
+          return;
+        }
+
+        index += 1;
+        setVisibleText(text.slice(0, index));
+
+        if (index >= text.length) {
+          window.clearInterval(typingTimer);
+          restartTimer = window.setTimeout(startTyping, restartDelay);
+        }
+      }, speed);
+    };
+
+    startTyping();
+
+    return () => {
+      stopped = true;
+      if (typingTimer) window.clearInterval(typingTimer);
+      if (restartTimer) window.clearTimeout(restartTimer);
+    };
+  }, [text, speed, restartDelay]);
+
+  return (
+    <>
+      {visibleText}
+      {visibleText.length < text.length ? <span className="ml-0.5 animate-pulse">|</span> : null}
+    </>
+  );
+}
+
 function SchedulePage({ schedules, clubs }) {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('all');
@@ -2075,7 +2120,7 @@ function Hero({ stats, schedules, lang }) {
         className="mx-auto mt-10 max-w-5xl text-center"
       >
         <div className="inline-flex rounded-full border border-violet-300/50 bg-white/60 px-4 py-2 text-sm font-black uppercase tracking-[0.16em] text-violet-700 shadow-lg shadow-violet-500/10 backdrop-blur dark:border-cyan-300/20 dark:bg-white/8 dark:text-cyan-100">
-          {t(lang, 'heroBadge')}
+          <TypewriterText text={t(lang, 'heroBadge')} speed={120} restartDelay={5000} />
         </div>
         <h1 className="mx-auto mt-7 max-w-[21rem] text-[1.42rem] font-black leading-[1.18] tracking-normal text-slate-950 dark:text-white sm:hidden">
           <span className="block">{t(lang, 'heroTitle')}</span>

@@ -301,5 +301,9 @@ class DatabaseSeeder extends Seeder
                 'status' => 'new',
             ]
         );
+
+        // SamarqandClubsScheduleSeeder intentionally not called here.
+        // Run it manually only once when initial import is needed:
+        // php artisan db:seed --class=SamarqandClubsScheduleSeeder
     }
 }

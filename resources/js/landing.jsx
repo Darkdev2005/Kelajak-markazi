@@ -713,6 +713,186 @@ function FilterSelect({ value, onChange, options, placeholder, compact = false }
   );
 }
 
+function weekdayToIndex(slot) {
+  const raw = String(slot?.weekday || slot?.dayLabel || '').toLowerCase().trim();
+  const key = raw
+    .replace(/['’`]/g, '')
+    .replace(/ё/g, 'e')
+    .replace(/\s+/g, '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
+  const map = {
+    monday: 0,
+    dushanba: 0,
+    tuesday: 1,
+    seshanba: 1,
+    wednesday: 2,
+    chorshanba: 2,
+    thursday: 3,
+    payshanba: 3,
+    friday: 4,
+    juma: 4,
+    saturday: 5,
+    shanba: 5,
+    sunday: 6,
+    yakshanba: 6,
+  };
+
+  return map[key] ?? null;
+}
+
+function formatMonthLabel(date) {
+  return date.toLocaleDateString('uz-UZ', {
+    month: 'long',
+    year: 'numeric',
+  }).replace(/^\p{L}/u, (char) => char.toUpperCase());
+}
+
+function buildCalendarGrid(monthDate) {
+  const year = monthDate.getFullYear();
+  const month = monthDate.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const startOffset = (firstDay.getDay() + 6) % 7; // monday = 0
+  const gridStart = new Date(year, month, 1 - startOffset);
+
+  return Array.from({ length: 42 }, (_, i) => {
+    const day = new Date(gridStart);
+    day.setDate(gridStart.getDate() + i);
+    return day;
+  });
+}
+
+function ScheduleCalendarView({ slots }) {
+  const [monthCursor, setMonthCursor] = useState(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  });
+
+  const headers = ['DUSH', 'SESH', 'CHOR', 'PAY', 'JUM', 'SHAN', 'YAK'];
+  const today = new Date();
+  const monthGrid = useMemo(() => buildCalendarGrid(monthCursor), [monthCursor]);
+
+  const slotSummary = useMemo(() => {
+    const unique = new Map();
+    (slots || []).forEach((slot) => {
+      const idx = weekdayToIndex(slot);
+      if (idx === null) {
+        return;
+      }
+      const key = `${idx}-${slot.startTime}-${slot.endTime}`;
+      if (!unique.has(key)) {
+        unique.set(key, {
+          idx,
+          label: slot.dayLabel || headers[idx],
+          time: `${slot.startTime} - ${slot.endTime}`,
+        });
+      }
+    });
+    return Array.from(unique.values()).sort((a, b) => a.idx - b.idx || a.time.localeCompare(b.time));
+  }, [slots]);
+
+  const slotsByWeekday = useMemo(() => {
+    const map = new Map();
+    (slots || []).forEach((slot) => {
+      const idx = weekdayToIndex(slot);
+      if (idx === null) {
+        return;
+      }
+      const list = map.get(idx) || [];
+      list.push(slot);
+      list.sort((a, b) => String(a.startTime || '').localeCompare(String(b.startTime || '')));
+      map.set(idx, list);
+    });
+    return map;
+  }, [slots]);
+
+  return (
+    <div className="mt-4 rounded-[1.2rem] border border-slate-200 bg-white p-4 sm:p-5">
+      <h5 className="text-2xl font-black text-slate-950">Dars jadvali</h5>
+
+      {slotSummary.length ? (
+        <div className="mt-4 flex flex-wrap gap-3">
+          {slotSummary.slice(0, 1).map((item, index) => (
+            <article key={`${item.label}-${item.time}-${index}`} className="min-w-[180px] rounded-2xl border border-violet-200 bg-violet-50 px-4 py-3">
+              <p className="truncate text-sm font-bold text-slate-400">Boshlang'ich...</p>
+              <p className="mt-1 text-3xl font-black text-[#3a1b78]">{item.time}</p>
+            </article>
+          ))}
+        </div>
+      ) : null}
+
+      <div className="mt-4 h-px bg-slate-200" />
+
+      <div className="mt-4 flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => setMonthCursor((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))}
+          className="inline-grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white text-xl font-black text-slate-500 transition hover:border-violet-300 hover:text-violet-700"
+          aria-label="Oldingi oy"
+        >
+          ‹
+        </button>
+        <div className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2 text-center text-2xl font-black text-slate-900">
+          {formatMonthLabel(monthCursor)}
+        </div>
+        <button
+          type="button"
+          onClick={() => setMonthCursor((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))}
+          className="inline-grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white text-xl font-black text-slate-500 transition hover:border-violet-300 hover:text-violet-700"
+          aria-label="Keyingi oy"
+        >
+          ›
+        </button>
+      </div>
+
+      <div className="mt-3 overflow-x-auto">
+        <div className="min-w-[840px] rounded-xl border border-slate-200">
+          <div className="grid grid-cols-7 border-b border-slate-200 bg-slate-50">
+            {headers.map((header) => (
+              <div key={header} className="px-2 py-2 text-center text-sm font-black tracking-wide text-slate-500">
+                {header}
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-7">
+            {monthGrid.map((day) => {
+              const isCurrentMonth = day.getMonth() === monthCursor.getMonth();
+              const dayIndex = (day.getDay() + 6) % 7;
+              const daySlots = slotsByWeekday.get(dayIndex) || [];
+              const isToday =
+                day.getFullYear() === today.getFullYear()
+                && day.getMonth() === today.getMonth()
+                && day.getDate() === today.getDate();
+
+              return (
+                <div key={day.toISOString()} className={`min-h-[106px] border-r border-b border-slate-200 px-2 py-2 ${isCurrentMonth ? 'bg-white' : 'bg-slate-50/70'}`}>
+                  <div className={`mb-2 text-right text-sm font-bold ${isCurrentMonth ? 'text-slate-800' : 'text-slate-400'}`}>
+                    <span className={`inline-flex h-7 min-w-7 items-center justify-center rounded-lg px-1.5 ${isToday ? 'bg-blue-100 text-blue-700' : ''}`}>
+                      {day.getDate()}
+                    </span>
+                  </div>
+                  <div className="grid gap-1">
+                    {daySlots.slice(0, 2).map((slot, idx) => (
+                      <span key={`${slot.startTime}-${slot.endTime}-${idx}`} className="truncate rounded-md bg-blue-500 px-2 py-1 text-xs font-black text-white">
+                        {slot.startTime} - {slot.endTime}
+                      </span>
+                    ))}
+                    {daySlots.length > 2 ? (
+                      <span className="text-xs font-bold text-slate-500">+{daySlots.length - 2} ta</span>
+                    ) : null}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ClubDetailsModal({ club, slots, onClose }) {
   if (!club) {
     return null;
@@ -801,40 +981,8 @@ function ClubDetailsModal({ club, slots, onClose }) {
         </div>
 
         <div className="border-t border-slate-200 bg-white px-6 py-6 sm:px-8">
-          <h4 className="text-2xl font-black text-slate-950">Dars jadvali</h4>
           {slots?.length ? (
-            <div className="mt-4 grid gap-3 md:grid-cols-2">
-              {slots.map((slot, idx) => (
-                <article key={`${slot.programId || club.id}-${slot.weekday || slot.dayLabel}-${slot.startTime}-${idx}`} className="rounded-[1.05rem] border border-slate-200 bg-slate-50 p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-400">{slot.dayLabel}</p>
-                      <h5 className="mt-2 text-[1.7rem] font-black leading-tight text-slate-950">
-                        {slot.startTime} - {slot.endTime}
-                      </h5>
-                    </div>
-                    <span className={`rounded-full px-3 py-1.5 text-xs font-black ${slot.isOnline ? 'bg-cyan-100 text-cyan-700' : 'bg-violet-100 text-violet-700'}`}>
-                      {slot.isOnline ? 'Online' : 'Offline'}
-                    </span>
-                  </div>
-
-                  <div className="mt-4 grid gap-2.5 text-sm font-semibold text-slate-600">
-                    <div className="flex items-center justify-between gap-4 rounded-xl bg-white px-3 py-2">
-                      <span>O'qituvchi</span>
-                      <strong className="font-black text-slate-900">{slot.mentor || "Belgilanmagan"}</strong>
-                    </div>
-                    <div className="flex items-center justify-between gap-4 rounded-xl bg-white px-3 py-2">
-                      <span>Xona</span>
-                      <strong className="font-black text-slate-900">{slot.room || "Ko'rsatilmagan"}</strong>
-                    </div>
-                    <div className="flex items-center justify-between gap-4 rounded-xl bg-white px-3 py-2">
-                      <span>Sig'im</span>
-                      <strong className="font-black text-slate-900">{slot.capacity || '—'} ta</strong>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
+            <ScheduleCalendarView slots={slots} />
           ) : (
             <div className="mt-4 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-4 text-sm font-semibold text-slate-600">
               Bu to'garak uchun dars jadvali hali kiritilmagan.
@@ -1281,42 +1429,13 @@ function ScheduleProgramModal({ club, slots, onClose }) {
         </div>
 
         <div className="max-h-[70vh] overflow-y-auto p-6 sm:p-8">
-          <div className="grid gap-4 md:grid-cols-2">
-            {slots.map((slot) => (
-              <article key={`${slot.programId || club.id}-${slot.time}-${slot.mentor}`} className="rounded-[1.1rem] border border-slate-200 bg-slate-50 p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-400">{slot.dayLabel}</p>
-                    <h4 className="mt-2 text-xl font-black text-slate-950">{slot.startTime} - {slot.endTime}</h4>
-                  </div>
-                  <span className="rounded-full bg-violet-100 px-3 py-1.5 text-xs font-black text-violet-700">
-                    {slot.isOnline ? 'Online' : 'Offline'}
-                  </span>
-                </div>
-
-                <dl className="mt-4 grid gap-3 text-sm font-semibold text-slate-600">
-                  <div className="flex items-center justify-between gap-4 rounded-xl bg-white px-3 py-2">
-                    <dt>O'qituvchi</dt>
-                    <dd className="font-black text-slate-900">{slot.mentor}</dd>
-                  </div>
-                  <div className="flex items-center justify-between gap-4 rounded-xl bg-white px-3 py-2">
-                    <dt>Xona</dt>
-                    <dd className="font-black text-slate-900">{slot.room || 'Belgilanmagan'}</dd>
-                  </div>
-                  <div className="flex items-center justify-between gap-4 rounded-xl bg-white px-3 py-2">
-                    <dt>Sig'im</dt>
-                    <dd className="font-black text-slate-900">{slot.capacity || '—'} ta</dd>
-                  </div>
-                </dl>
-              </article>
-            ))}
-          </div>
-
-          {!slots.length ? (
+          {slots.length ? (
+            <ScheduleCalendarView slots={slots} />
+          ) : (
             <div className="rounded-[1.1rem] border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm font-bold text-slate-500">
               Bu to'garak uchun dars slotlari hali kiritilmagan.
             </div>
-          ) : null}
+          )}
         </div>
       </div>
     </div>

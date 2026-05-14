@@ -9,6 +9,10 @@
         'registerUrl' => route('register'),
         'dashboardUrl' => route('dashboard'),
         'isAuthenticated' => auth()->check(),
+        'isAdmin' => auth()->check() ? auth()->user()->isAdmin() : false,
+        'adminLessonsUrl' => auth()->check() && auth()->user()->isAdmin()
+            ? route('admin.index', ['section' => 'lessons'])
+            : null,
         'csrfToken' => csrf_token(),
         'flashMessage' => session('ok'),
         'contact' => [

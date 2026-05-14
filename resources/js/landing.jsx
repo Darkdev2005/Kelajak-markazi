@@ -713,12 +713,15 @@ function FilterSelect({ value, onChange, options, placeholder, compact = false }
   );
 }
 
-function ClubDetailsModal({ club, onClose }) {
+function ClubDetailsModal({ club, slots, onClose }) {
   if (!club) {
     return null;
   }
 
   const imageUrl = club.imageUrl || payload.heroImageUrl;
+  const adminLessonsLink = payload.isAdmin && payload.adminLessonsUrl
+    ? appendQuery(payload.adminLessonsUrl, 'program', String(club.id))
+    : null;
 
   return (
     <div className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-sm" onClick={onClose}>
@@ -795,6 +798,67 @@ function ClubDetailsModal({ club, onClose }) {
               </a>
             </div>
           </div>
+        </div>
+
+        <div className="border-t border-slate-200 bg-white px-6 py-6 sm:px-8">
+          <h4 className="text-2xl font-black text-slate-950">Dars jadvali</h4>
+          {slots?.length ? (
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              {slots.map((slot, idx) => (
+                <article key={`${slot.programId || club.id}-${slot.weekday || slot.dayLabel}-${slot.startTime}-${idx}`} className="rounded-[1.05rem] border border-slate-200 bg-slate-50 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-400">{slot.dayLabel}</p>
+                      <h5 className="mt-2 text-[1.7rem] font-black leading-tight text-slate-950">
+                        {slot.startTime} - {slot.endTime}
+                      </h5>
+                    </div>
+                    <span className={`rounded-full px-3 py-1.5 text-xs font-black ${slot.isOnline ? 'bg-cyan-100 text-cyan-700' : 'bg-violet-100 text-violet-700'}`}>
+                      {slot.isOnline ? 'Online' : 'Offline'}
+                    </span>
+                  </div>
+
+                  <div className="mt-4 grid gap-2.5 text-sm font-semibold text-slate-600">
+                    <div className="flex items-center justify-between gap-4 rounded-xl bg-white px-3 py-2">
+                      <span>O'qituvchi</span>
+                      <strong className="font-black text-slate-900">{slot.mentor || "Belgilanmagan"}</strong>
+                    </div>
+                    <div className="flex items-center justify-between gap-4 rounded-xl bg-white px-3 py-2">
+                      <span>Xona</span>
+                      <strong className="font-black text-slate-900">{slot.room || "Ko'rsatilmagan"}</strong>
+                    </div>
+                    <div className="flex items-center justify-between gap-4 rounded-xl bg-white px-3 py-2">
+                      <span>Sig'im</span>
+                      <strong className="font-black text-slate-900">{slot.capacity || '—'} ta</strong>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-4 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-4 text-sm font-semibold text-slate-600">
+              Bu to'garak uchun dars jadvali hali kiritilmagan.
+              {adminLessonsLink ? (
+                <a
+                  href={adminLessonsLink}
+                  className="mt-3 inline-flex min-h-10 items-center justify-center rounded-xl bg-slate-950 px-4 text-sm font-black text-white transition hover:bg-[#3a1b78]"
+                >
+                  Admin panelda jadval qo'shish
+                </a>
+              ) : null}
+            </div>
+          )}
+
+          {adminLessonsLink && slots?.length ? (
+            <div className="mt-4">
+              <a
+                href={adminLessonsLink}
+                className="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-black text-slate-800 transition hover:border-violet-300 hover:text-violet-700"
+              >
+                Admin panelda ushbu to'garak jadvalini tahrirlash
+              </a>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
@@ -942,13 +1006,52 @@ function ClubsHeroPreview({ clubs, categories }) {
   );
 }
 
-function ClubsPage({ clubs }) {
+function ClubsPage({ clubs, schedules }) {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('all');
   const [clubType, setClubType] = useState('all');
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(12);
   const [selectedClub, setSelectedClub] = useState(null);
+
+  const clubSlotsMap = useMemo(() => {
+    const map = new Map();
+    const weekdayOrder = {
+      dushanba: 1,
+      seshanba: 2,
+      chorshanba: 3,
+      payshanba: 4,
+      juma: 5,
+      shanba: 6,
+      yakshanba: 7,
+    };
+
+    (schedules || []).forEach((slot) => {
+      const key = Number(slot.programId);
+      if (!key) {
+        return;
+      }
+      const list = map.get(key) || [];
+      list.push(slot);
+      map.set(key, list);
+    });
+
+    map.forEach((items, key) => {
+      const sorted = [...items].sort((a, b) => {
+        const dayA = weekdayOrder[(a.dayLabel || '').toLowerCase()] || 99;
+        const dayB = weekdayOrder[(b.dayLabel || '').toLowerCase()] || 99;
+        if (dayA !== dayB) {
+          return dayA - dayB;
+        }
+        return String(a.startTime || '').localeCompare(String(b.startTime || ''));
+      });
+      map.set(key, sorted);
+    });
+
+    return map;
+  }, [schedules]);
+
+  const selectedClubSlots = selectedClub ? (clubSlotsMap.get(Number(selectedClub.id)) || []) : [];
 
   const categories = useMemo(() => [...new Set(clubs.map((club) => club.category).filter(Boolean))], [clubs]);
   const clubTypes = useMemo(() => [...new Set(clubs.map((club) => club.clubType).filter(Boolean))], [clubs]);
@@ -1135,7 +1238,7 @@ function ClubsPage({ clubs }) {
         </aside>
       </section>
 
-      <ClubDetailsModal club={selectedClub} onClose={() => setSelectedClub(null)} />
+      <ClubDetailsModal club={selectedClub} slots={selectedClubSlots} onClose={() => setSelectedClub(null)} />
     </div>
   );
 }
@@ -2365,7 +2468,7 @@ function App() {
         </div>
         {route === 'clubs' ? (
           <>
-            <ClubsPage clubs={clubs} />
+            <ClubsPage clubs={clubs} schedules={schedules} />
             <Footer />
           </>
         ) : route === 'schedule' ? (

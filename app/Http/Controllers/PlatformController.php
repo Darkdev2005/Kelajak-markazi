@@ -42,7 +42,6 @@ class PlatformController extends Controller
             ->where('is_active', true)
             ->orderBy('sort_order')
             ->orderBy('start_time')
-            ->limit(10)
             ->get();
 
         $specialCourses = SpecialCourse::query()

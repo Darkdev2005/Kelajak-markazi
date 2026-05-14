@@ -351,13 +351,16 @@
 <section class="grid two section-block reveal" id="admin-lessons">
     <article class="card">
         <h2>Dars jadvali qo'shish</h2>
+        <p style="margin-bottom:10px; color:#64748b; font-weight:600;">
+            Muhim: har bir slot albatta ma'lum bir to'garakka bog'lanadi. Shunda frontda "Batafsil" bosilganda faqat shu to'garak jadvali chiqadi.
+        </p>
         <form method="POST" action="{{ route('admin.lesson-schedules.store') }}" class="form">
             @csrf
             <label>Dastur</label>
-            <select name="program_id">
-                <option value="">Erkin mashg'ulot</option>
+            <select name="program_id" required>
+                <option value="" disabled @selected(($selectedProgramId ?? 0) === 0)>To'garakni tanlang</option>
                 @foreach($programs as $program)
-                    <option value="{{ $program->id }}">{{ $program->title }}</option>
+                    <option value="{{ $program->id }}" @selected(($selectedProgramId ?? 0) === $program->id)>{{ $program->title }}</option>
                 @endforeach
             </select>
             <div class="grid two compact">
@@ -399,13 +402,26 @@
 
     <article class="card">
         <h2>Jadvalni boshqarish</h2>
+        <form method="GET" action="{{ route('admin.index') }}" class="form" style="margin-bottom:14px;">
+            <input type="hidden" name="section" value="lessons">
+            <label>To'garak bo'yicha filter</label>
+            <div class="row gap">
+                <select name="program">
+                    <option value="">Barchasi</option>
+                    @foreach($programs as $program)
+                        <option value="{{ $program->id }}" @selected(($selectedProgramId ?? 0) === $program->id)>{{ $program->title }}</option>
+                    @endforeach
+                </select>
+                <button class="btn ghost" type="submit">Ko'rsatish</button>
+            </div>
+        </form>
         <div class="resource-list">
             @forelse($lessonSchedules as $slot)
                 <details class="resource-item">
                     <summary>
                         <span>
                             <strong>{{ $slot->day_label }} В· {{ $slot->start_time->format('H:i') }}</strong>
-                            <small>{{ $slot->program?->title ?? 'Erkin mashg\'ulot' }} В· {{ $slot->mentor ?? "O'qituvchi belgilanmagan" }}</small>
+                            <small>{{ $slot->program?->title ?? "To'garak biriktirilmagan" }} В· {{ $slot->mentor ?? "O'qituvchi belgilanmagan" }}</small>
                         </span>
                         <em>{{ $slot->is_active ? 'Faol' : 'Yopiq' }}</em>
                     </summary>
@@ -413,8 +429,8 @@
                         @csrf
                         @method('PATCH')
                         <label>Dastur</label>
-                        <select name="program_id">
-                            <option value="">Erkin mashg'ulot</option>
+                        <select name="program_id" required>
+                            <option value="" disabled>To'garakni tanlang</option>
                             @foreach($programs as $program)
                                 <option value="{{ $program->id }}" @selected($slot->program_id === $program->id)>{{ $program->title }}</option>
                             @endforeach
@@ -796,4 +812,3 @@
 </section>
 @endif
 @endsection
-

@@ -290,6 +290,7 @@ class AdminController extends Controller
         if (! in_array($activeSection, $allowedSections, true)) {
             $activeSection = 'programs';
         }
+        $selectedProgramId = (int) $request->integer('program');
 
         $stats = [
             'users' => \App\Models\User::count(),
@@ -315,6 +316,7 @@ class AdminController extends Controller
         $announcements = Announcement::query()->latest('published_at')->latest()->get();
         $lessonSchedules = LessonSchedule::query()
             ->with('program')
+            ->when($selectedProgramId > 0, fn ($query) => $query->where('program_id', $selectedProgramId))
             ->orderBy('sort_order')
             ->latest()
             ->get();
@@ -348,7 +350,8 @@ class AdminController extends Controller
             'contactMessages',
             'studentCouncilMembers',
             'studentCouncilAdvisor',
-            'activeSection'
+            'activeSection',
+            'selectedProgramId'
         ));
     }
 
@@ -480,7 +483,7 @@ class AdminController extends Controller
         $this->ensureAdmin();
 
         $validated = $request->validate([
-            'program_id' => ['nullable', 'exists:programs,id'],
+            'program_id' => ['required', 'exists:programs,id'],
             'weekday' => ['required', 'string', 'max:40'],
             'day_label' => ['required', 'string', 'max:80'],
             'start_time' => ['required', 'date_format:H:i'],
@@ -507,7 +510,7 @@ class AdminController extends Controller
         $this->ensureAdmin();
 
         $validated = $request->validate([
-            'program_id' => ['nullable', 'exists:programs,id'],
+            'program_id' => ['required', 'exists:programs,id'],
             'weekday' => ['required', 'string', 'max:40'],
             'day_label' => ['required', 'string', 'max:80'],
             'start_time' => ['required', 'date_format:H:i'],
